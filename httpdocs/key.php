@@ -17,6 +17,6 @@ header("Access-Control-Allow-Headers: content-type");
 $public_key_file = fopen("../id_rsa.pub", "r") or die("{\"error\":\"unable to open public key file\"}");
 $k = fread($public_key_file, filesize("../id_rsa.pub"));
 fclose($public_key_file);
-$key = stripped_key($k):
+$key = stripped_key($k);
 die("{\"key\":\"$key\"}");
 ?>
