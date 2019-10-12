@@ -7,7 +7,7 @@ function stripped_key($public_key) {
   $l = strlen($public_key) - $footer;
   for($i = $header; $i < $l; $i += 65)
     $stripped .= substr($public_key, $i, 64);
-  $stripped = substr($stripped, 0, -1 - $footer);
+  $stripped = substr($stripped, 0, -2 - $footer);
   return $stripped;
 }
 
