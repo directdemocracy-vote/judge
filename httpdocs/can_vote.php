@@ -8,6 +8,8 @@ if (!isset($_GET['citizen']))
 // the citizen location should match the referendum area.
 // the citizen reputation should be high enough to be allowed to vote.
 
-// die("no");
-die("yes");
+// die("Citizen does not live in referendum area.");
+// die("Ciziten reputation is not high enough to vote.");
+
+die("yes"); // Citizen is allowed to vote to this referendum
 ?>
