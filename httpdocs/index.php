@@ -27,7 +27,7 @@
           <div class="directdemocracy-subtitle" style="position:relative;top:0;margin-bottom:40px">
             <h3>This webservice provides a web of trust</h3>
             <h3>enabling directdemocracy. You can check</h3>
-            <h3>the reputation of all participants here.</h3>
+            <h3>the reputation of all the participants here.</h3>
           </div>
         </div>
         <br>
