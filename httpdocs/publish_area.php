@@ -3,7 +3,9 @@ $version = "0.0.1";
 $publisher = 'https://publisher.directdemocracy.vote';
 
 function error($message) {
-  die("{\"error\":\"$message\"}");
+  if ($message[0] != '{')
+    $message = '"'.$message.'"';
+  die("{\"error\":$message}");
 }
 
 function stripped_key($public_key) {
@@ -32,7 +34,7 @@ fclose($public_key_file);
 $key = stripped_key($k);
 
 $schema = "https://directdemocracy.vote/json-schema/$version/area.schema.json";
-$now = floatval(microtime(true) * 1000);  # milliseconds
+$now = intval(microtime(true) * 1000);  # milliseconds
 $area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => $now,
               'expires' => $now + 365.25 * 24 * 60 * 60 * 1000,  # expires in one year
               'name' => $names, 'polygons' => null);
@@ -64,7 +66,6 @@ $options = array('http' => array('method' => 'POST',
                                  'header' => "Content-Type: application/json\r\n" .
                                              "Accept: application/json\r\n"));
 $response = file_get_contents("$publisher/publish.php", false, stream_context_create($options));
-error($response);
 $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
