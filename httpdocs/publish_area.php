@@ -1,6 +1,6 @@
 <?php
 $version = "0.0.1";
-$station = 'https://station.directdemocracy.vote';
+$publisher = 'https://publisher.directdemocracy.vote';
 
 function error($message) {
   die("{\"error\":\"$message\"}");
@@ -21,7 +21,7 @@ foreach($_GET as $key => $value) {
   $query .= "$key=$value&";
 }
 $url = "https://nominatim.openstreetmap.org/search?". $query . "polygon_geojson=1&format=json";
-$options = [ "http" => [ "method" => "GET", "header" => "User-agent: directdemocracy\r\n" ] ];
+$options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemocracy\r\n" ] ];
 $context = stream_context_create($options);
 $result = file_get_contents($url, false, $context);
 $search = json_decode($result);
@@ -58,6 +58,15 @@ if ($success === FALSE)
 $area['signature'] = base64_encode($signature);
 
 # publish area
+$area_data = json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+$options = array('http' => array('method' => 'POST',
+                                 'content' => $area_data,
+                                 'header' => "Content-Type: application/json\r\n" .
+                                             "Accept: application/json\r\n"));
+$response = file_get_contents("$publisher/publish.php", false, stream_context_create($options));
+$json = json_decode($response);
+if (isset($json->error))
+  error($json->error);
 
 echo("<h1>Published area</h1>");
 # echo ("<pre>".json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)."</pre>");
