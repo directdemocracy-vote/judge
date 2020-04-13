@@ -68,10 +68,6 @@ $options = array('http' => array('method' => 'POST',
 $response = file_get_contents("$publisher/publish.php", false, stream_context_create($options));
 $json = json_decode($response);
 
-echo ("<pre>".json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)."</pre>");
-
-error($response);
-
 if (isset($json->error))
   error($json->error);
 
