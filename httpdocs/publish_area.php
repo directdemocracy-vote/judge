@@ -39,13 +39,13 @@ $area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published'
               'name' => $names, 'polygons' => null);
 $place = $search[0];
 $geojson = $place->geojson;
-$polygons = array();
 if ($geojson->type == 'Polygon') {
-  array_push($polygons, array($geojson->coordinates));
-} elseif ($geojson->type == 'MultiPolygon') {
+  $polygons = array();
   array_push($polygons, $geojson->coordinates);
+} elseif ($geojson->type == 'MultiPolygon') {
+  $polygons = &$geojson->coordinates;
 }
-$area['polygons'] = $polygons;
+$area['polygons'] = &$polygons;
 
 # sign area
 $data = json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
