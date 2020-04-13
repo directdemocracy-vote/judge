@@ -1,12 +1,25 @@
 <?php
 $version = "0.0.1";
 $station = 'https://station.directdemocracy.vote';
+
+function error($message) {
+  die("{\"error\":\"$message\"}");
+}
+
+function stripped_key($public_key) {
+  $stripped = str_replace("-----BEGIN PUBLIC KEY-----", "", $public_key);
+  $stripped = str_replace("-----END PUBLIC KEY-----", "", $stripped);
+  $stripped = str_replace("\r\n", '', $stripped);
+  $stripped = str_replace("\n", '', $stripped);
+  return $stripped;
+}
+
 $names = '';
 $query = '';
-foreach($_GET as $get) {
+foreach($_GET as $key => $value) {
   echo $get;
-  $names .= $get . "\n";
-  $query .= $get . "&";
+  $names .= "$key=$value\n";
+  $query .= "$key=$value&";
 }
 $url = "https://nominatim.openstreetmap.org/search?". $query . "polygon_geojson=1&format=json";
 $options = [ "http" => [ "method" => "GET", "header" => "User-agent: directdemocracy\r\n" ] ];
