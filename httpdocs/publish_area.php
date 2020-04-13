@@ -31,21 +31,37 @@ foreach($_GET as $key => $value) {
 if ($message)
   $message = substr($message, 0, -2);
 
+# check if the area is not already published with a validity of at least 1 year.
+$public_key_file = fopen("../id_rsa.pub", "r") or die("{\"error\":\"unable to open public key file\"}");
+$k = fread($public_key_file, filesize("../id_rsa.pub"));
+fclose($public_key_file);
+$key = stripped_key($k);
+
+$request = array("trustee" => $key, "area" => $names);
+$data = json_encode($request, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+$options = array('http' => array('method' => 'POST',
+                                 'content' => $data,
+                                 'header' => "Content-Type: application/json\r\n" .
+                                             "Accept: application/json\r\n"));
+$response = file_get_contents("$publisher/area.php", false, stream_context_create($options));
+$json = json_decode($response);
+if (isset($json->error))
+  error($json->error);
+$now = intval(microtime(true) * 1000);  # milliseconds
+if (isset($json->expires)) {
+  if ($json->expires > $now + 365.25 * 25 * 60 * 60 * 1000)
+  die("{\"status\":\"Already published area: $message\"}");
+}
+
 $url = "https://nominatim.openstreetmap.org/search?". $query . "polygon_geojson=1&format=json";
 $options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemocracy\r\n" ] ];
 $context = stream_context_create($options);
 $result = file_get_contents($url, false, $context);
 $search = json_decode($result);
 
-$public_key_file = fopen("../id_rsa.pub", "r") or die("{\"error\":\"unable to open public key file\"}");
-$k = fread($public_key_file, filesize("../id_rsa.pub"));
-fclose($public_key_file);
-$key = stripped_key($k);
-
 $schema = "https://directdemocracy.vote/json-schema/$version/area.schema.json";
-$now = intval(microtime(true) * 1000);  # milliseconds
 $area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => $now,
-              'expires' => $now + 365.25 * 24 * 60 * 60 * 1000,  # expires in one year
+              'expires' => $now + 2 * 365.25 * 24 * 60 * 60 * 1000,  # expires in 2 years
               'name' => $names, 'polygons' => null);
 if (count($search) == 0)
   die("Area not found: $message");
@@ -78,7 +94,6 @@ $options = array('http' => array('method' => 'POST',
                                              "Accept: application/json\r\n"));
 $response = file_get_contents("$publisher/publish.php", false, stream_context_create($options));
 $json = json_decode($response);
-
 if (isset($json->error))
   error($json->error);
 
