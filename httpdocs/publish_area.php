@@ -41,7 +41,7 @@ $place = $search[0];
 $geojson = $place->geojson;
 if ($geojson->type == 'Polygon') {
   $polygons = array();
-  array_push($polygons, $geojson->coordinates);
+  array_push($polygons, &$geojson->coordinates);
 } elseif ($geojson->type == 'MultiPolygon') {
   $polygons = &$geojson->coordinates;
 }
