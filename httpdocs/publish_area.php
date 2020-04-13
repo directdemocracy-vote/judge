@@ -49,9 +49,11 @@ if (isset($json->error))
   error($json->error);
 $now = intval(microtime(true) * 1000);  # milliseconds
 if (isset($json->expires)) {
-  if ($json->expires > $now + 365.25 * 25 * 60 * 60 * 1000)
+  if ($json->expires > $now + 365.25 * 24 * 60 * 60 * 1000)
   die("{\"status\":\"Already published area: $message\"}");
 }
+
+die("json->expires = " . $json->expires. " > ". ($now + 365.25 * 24 * 60 * 60 * 1000));
 
 $url = "https://nominatim.openstreetmap.org/search?". $query . "polygon_geojson=1&format=json";
 $options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemocracy\r\n" ] ];
