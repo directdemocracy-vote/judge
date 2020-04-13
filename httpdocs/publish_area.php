@@ -40,7 +40,7 @@ $area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published'
 $place = $search[0];
 $geojson = $place->geojson;
 $polygons = array();
-if ($jeojson->type == 'Polygon') {
+if ($geojson->type == 'Polygon') {
   array_push($polygon, array($geojson->coordinates));
 } elseif ($geojson->type == 'MultiPolygon') {
   array_push($polygon, $geojson->coordinates);
@@ -55,7 +55,7 @@ $signature = '';
 $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
 if ($success === FALSE)
   error("Failed to sign area.");
-$area->signature = base64_encode($signature);
+$area['signature'] = base64_encode($signature);
 
 # publish area
 
