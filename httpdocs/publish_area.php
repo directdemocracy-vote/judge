@@ -17,7 +17,6 @@ function stripped_key($public_key) {
 $names = '';
 $query = '';
 foreach($_GET as $key => $value) {
-  echo "$key=$value<br>\n";
   $names .= "$key=$value\n";
   $query .= "$key=$value&";
 }
@@ -60,5 +59,5 @@ $area['signature'] = base64_encode($signature);
 
 # publish area
 
-die("<h1>Published area</h1><pre>".json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."</pre>");
+die("<h1>Published area</h1><pre>".json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)."</pre>");
 ?>
