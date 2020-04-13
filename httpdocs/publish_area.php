@@ -18,10 +18,15 @@ function stripped_key($public_key) {
 
 $names = '';
 $query = '';
+$message = '';
 foreach($_GET as $key => $value) {
   $names .= "$key=$value\n";
   $query .= "$key=$value&";
+  $message .= "$value, ";
 }
+if ($message)
+  $message = substr($message, 0, -2);
+
 $url = "https://nominatim.openstreetmap.org/search?". $query . "polygon_geojson=1&format=json";
 $options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemocracy\r\n" ] ];
 $context = stream_context_create($options);
@@ -72,6 +77,8 @@ if (isset($json->error))
   error($json->error);
 
 echo("<h1>Published area</h1>");
+echo("<p>$message</p>");
+
 # echo ("<pre>".json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)."</pre>");
 
 ?>
