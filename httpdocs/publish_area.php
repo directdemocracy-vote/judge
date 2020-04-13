@@ -41,9 +41,9 @@ $place = $search[0];
 $geojson = $place->geojson;
 $polygons = array();
 if ($geojson->type == 'Polygon') {
-  array_push($polygon, array($geojson->coordinates));
+  array_push($polygons, array($geojson->coordinates));
 } elseif ($geojson->type == 'MultiPolygon') {
-  array_push($polygon, $geojson->coordinates);
+  array_push($polygons, $geojson->coordinates);
 }
 
 # sign area
@@ -59,5 +59,5 @@ $area['signature'] = base64_encode($signature);
 
 # publish area
 
-die(json_encode($area));
+die(json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 ?>
