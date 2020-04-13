@@ -45,6 +45,7 @@ if ($geojson->type == 'Polygon') {
 } elseif ($geojson->type == 'MultiPolygon') {
   array_push($polygons, $geojson->coordinates);
 }
+$area['polygons'] = $polygons;
 
 # sign area
 $data = json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
