@@ -16,6 +16,10 @@ function stripped_key($public_key) {
   return $stripped;
 }
 
+header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: content-type");
+
 $names = '';
 $query = '';
 $message = '';
@@ -78,9 +82,6 @@ $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
 
-echo("<h1>Published area</h1>");
-echo("<p>$message</p>");
-
-# echo ("<pre>".json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)."</pre>");
+die("{\"status\":\"Published area: $message\"}");
 
 ?>
