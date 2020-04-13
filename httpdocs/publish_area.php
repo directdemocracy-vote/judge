@@ -43,6 +43,8 @@ $now = intval(microtime(true) * 1000);  # milliseconds
 $area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => $now,
               'expires' => $now + 365.25 * 24 * 60 * 60 * 1000,  # expires in one year
               'name' => $names, 'polygons' => null);
+if (count($search) == 0)
+  die("Area not found: $message");
 $place = $search[0];
 $geojson = $place->geojson;
 if ($geojson->type == 'Polygon') {
