@@ -44,7 +44,7 @@ if ($geojson->type == 'Polygon') {
   $polygons = array();
   array_push($polygons, $geojson->coordinates);
 } elseif ($geojson->type == 'MultiPolygon') {
-  $polygons = &($geojson->coordinates);
+  $polygons = $geojson->coordinates;
 } else
   error("Unsupported geometry type: '$geojson->type'");
 $area['polygons'] = &$polygons;
