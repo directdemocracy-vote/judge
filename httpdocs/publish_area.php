@@ -38,12 +38,12 @@ $area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published'
               'expires' => $now + 365.25 * 24 * 60 * 60 * 1000,  # expires in one year
               'name' => $names, 'polygons' => null);
 $place = $search[0];
-$geojson = $place['geojson'];
+$geojson = $place->geojson;
 $polygons = array();
-if ($jeojson['type'] == 'Polygon') {
-  array_push($polygon, array($geojson['coordinates']));
-} elseif ($geojson['type'] == 'MultiPolygon') {
-  array_push($polygon, $geojson['coordinates']);
+if ($jeojson->type == 'Polygon') {
+  array_push($polygon, array($geojson->coordinates));
+} elseif ($geojson->type == 'MultiPolygon') {
+  array_push($polygon, $geojson->coordinates);
 }
 
 # sign area
