@@ -59,5 +59,7 @@ $area['signature'] = base64_encode($signature);
 
 # publish area
 
-die("<h1>Published area</h1><pre>".json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)."</pre>");
+echo("<h1>Published area</h1>");
+# echo ("<pre>".json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)."</pre>");
+
 ?>
