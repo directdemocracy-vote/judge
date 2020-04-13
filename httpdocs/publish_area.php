@@ -64,8 +64,8 @@ $options = array('http' => array('method' => 'POST',
                                  'header' => "Content-Type: application/json\r\n" .
                                              "Accept: application/json\r\n"));
 $response = file_get_contents("$publisher/publish.php", false, stream_context_create($options));
+error($response);
 $json = json_decode($response);
-error($json);
 if (isset($json->error))
   error($json->error);
 
