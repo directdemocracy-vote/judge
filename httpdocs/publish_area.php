@@ -44,11 +44,10 @@ if ($geojson->type == 'Polygon') {
   $polygons = array();
   array_push($polygons, $geojson->coordinates);
 } elseif ($geojson->type == 'MultiPolygon') {
-  $polygons = $geojson->coordinates;
+  $polygons = &($geojson->coordinates);
 } else
   error("Unsupported geometry type: '$geojson->type'");
 $area['polygons'] = &$polygons;
-
 # sign area
 $data = json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 $private_key = openssl_get_privatekey("file://../id_rsa");
@@ -68,6 +67,9 @@ $options = array('http' => array('method' => 'POST',
                                              "Accept: application/json\r\n"));
 $response = file_get_contents("$publisher/publish.php", false, stream_context_create($options));
 $json = json_decode($response);
+
+echo ("<pre>".json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)."</pre>");
+
 if (isset($json->error))
   error($json->error);
 
