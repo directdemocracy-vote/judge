@@ -17,7 +17,7 @@ function stripped_key($public_key) {
 $names = '';
 $query = '';
 foreach($_GET as $key => $value) {
-  echo $get;
+  echo "$key=$value<br>\n";
   $names .= "$key=$value\n";
   $query .= "$key=$value&";
 }
@@ -33,11 +33,12 @@ fclose($public_key_file);
 $key = stripped_key($k);
 
 $schema = "https://directdemocracy.vote/json-schema/$version/area.schema.json";
+$now = floatval(microtime(true) * 1000);  # milliseconds
 $area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => $now,
               'expires' => $now + 365.25 * 24 * 60 * 60 * 1000,  # expires in one year
               'name' => $names, 'polygons' => null);
 $place = $search[0];
-$jeojson = $place['jeoson'];
+$jeojson = $place['jeojson'];
 $polygons = array();
 if ($jeojson['type'] == 'Polygon') {
   array_push($polygon, array($jeojson['coordinates']));
