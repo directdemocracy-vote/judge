@@ -23,6 +23,8 @@ $status = $result->fetch_assoc();
 $result->free();
 $last_update = floatval($status['lastUpdate']);
 
+$last_update = 0;  #FIXME
+
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
 $url = "$publisher/publications.php?type=endorsement&published_from=$last_update";
