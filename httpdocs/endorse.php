@@ -25,7 +25,7 @@ $last_update = floatval($status['lastUpdate']);
 
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
-$url = "$publisher/publications.php?type=endorsement&published_from=$status->lastUpdate";
+$url = "$publisher/publications.php?type=endorsement&published_from=$last_update";
 $response = file_get_contents($url, false, stream_context_create($options));
 $endorsements = json_decode($response);
 if (isset($endorsements->error))
@@ -51,7 +51,7 @@ foreach($endorsements as $endorsement) {
     $row = $result->fetch_assoc();
     $endorser = $row['id'];
   }
-  $key = $endorsement->publication->key;
+  $key = $endorsement['publication']['key'];
   $query = "SELECT id FROM entity WHERE `key`='$key'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
