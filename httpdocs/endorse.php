@@ -84,7 +84,7 @@ $count = $result->fetch_assoc();
 $N = $count['N'];
 
 for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
-  $query = "SELECT id, level FROM reputation"
+  $query = "SELECT id, level FROM reputation";
   $result = $mysqli->query($query) or error($mysqli->error);
   while($reputation = $result->fetch_assoc()) {
     $id = intval($reputation['id']);
