@@ -112,7 +112,7 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
 }
 
 $count = 0;
-$query = "SELECT reputation.level, entity.`key` FROM reputation LEFT JOIN entity WHERE entity.id=reputation.id";
+$query = "SELECT reputation.level, entity.`key` FROM reputation LEFT JOIN entity ON entity.id=reputation.id";
 $result = $mysqli->query($query) or error($mysqli->error);
 while($reputation = $result->fetch_assoc()) {
   $id = intval($reputation['key']);
