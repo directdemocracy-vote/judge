@@ -23,8 +23,7 @@ $status = $result->fetch_assoc();
 $result->free();
 $last_update = floatval($status['lastUpdate']);
 
-$options = array('http' => array('method' => 'POST',
-                                 'content' => $data,
+$options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
 $url = "$publisher/publications.php?type=endorsement&published_from=$status->lastUpdate";
 $response = file_get_contents($url, false, stream_context_create($options));
