@@ -17,7 +17,7 @@ if ($mysqli->connect_errno)
   error("Failed to connect to MySQL database: $mysqli->connect_error ($mysqli->connect_errno)");
 $mysqli->set_charset('utf8mb4');
 
-$query = "SELECT lastUpdate FROM status"
+$query = "SELECT lastUpdate FROM status";
 $result = $mysqli->query($query) or error($mysqli->error);
 $status = $result->fetch_object();
 $result->free();
