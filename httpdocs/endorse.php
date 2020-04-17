@@ -19,9 +19,9 @@ $mysqli->set_charset('utf8mb4');
 
 $query = "SELECT lastUpdate FROM status";
 $result = $mysqli->query($query) or error($mysqli->error);
-$status = $result->fetch_object();
+$status = $result->fetch_assoc();
 $result->free();
-$last_update = floatval($status->lastUpdate);
+$last_update = floatval($status['lastUpdate']);
 
 $options = array('http' => array('method' => 'POST',
                                  'content' => $data,
