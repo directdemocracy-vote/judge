@@ -54,13 +54,10 @@ foreach($endorsements as $endorsement) {
     $row = $result->fetch_assoc();
     $endorser = $row['id'];
   }
-  die(json_encode($endorsement));
-  $endorsement_p = $endorsement->publication;
-  $key = $endorsement_p->key;
-  $query = "SELECT id FROM entity WHERE `key`='$key'";
+  $query = "SELECT id FROM entity WHERE `key`='$endorsement->key'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
-    $query = "INSERT INTO entity(`key`) VALUES('$key')";
+    $query = "INSERT INTO entity(`key`) VALUES('$endorsement->key')";
     $mysqli->query($query) or error($mysqli->error);
     $endorsed = $mysqli->insert_id;
     $query = "INSERT INTO reputation(id, level) VALUES($endorsed, 1)";
