@@ -54,8 +54,8 @@ foreach($endorsements as $endorsement) {
     $row = $result->fetch_assoc();
     $endorser = $row['id'];
   }
-  $endorsement_p = $endorsement['publication'];
-  $key = $endorsement_p['key'];
+  $endorsement_p = $endorsement->publication;
+  $key = $endorsement_p->key;
   $query = "SELECT id FROM entity WHERE `key`='$key'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
