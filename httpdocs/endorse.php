@@ -116,15 +116,19 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
 }
 
 $count = 0;
+$table = '<table>';
 $query = "SELECT reputation.level, entity.`key` FROM reputation LEFT JOIN entity ON entity.id=reputation.id";
 $result = $mysqli->query($query) or error($mysqli->error);
 while($reputation = $result->fetch_assoc()) {
   $id = intval($reputation['key']);
   $level = floatval($reputation['level']);
+  $table .= "<tr><td>$id</td><td>$level</td></tr>";
   if ($level > 1) {
     # publish endorsement for citizen is allowed to vote by this trustee
     $count++;
   }
 }
-die("endorsed $count citizens from $N");
+$table .= '<table>';
+
+die("endorsed $count citizens from $N:\n$table");
 ?>
