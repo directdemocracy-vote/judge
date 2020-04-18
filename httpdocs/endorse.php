@@ -126,7 +126,7 @@ while($reputation = $result->fetch_assoc()) {
   $id = intval($reputation['id']);
   $level = floatval($reputation['level']);
   $table .= "$id:\t$level\n";
-  if ($level > 1) {
+  if ($level > 0.5) {
     # publish endorsement for citizen is allowed to vote by this trustee
     $count++;
   }
