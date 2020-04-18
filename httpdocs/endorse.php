@@ -62,7 +62,6 @@ foreach($endorsements as $endorsement) {
     $row = $result->fetch_assoc();
     $endorsed = $row['id'];
   }
-  $query = "INSERT IGNORE INTO reputation(id, level) VALUES($endorsed, 1) ";
   $mysqli->query($query) or error($mysqli->error);
   if (isset($endorsement->revoke) && $endorsement->revoke)
     $query = "DELETE FROM link WHERE endorser=$endorser AND endorsed=$endorsed";
@@ -74,8 +73,8 @@ foreach($endorsements as $endorsement) {
 }
 
 # cleanup entities
-$query = "DELETE entity FROM entity LEFT JOIN link ON link.endorsed=entity.id WHERE endorsed IS NULL";
-$mysqli->query($query) or error($mysqli->error);
+# $query = "DELETE entity FROM entity LEFT JOIN link ON link.endorsed=entity.id WHERE endorsed IS NULL";
+# $mysqli->query($query) or error($mysqli->error);
 
 # run page rank algorithm, see https://en.wikipedia.org/wiki/PageRank
 $d = 0.85;  # d is the damping parameter (default value is 0.85)
@@ -89,11 +88,10 @@ $N = $count['N'];
 $debug = '';
 
 for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
-  $query = "SELECT id, level FROM reputation";
+  $query = "SELECT id FROM entity";
   $result = $mysqli->query($query) or error($mysqli->error);
-  while($reputation = $result->fetch_assoc()) {
-    $id = intval($reputation['id']);
-    $level = floatval($reputation['level']);
+  while($entity = $result->fetch_assoc()) {
+    $id = intval($entity['id']);
     $query = "SELECT endorser FROM link WHERE endorsed=$id";
     $r0 = $mysqli->query($query) or error($mysqli->error);
     $sum = 0;
@@ -104,29 +102,29 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
       $count = $r1->fetch_assoc();
       $Lj = intval($count['c']);
       $r1->free();
-      $query = "SELECT level FROM reputation WHERE id=$endorser";
+      $query = "SELECT reputation FROM entity WHERE id=$endorser";
       $r1 = $mysqli->query($query) or error($mysqli->error);
-      $level = $r1->fetch_assoc();
-      $PRj = floatval($level['level']);
+      $e = $r1->fetch_assoc();
+      $PRj = floatval($e['reputation']);
       $r1->free();
       $sum += $PRj / $Lj;
     }
     $r0->free();
     $PR = (1 - $d) / $N + $d * $sum;
-    $query = "UPDATE reputation SET level=$PR WHERE id=$id";
+    $query = "UPDATE entity SET reputation=$PR WHERE id=$id";
     $mysqli->query($query) or error($mysqli->error);
   }
 }
 
 $count = 0;
 $table = '';
-$query = "SELECT reputation.id, reputation.level, entity.`key` FROM reputation LEFT JOIN entity ON entity.id=reputation.id";
+$query = "SELECT id, reputation, `key` FROM entity WHERE reputation > 0";
 $result = $mysqli->query($query) or error($mysqli->error);
-while($reputation = $result->fetch_assoc()) {
-  $id = intval($reputation['id']);
-  $level = floatval($reputation['level']);
-  $table .= "$id:\t$level\n";
-  if ($level > 0.5) {
+while($entity = $result->fetch_assoc()) {
+  $id = intval($entity['id']);
+  $reputation = floatval($entity['reputation']);
+  $table .= "$id:\t$reputation\n";
+  if ($reputation > 0.5) {
     # publish endorsement for citizen is allowed to vote by this trustee
     $count++;
   }
