@@ -54,6 +54,7 @@ foreach($endorsements as $endorsement) {
     $row = $result->fetch_assoc();
     $endorser = $row['id'];
   }
+  die(json_encode($endorsement));
   $endorsement_p = $endorsement->publication;
   $key = $endorsement_p->key;
   $query = "SELECT id FROM entity WHERE `key`='$key'";
