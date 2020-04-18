@@ -23,6 +23,8 @@ $status = $result->fetch_assoc();
 $result->free();
 $last_update = floatval($status['lastUpdate']);
 
+$last_update = 0;
+
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
 $url = "$publisher/publications.php?type=endorsement&published_from=$last_update";
@@ -58,12 +60,12 @@ foreach($endorsements as $endorsement) {
     $query = "INSERT INTO entity(`key`) VALUES('$endorsement->key')";
     $mysqli->query($query) or error($mysqli->error);
     $endorsed = $mysqli->insert_id;
-    $query = "INSERT INTO reputation(id, level) VALUES($endorsed, 1)";
-    $mysqli->query($query) or error($mysqli->error);
   } else {
     $row = $result->fetch_assoc();
     $endorsed = $row['id'];
   }
+  $query = "INSERT IGNORE INTO reputation(id, level) VALUES($endorsed, 1) ";
+  $mysqli->query($query) or error($mysqli->error);
   if (isset($endorsement->revoke) && $endorsement->revoke)
     $query = "DELETE FROM link WHERE endorser=$endorser AND endorsed=$endorsed";
   else
