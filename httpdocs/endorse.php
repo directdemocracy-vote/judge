@@ -122,5 +122,5 @@ while($reputation = $result->fetch_assoc()) {
     $count++;
   }
 }
-die("endorsed $count citizens");
+die("endorsed $count citizens from $N");
 ?>
