@@ -47,7 +47,7 @@ foreach($endorsements as $endorsement) {
   $query = "SELECT id FROM entity WHERE `key`='$endorsement->key'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
-    $query = "INSERT INTO entity(`key`) VALUES('$endorsement->key')";
+    $query = "INSERT IGNORE INTO entity(`key`) VALUES('$endorsement->key')";
     $mysqli->query($query) or error("$query $mysqli->error");
     $endorser = $mysqli->insert_id;
   } else {
@@ -57,7 +57,7 @@ foreach($endorsements as $endorsement) {
   $query = "SELECT id FROM entity WHERE `key`='$endorsement->key'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
-    $query = "INSERT INTO entity(`key`) VALUES('$endorsement->key')";
+    $query = "INSERT IGNORE INTO entity(`key`) VALUES('$endorsement->key')";
     $mysqli->query($query) or error($mysqli->error);
     $endorsed = $mysqli->insert_id;
   } else {
@@ -74,6 +74,10 @@ foreach($endorsements as $endorsement) {
             ."ON DUPLICATE KEY UPDATE published=$endorsement->published, expires=$endorsement->expires";
   $mysqli->query($query) or error($mysqli->error);
 }
+
+# cleanup entities
+$query = "DELETE entity FROM entity LEFT JOIN link ON link.endorsed=entity.id WHERE endorsed IS NULL";
+$mysqli->query($query) or error($mysqli->error);
 
 # run page rank algorithm, see https://en.wikipedia.org/wiki/PageRank
 $d = 0.85;  # d is the damping parameter (default value is 0.85)
