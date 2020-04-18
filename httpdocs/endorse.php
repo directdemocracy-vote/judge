@@ -46,7 +46,7 @@ foreach($endorsements as $endorsement) {
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
     $query = "INSERT INTO entity(`key`) VALUES('$endorsement->key')";
-    $mysqli->query($query) or error($mysqli->error);
+    $mysqli->query($query) or error("$query $mysqli->error");
     $endorser = $mysqli->insert_id;
   } else {
     $row = $result->fetch_assoc();
