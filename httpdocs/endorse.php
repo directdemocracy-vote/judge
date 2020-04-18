@@ -86,6 +86,8 @@ $result = $mysqli->query($query) or error($mysqli->error);
 $count = $result->fetch_assoc();
 $N = $count['N'];
 
+$debug = '';
+
 for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
   $query = "SELECT id, level FROM reputation";
   $result = $mysqli->query($query) or error($mysqli->error);
@@ -112,6 +114,7 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
     $r0->free();
     $PR = (1 - $d) / $N + $d * $sum;
     $query = "UPDATE reputation SET level=$PR WHERE id=$id";
+    $mysqli->query($query) or error($mysqli->error);
   }
 }
 
@@ -122,12 +125,12 @@ $result = $mysqli->query($query) or error($mysqli->error);
 while($reputation = $result->fetch_assoc()) {
   $id = intval($reputation['id']);
   $level = floatval($reputation['level']);
-  $table .= "$id: $level\n";
+  $table .= "$id:\t$level\n";
   if ($level > 1) {
     # publish endorsement for citizen is allowed to vote by this trustee
     $count++;
   }
 }
 
-die("endorsed $count citizens from $N:\n$table");
+die("endorsed $count citizens out of $N:\n$table");
 ?>
