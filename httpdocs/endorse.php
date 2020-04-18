@@ -27,7 +27,7 @@ $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
 $url = "$publisher/publications.php?type=endorsement&published_from=$last_update";
 $response = file_get_contents($url, false, stream_context_create($options));
-die($response);
+
 $endorsements = json_decode($response);
 if (isset($endorsements->error))
   error($endorsements->error);
