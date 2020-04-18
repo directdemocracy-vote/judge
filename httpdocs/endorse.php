@@ -111,7 +111,7 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
     }
     $r0->free();
     $PR = (1 - $d) / $N + $d * $sum;
-    $query = "UPDATE reputation SET level=$PR WHERE id=$endorsed";
+    $query = "UPDATE reputation SET level=$PR WHERE id=$id";
   }
 }
 
