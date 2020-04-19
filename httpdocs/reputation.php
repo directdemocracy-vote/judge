@@ -25,5 +25,5 @@ if ($entity) {
   $reputation = 0;
   $endorsed = 'false';
 }
-die("{\"reputation\":$reputation,\"endorsed\":$endorsed}");
+die("{\"reputation\":$reputation,\"endorsed\":$endorsed,\"update\":\"$response\"}");
 ?>
