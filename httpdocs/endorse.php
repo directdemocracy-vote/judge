@@ -47,10 +47,14 @@ $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
 $url = "$publisher/publications.php?type=endorsement&published_from=$last_update";
 $response = file_get_contents($url, false, stream_context_create($options));
-
 $endorsements = json_decode($response);
 if (isset($endorsements->error))
   error($endorsements->error);
+
+$public_key_file = fopen("../id_rsa.pub", "r") or error("Failed to read public key file");
+$k = fread($public_key_file, filesize("../id_rsa.pub"));
+fclose($public_key_file);
+$public_key = stripped_key($k);
 
 $now = floatval(microtime(true) * 1000);  # milliseconds
 $query = "UPDATE status SET lastUpdate=$now";
@@ -62,6 +66,8 @@ $mysqli->query($query) or error($mysqli->error);
 
 # insert endorser and endorsed in entities, links
 foreach($endorsements as $endorsement) {
+  if ($endorsement->key == $public_key)  # ignore mine
+    continue;
   $query = "SELECT id FROM entity WHERE `key`='$endorsement->key' AND signature='$endorsement->signature'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
@@ -144,22 +150,28 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
   }
 }
 
-$count = 0;
+$count_e = 0;
+$count_r = 0;
 $table = '';
 $schema = "https://directdemocracy.vote/json-schema/$version/endorsement.schema.json";
-$public_key_file = fopen("../id_rsa.pub", "r") or error("Failed to read public key file");
-$k = fread($public_key_file, filesize("../id_rsa.pub"));
-fclose($public_key_file);
-$key = stripped_key($k);
 $private_key = openssl_get_privatekey("file://../id_rsa") or error("Failed to read private key file");
-$query = "SELECT id, `key`, signature, reputation FROM entity WHERE expires < $now";
+$query = "SELECT id, `key`, signature, endorsed, reputation FROM entity WHERE expires < $now";
 $result = $mysqli->query($query) or error($mysqli->error);
 while($entity = $result->fetch_assoc()) {
   $id = intval($entity['id']);
   $reputation = floatval($entity['reputation']);
   $table .= "$id:\t$reputation\n";
-  $endorsement = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => $now, 'expires' => $one_year,
-                'publication' => array('key' => $entity['key'], 'signature' => $entity['signature']));
+  $endorsement = array('schema' => $schema,
+                       'key' => $public_key,
+                       'signature' => '',
+                       'published' => $now,
+                       'expires' => $one_year);
+  if ($entity['endorsed'] == 0) {
+    $count_r++;
+    $endorsement['revoke'] = 1;
+  } else
+    $count_e++;
+  $endorsement['publication'] = array('key' => $entity['key'], 'signature' => $entity['signature']);
   $signature = '';
   $data = json_encode($endorsement, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
@@ -167,11 +179,20 @@ while($entity = $result->fetch_assoc()) {
     error("Failed to sign endorsement");
   $endorsement['signature'] = base64_encode($signature);
   # publish endorsement for citizen is allowed to vote by this trustee
+  $data = json_encode($endorsement, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+  $options = array('http' => array('method' => 'POST',
+                                   'content' => $data,
+                                   'header' => "Content-Type: application/json\r\n" .
+                                               "Accept: application/json\r\n"));
+  $response = file_get_contents("$publisher/publish.php", false, stream_context_create($options));
+  $json = json_decode($response);
+  if (isset($json->error))
+    error($json->error);
+
   $one_year_minus_one_month = $one_year - 30 * 24 * 60 * 60 * 1000;
   $query = "UPDATE entity SET expires=$one_year_minus_one_month WHERE id=$id";
   $mysqli->query($query) or error($mysqli->error);
-  $count++;
 }
 
-die("endorsed $count citizens out of $N:\n$table");
+die("endorsed $count_e and revoked $count_r citizens out of $N:\n$table");
 ?>
