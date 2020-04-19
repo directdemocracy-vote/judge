@@ -73,7 +73,6 @@ foreach($endorsements as $endorsement) {
     $row = $result->fetch_assoc();
     $endorser = $row['id'];
   }
-  die(json_encode($endorsement, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
   $key = $endorsement->publication->key;
   $signature = $endorsement->publication->signature;
   $query = "SELECT id FROM entity WHERE `key`='$key' AND signature='$signature'";
