@@ -159,7 +159,7 @@ while($entity = $result->fetch_assoc()) {
   $reputation = floatval($entity['reputation']);
   $table .= "$id:\t$reputation\n";
   $endorsement = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => $now, 'expires' => $one_year,
-                'publicationKey' => $publication['key'], 'publicationSignature' => $publication['signature']);
+                'publication' => array('key' => $entity['key'], 'signature' => $entity['signature']));
   $signature = '';
   $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
   if ($success === FALSE)
