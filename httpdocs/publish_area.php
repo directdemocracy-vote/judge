@@ -25,7 +25,7 @@ $query = '';
 $message = '';
 foreach($_GET as $key => $value) {
   $names .= "$key=$value\n";
-  $query .= "$key=$value&";
+  $query .= "$key=" . urlencode($value) . "&";
   $message .= "$value, ";
 }
 if ($message)
