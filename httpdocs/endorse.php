@@ -71,8 +71,9 @@ foreach($endorsements as $endorsement) {
   $query = "SELECT id FROM entity WHERE `key`='$endorsement->key' AND signature='$endorsement->signature'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
-    $query = "INSERT IGNORE INTO entity(`key`, signature, reputation, endorsed, expires) "
-            ."VALUES('$endorsement->key', '$endorsement->signature', $initial, 0, 0)";
+    $query = "INSERT INTO entity(`key`, signature, reputation, endorsed, expires, changed) "
+            ."VALUES('$endorsement->key', '$endorsement->signature', $initial, 0, 0, 0) "
+            ."ON DUPLICATE KEY UPDATE signature='$signature'";
     $mysqli->query($query) or error("$query $mysqli->error");
     $endorser = $mysqli->insert_id;
   } else {
@@ -84,8 +85,9 @@ foreach($endorsements as $endorsement) {
   $query = "SELECT id FROM entity WHERE `key`='$key' AND signature='$signature'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
-    $query = "INSERT IGNORE INTO entity(`key`, signature, reputation, endorsed, expires) "
-            ."VALUES('$key', '$signature', $initial, 0, 0)";
+    $query = "INSERT INTO entity(`key`, signature, reputation, endorsed, expires, changed) "
+            ."VALUES('$key', '$signature', $initial, 0, $endorsement->expires, 0) "
+            ."ON DUPLICATE KEY UPDATE signature='$signature', expires=$endorsement->expires";
     $mysqli->query($query) or error($mysqli->error);
     $endorsed = $mysqli->insert_id;
   } else {
@@ -118,7 +120,7 @@ $threshold = 1.0 / $N;
 $one_year = intval($now + 1 * 365.25 * 24 * 60 * 60 * 1000);
 
 for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
-  $query = "SELECT id FROM entity";
+  $query = "SELECT id FROM entity WHERE expires > 0";
   $result = $mysqli->query($query) or error($mysqli->error);
   while($entity = $result->fetch_assoc()) {
     $id = intval($entity['id']);
@@ -143,9 +145,9 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
     $PR = (1 - $d) / $N + $d * $sum;
     $query = "UPDATE entity SET reputation=$PR WHERE id=$id";
     $mysqli->query($query) or error($mysqli->error);
-    $query = "UPDATE entity SET endorsed=1, expires=0 WHERE id=$id AND endorsed=0 AND reputation>$threshold";
+    $query = "UPDATE entity SET endorsed=1, changed=1 WHERE id=$id AND endorsed=0 AND reputation>$threshold";
     $mysqli->query($query) or error($mysqli->error);
-    $query = "UPDATE entity SET endorsed=0, expires=0 WHERE id=$id AND endorsed=1 AND reputation<$threshold";
+    $query = "UPDATE entity SET endorsed=0, changed=1 WHERE id=$id AND endorsed=1 AND reputation<$threshold";
     $mysqli->query($query) or error($mysqli->error);
   }
 }
@@ -155,17 +157,16 @@ $count_r = 0;
 $table = '';
 $schema = "https://directdemocracy.vote/json-schema/$version/endorsement.schema.json";
 $private_key = openssl_get_privatekey("file://../id_rsa") or error("Failed to read private key file");
-$query = "SELECT id, `key`, signature, endorsed, reputation FROM entity WHERE expires < $now";
+$query = "SELECT id, `key`, signature, endorsed, reputation, expires FROM entity WHERE changed=1";
 $result = $mysqli->query($query) or error($mysqli->error);
 while($entity = $result->fetch_assoc()) {
   $id = intval($entity['id']);
-  $reputation = floatval($entity['reputation']);
-  $table .= "$id:\t$reputation\n";
+  $table .= "$id:\t" . floatval($entity['reputation']) ."\n";
   $endorsement = array('schema' => $schema,
                        'key' => $public_key,
                        'signature' => '',
                        'published' => $now,
-                       'expires' => $one_year);
+                       'expires' => floatval($entity['expires']));
   if ($entity['endorsed'] == 0) {
     $count_r++;
     $endorsement['revoke'] = true;
@@ -189,8 +190,7 @@ while($entity = $result->fetch_assoc()) {
   if (isset($json->error))
     error(json_encode($json->error));
 
-  $one_year_minus_one_month = $one_year - 30 * 24 * 60 * 60 * 1000;
-  $query = "UPDATE entity SET expires=$one_year_minus_one_month WHERE id=$id";
+  $query = "UPDATE entity SET changed=0";
   $mysqli->query($query) or error($mysqli->error);
 }
 
