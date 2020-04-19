@@ -10,7 +10,7 @@ $mysqli->set_charset('utf8mb4');
 if (!isset($_GET['key']))
   die("\"error\":\"Missing key argument\"}");
 
-$response = file_get_contents("/endorse.php");
+$response = file_get_contents("endorse.php");
 
 $key = $mysqli->escape_string($_GET['key']);
 $query = "SELECT reputation, endorsed FROM entity WHERE `key`='$key'";
