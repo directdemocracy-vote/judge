@@ -161,6 +161,7 @@ while($entity = $result->fetch_assoc()) {
   $endorsement = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => $now, 'expires' => $one_year,
                 'publication' => array('key' => $entity['key'], 'signature' => $entity['signature']));
   $signature = '';
+  $data = json_encode($endorsement, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
   if ($success === FALSE)
     error("Failed to sign endorsement");
