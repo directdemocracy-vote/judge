@@ -26,11 +26,20 @@ if ($mysqli->connect_errno)
   error("Failed to connect to MySQL database: $mysqli->connect_error ($mysqli->connect_errno)");
 $mysqli->set_charset('utf8mb4');
 
+$now = intval(microtime(true) * 1000);  # milliseconds
+
 $query = "SELECT lastUpdate FROM status";
 $result = $mysqli->query($query) or error($mysqli->error);
 $status = $result->fetch_assoc();
 $result->free();
 $last_update = floatval($status['lastUpdate']);
+
+$update_every = 10;
+if ($last_update + $update_every * 1000 > $now)
+  die("Updated in the last $update_every seconds");
+
+$query = "UPDATE status SET lastUpdate=$now";
+$mysqli->query($query) or error($mysqli->error);
 
 # compute the initial reputation value from the number of entities
 $query = "SELECT COUNT(*) AS N FROM entity";
@@ -55,10 +64,6 @@ $public_key_file = fopen("../id_rsa.pub", "r") or error("Failed to read public k
 $k = fread($public_key_file, filesize("../id_rsa.pub"));
 fclose($public_key_file);
 $public_key = stripped_key($k);
-
-$now = intval(microtime(true) * 1000);  # milliseconds
-$query = "UPDATE status SET lastUpdate=$now";
-$mysqli->query($query) or error($mysqli->error);
 
 # remove expired links
 $query = "DELETE FROM link WHERE expires < $now";
