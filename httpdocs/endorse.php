@@ -56,7 +56,7 @@ $k = fread($public_key_file, filesize("../id_rsa.pub"));
 fclose($public_key_file);
 $public_key = stripped_key($k);
 
-$now = floatval(microtime(true) * 1000);  # milliseconds
+$now = intval(microtime(true) * 1000);  # milliseconds
 $query = "UPDATE status SET lastUpdate=$now";
 $mysqli->query($query) or error($mysqli->error);
 
@@ -115,7 +115,7 @@ $result = $mysqli->query($query) or error($mysqli->error);
 $count = $result->fetch_assoc();
 $N = intval($count['N']);
 $threshold = 1.0 / $N;
-$one_year = $now + 1 * 365.25 * 24 * 60 * 60 * 1000;
+$one_year = intval($now + 1 * 365.25 * 24 * 60 * 60 * 1000);
 
 for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
   $query = "SELECT id FROM entity";
