@@ -10,12 +10,15 @@ $mysqli->set_charset('utf8mb4');
 if (!isset($_GET['key']))
   die("\"error\":\"Missing key argument\"}");
 $key = $mysqli->escape_string($_GET['key']);
-$query = "SELECT reputation FROM entity WHERE `key`='$key'";
+$query = "SELECT reputation, endorsed FROM entity WHERE `key`='$key'";
 $result = $mysqli->query($query) or die("{\"error\":\"$mysqli->error\"}");
 $entity = $result->fetch_assoc();
-if ($entity)
+if ($entity) {
   $reputation = floatval($entity['reputation']);
-else
+  $endorsed = ($entity['endorsed'] == '1');
+} else {
   $reputation = 0;
-die("{\"reputation\":$reputation}");
+  $endorsed = false;
+}
+die("{\"reputation\":$reputation,\"endorsed\":$endorsed}");
 ?>
