@@ -40,12 +40,18 @@ $mysqli->query($query) or error($mysqli->error);
 $query = "DELETE FROM link WHERE expires < $now";
 $mysqli->query($query) or error($mysqli->error);
 
+# compute the initial reputation value from the number of entities
+$query = "SELECT COUNT(*) AS N FROM entity";
+$result = $mysqli->query($query) or error($mysqli->error);
+$count = $result->fetch_assoc();
+$initial = 1.0 / intval($count['N']);
+
 # we assume the station already checked
 foreach($endorsements as $endorsement) {
   $query = "SELECT id FROM entity WHERE `key`='$endorsement->key'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
-    $query = "INSERT IGNORE INTO entity(`key`) VALUES('$endorsement->key')";
+    $query = "INSERT IGNORE INTO entity(`key`, reputation) VALUES('$endorsement->key', $initial)";
     $mysqli->query($query) or error("$query $mysqli->error");
     $endorser = $mysqli->insert_id;
   } else {
@@ -55,7 +61,7 @@ foreach($endorsements as $endorsement) {
   $query = "SELECT id FROM entity WHERE `key`='$endorsement->key'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
-    $query = "INSERT IGNORE INTO entity(`key`) VALUES('$endorsement->key')";
+    $query = "INSERT IGNORE INTO entity(`key`, reputation) VALUES('$endorsement->key', $initial)";
     $mysqli->query($query) or error($mysqli->error);
     $endorsed = $mysqli->insert_id;
   } else {
@@ -79,11 +85,11 @@ foreach($endorsements as $endorsement) {
 # run page rank algorithm, see https://en.wikipedia.org/wiki/PageRank
 $d = 0.85;  # d is the damping parameter (default value is 0.85)
 
-# N is the total number of entities
+# N is the new total number of entities
 $query = "SELECT COUNT(*) AS N FROM entity";
 $result = $mysqli->query($query) or error($mysqli->error);
 $count = $result->fetch_assoc();
-$N = $count['N'];
+$N = intval($count['N']);
 
 $debug = '';
 
