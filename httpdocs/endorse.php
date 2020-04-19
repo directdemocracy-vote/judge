@@ -1,6 +1,7 @@
 <?php
 require_once '../php/database.php';
 
+$version = '0.0.1';
 $publisher = 'https://publisher.directdemocracy.vote';
 
 function error($message) {
@@ -23,7 +24,16 @@ $status = $result->fetch_assoc();
 $result->free();
 $last_update = floatval($status['lastUpdate']);
 
-$last_update = 0;
+# compute the initial reputation value from the number of entities
+$query = "SELECT COUNT(*) AS N FROM entity";
+$result = $mysqli->query($query) or error($mysqli->error);
+$count = $result->fetch_assoc();
+$N = intval($count['N']);
+if ($N==0) {
+  $initial = 1.0;
+  $last_update = 0; // the database was likely wiped out
+} else
+  $initial = 1.0 / $N;
 
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
@@ -42,32 +52,26 @@ $mysqli->query($query) or error($mysqli->error);
 $query = "DELETE FROM link WHERE expires < $now";
 $mysqli->query($query) or error($mysqli->error);
 
-# compute the initial reputation value from the number of entities
-$query = "SELECT COUNT(*) AS N FROM entity";
-$result = $mysqli->query($query) or error($mysqli->error);
-$count = $result->fetch_assoc();
-$N = intval($count['N']);
-if ($N==0)
-  $initial = 1.0;
-else
-  $initial = 1.0 / $N;
-
-# we assume the station already checked
+# insert endorser and endorsed in entities, links
 foreach($endorsements as $endorsement) {
-  $query = "SELECT id FROM entity WHERE `key`='$endorsement->key'";
+  $query = "SELECT id FROM entity WHERE `key`='$endorsement->key' AND signature='$endorsement->signature'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
-    $query = "INSERT IGNORE INTO entity(`key`, reputation) VALUES('$endorsement->key', $initial)";
+    $query = "INSERT IGNORE INTO entity(`key`, signature, reputation, endorsed, expires) "
+            ."VALUES('$endorsement->key', '$endorsement->signature', $initial, 0, 0)";
     $mysqli->query($query) or error("$query $mysqli->error");
     $endorser = $mysqli->insert_id;
   } else {
     $row = $result->fetch_assoc();
     $endorser = $row['id'];
   }
-  $query = "SELECT id FROM entity WHERE `key`='$endorsement->key'";
+  $key = $endorsement->publication->key;
+  $signature = $endorsement->publication->signature;
+  $query = "SELECT id FROM entity WHERE `key`='$key' AND signature='$signature'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
-    $query = "INSERT IGNORE INTO entity(`key`, reputation) VALUES('$endorsement->key', $initial)";
+    $query = "INSERT IGNORE INTO entity(`key`, signature, reputation, endorsed, expires) "
+            ."VALUES('$key', '$signature', $initial, 0, 0)";
     $mysqli->query($query) or error($mysqli->error);
     $endorsed = $mysqli->insert_id;
   } else {
@@ -96,8 +100,8 @@ $query = "SELECT COUNT(*) AS N FROM entity";
 $result = $mysqli->query($query) or error($mysqli->error);
 $count = $result->fetch_assoc();
 $N = intval($count['N']);
-
-$debug = '';
+$threshold = 1.0 / $N;
+$one_year = $now + 1 * 365.25 * 24 * 60 * 60 * 1000;
 
 for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
   $query = "SELECT id FROM entity";
@@ -125,22 +129,39 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
     $PR = (1 - $d) / $N + $d * $sum;
     $query = "UPDATE entity SET reputation=$PR WHERE id=$id";
     $mysqli->query($query) or error($mysqli->error);
+    $query = "UPDATE entity SET endorsed=1, expires=0 WHERE id=$id AND endorsed=0 AND reputation>$threshold";
+    $mysqli->query($query) or error($mysqli->error);
+    $query = "UPDATE entity SET endorsed=0, expires=0 WHERE id=$id AND endorsed=1 AND reputation<$threshold";
+    $mysqli->query($query) or error($mysqli->error);
   }
 }
 
-$threshold = 1.0 / $N;
 $count = 0;
 $table = '';
-$query = "SELECT id, reputation, `key` FROM entity WHERE reputation > 0";
+$schema = "https://directdemocracy.vote/json-schema/$version/endorsement.schema.json";
+$public_key_file = fopen("../id_rsa.pub", "r") or error("Failed to read public key file");
+$k = fread($public_key_file, filesize("../id_rsa.pub"));
+fclose($public_key_file);
+$key = stripped_key($k);
+$private_key = openssl_get_privatekey("file://../id_rsa") or error("Failed to read private key file");
+$query = "SELECT id, `key`, signature, reputation FROM entity WHERE expires < $now";
 $result = $mysqli->query($query) or error($mysqli->error);
 while($entity = $result->fetch_assoc()) {
   $id = intval($entity['id']);
   $reputation = floatval($entity['reputation']);
   $table .= "$id:\t$reputation\n";
-  if ($reputation > $threshold) {
-    # publish endorsement for citizen is allowed to vote by this trustee
-    $count++;
-  }
+  $endorsement = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => $now, 'expires' => $one_year,
+                'publicationKey' => $publication['key'], 'publicationSignature' => $publication['signature']);
+  $signature = '';
+  $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
+  if ($success === FALSE)
+    error("Failed to sign endorsement");
+  $endorsement['signature'] = base64_encode($signature);
+  # publish endorsement for citizen is allowed to vote by this trustee
+  $one_year_minus_one_month = $one_year - 30 * 24 * 60 * 60 * 1000;
+  $query = "UPDATE entity SET expires=$one_year_minus_one_month WHERE id=$id";
+  $mysqli->query($query) or error($mysqli->error);
+  $count++;
 }
 
 die("endorsed $count citizens out of $N:\n$table");
