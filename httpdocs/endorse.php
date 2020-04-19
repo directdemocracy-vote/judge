@@ -187,7 +187,7 @@ while($entity = $result->fetch_assoc()) {
   $response = file_get_contents("$publisher/publish.php", false, stream_context_create($options));
   $json = json_decode($response);
   if (isset($json->error))
-    error($json->error);
+    error(json_encode($json->error));
 
   $one_year_minus_one_month = $one_year - 30 * 24 * 60 * 60 * 1000;
   $query = "UPDATE entity SET expires=$one_year_minus_one_month WHERE id=$id";
