@@ -73,7 +73,7 @@ foreach($endorsements as $endorsement) {
   if (!$result->num_rows) {
     $query = "INSERT INTO entity(`key`, signature, reputation, endorsed, expires, changed) "
             ."VALUES('$endorsement->key', '$endorsement->signature', $initial, 0, 0, 0) "
-            ."ON DUPLICATE KEY UPDATE signature='$signature'";
+            ."ON DUPLICATE KEY UPDATE signature='$endorsement->signature'";
     $mysqli->query($query) or error("$query $mysqli->error");
     $endorser = $mysqli->insert_id;
   } else {
