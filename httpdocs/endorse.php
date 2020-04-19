@@ -168,7 +168,7 @@ while($entity = $result->fetch_assoc()) {
                        'expires' => $one_year);
   if ($entity['endorsed'] == 0) {
     $count_r++;
-    $endorsement['revoke'] = 1;
+    $endorsement['revoke'] = true;
   } else
     $count_e++;
   $endorsement['publication'] = array('key' => $entity['key'], 'signature' => $entity['signature']);
