@@ -17,5 +17,5 @@ if ($entity)
   $reputation = floatval($entity['reputation']);
 else
   $reputation = 0;
-die("\"reputation\":$reputation}");
+die("{\"reputation\":$reputation}");
 ?>
