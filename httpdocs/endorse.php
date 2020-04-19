@@ -46,7 +46,11 @@ $mysqli->query($query) or error($mysqli->error);
 $query = "SELECT COUNT(*) AS N FROM entity";
 $result = $mysqli->query($query) or error($mysqli->error);
 $count = $result->fetch_assoc();
-$initial = 1.0 / intval($count['N']);
+$N = intval($count['N']);
+if ($N==0)
+  $initial = 1.0;
+else
+  $initial = 1.0 / $N;
 
 # we assume the station already checked
 foreach($endorsements as $endorsement) {
