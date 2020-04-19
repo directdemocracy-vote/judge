@@ -128,6 +128,7 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
   }
 }
 
+$threshold = 1.0 / $N;
 $count = 0;
 $table = '';
 $query = "SELECT id, reputation, `key` FROM entity WHERE reputation > 0";
@@ -136,7 +137,7 @@ while($entity = $result->fetch_assoc()) {
   $id = intval($entity['id']);
   $reputation = floatval($entity['reputation']);
   $table .= "$id:\t$reputation\n";
-  if ($reputation > 0.5) {
+  if ($reputation > $threshold) {
     # publish endorsement for citizen is allowed to vote by this trustee
     $count++;
   }
