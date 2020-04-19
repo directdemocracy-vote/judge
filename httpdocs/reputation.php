@@ -15,10 +15,10 @@ $result = $mysqli->query($query) or die("{\"error\":\"$mysqli->error\"}");
 $entity = $result->fetch_assoc();
 if ($entity) {
   $reputation = floatval($entity['reputation']);
-  $endorsed = ($entity['endorsed'] == '1');
+  $endorsed = $entity['endorsed'] == '1' ? 'true' : 'false';
 } else {
   $reputation = 0;
-  $endorsed = false;
+  $endorsed = 'false';
 }
 die("{\"reputation\":$reputation,\"endorsed\":$endorsed}");
 ?>
