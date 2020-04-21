@@ -199,5 +199,5 @@ while($entity = $result->fetch_assoc()) {
   $mysqli->query($query) or error($mysqli->error);
 }
 
-die("endorsed $count_e and revoked $count_r citizens out of $N:\n$table");
+die("endorsed $count_e and revoked $count_r citizens out of $N:\n$table\n\n$response");
 ?>
