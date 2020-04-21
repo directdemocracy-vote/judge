@@ -192,6 +192,8 @@ while($entity = $result->fetch_assoc()) {
                                                "Accept: application/json\r\n"));
   $response = file_get_contents("$publisher/publish.php", false, stream_context_create($options));
   $json = json_decode($response);
+  if ($json == NULL)
+    die($response);
   if (isset($json->error))
     error(json_encode($json->error));
 
@@ -199,5 +201,5 @@ while($entity = $result->fetch_assoc()) {
   $mysqli->query($query) or error($mysqli->error);
 }
 
-die("endorsed $count_e and revoked $count_r citizens out of $N:\n$table\n\n$response");
+die("endorsed $count_e and revoked $count_r citizens out of $N:\n$table");
 ?>
