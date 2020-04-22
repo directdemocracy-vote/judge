@@ -53,7 +53,7 @@ if (isset($json->expires)) {
   die("{\"status\":\"Already published area: $message\"}");
 }
 
-$url = "https://nominatim.openstreetmap.org/search?". $query . "polygon_geojson=1&format=json";
+$url = "https://nominatim.openstreetmap.org/search?". $query . "zoom=10&polygon_geojson=1&format=json";
 $options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemocracy\r\n" ] ];
 $context = stream_context_create($options);
 $result = file_get_contents($url, false, $context);
