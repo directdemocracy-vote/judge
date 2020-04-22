@@ -65,15 +65,17 @@ $k = fread($public_key_file, filesize("../id_rsa.pub"));
 fclose($public_key_file);
 $public_key = stripped_key($k);
 
-# remove expired links
-$query = "DELETE FROM link WHERE expires < $now";
+# remove expired entities and links
+$query = "DELETE FROM entity WHERE expires < $now";
+$mysqli->query($query) or error($mysqli->error);
+$query = "DELETE FROM link WHERE NOT EXISTS (SELECT id FROM entity WHERE id=endorser OR id=endorsed)";
 $mysqli->query($query) or error($mysqli->error);
 
 # insert endorser and endorsed in entities, links
 foreach($endorsements as $endorsement) {
   if ($endorsement->key == $public_key)  # ignore mine
     continue;
-  $query = "SELECT id FROM entity WHERE `key`='$endorsement->key' AND signature='$endorsement->signature'";
+  $query = "SELECT id FROM entity WHERE `key`='$endorsement->key'";  # endorser
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
     $query = "INSERT IGNORE INTO entity(`key`, signature, reputation, endorsed, expires, changed) "
@@ -99,18 +101,13 @@ foreach($endorsements as $endorsement) {
     $endorsed = $row['id'];
   }
   $mysqli->query($query) or error($mysqli->error);
-  if (isset($endorsement->revoke) && $endorsement->revoke)
+  if (isset($endorsement->revoke) && $endorsement->revoke) {
+    # FIXME: handle self-revocation
     $query = "DELETE FROM link WHERE endorser=$endorser AND endorsed=$endorsed";
-  else
-    $query = "INSERT INTO link(endorser, endorsed, published, expires) "
-            ."VALUES($endorser, $endorsed, $endorsement->published, $endorsement->expires) "
-            ."ON DUPLICATE KEY UPDATE published=$endorsement->published, expires=$endorsement->expires";
+  } else
+    $query = "INSERT IGNORE INTO link(endorser, endorsed) VALUES($endorser, $endorsed)";
   $mysqli->query($query) or error($mysqli->error);
 }
-
-# cleanup entities
-# $query = "DELETE entity FROM entity LEFT JOIN link ON link.endorsed=entity.id WHERE endorsed IS NULL";
-# $mysqli->query($query) or error($mysqli->error);
 
 # run page rank algorithm, see https://en.wikipedia.org/wiki/PageRank
 $d = 0.85;  # d is the damping parameter (default value is 0.85)
