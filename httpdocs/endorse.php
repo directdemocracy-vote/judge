@@ -66,7 +66,7 @@ fclose($public_key_file);
 $public_key = stripped_key($k);
 
 # remove expired entities and links
-$query = "DELETE FROM entity WHERE expires < $now";
+$query = "DELETE FROM entity WHERE signature!='' AND expires < $now";
 $mysqli->query($query) or error($mysqli->error);
 $query = "DELETE FROM link WHERE NOT EXISTS (SELECT NULL FROM entity WHERE id=endorser OR id=endorsed)";
 $mysqli->query($query) or error($mysqli->error);
