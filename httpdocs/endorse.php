@@ -41,6 +41,12 @@ if ($last_update + $update_every * 1000 > $now)
 $query = "UPDATE status SET lastUpdate=$now";
 $mysqli->query($query) or error($mysqli->error);
 
+# remove expired entities and links
+$query = "DELETE FROM entity WHERE signature!='' AND expires < $now";
+$mysqli->query($query) or error($mysqli->error);
+$query = "DELETE FROM link WHERE NOT EXISTS (SELECT NULL FROM entity WHERE id=endorser OR id=endorsed)";
+$mysqli->query($query) or error($mysqli->error);
+
 # compute the initial reputation value from the number of entities
 $query = "SELECT COUNT(*) AS N FROM entity";
 $result = $mysqli->query($query) or error($mysqli->error);
@@ -51,6 +57,9 @@ if ($N==0) {
   $last_update = 0; // the database was likely wiped out
 } else
   $initial = 1.0 / $N;
+
+$query = "UPDATE entity SET reputation=$initial WHERE signature=''";
+$mysqli->query($query) or error($mysqli->error);
 
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
@@ -64,12 +73,6 @@ $public_key_file = fopen("../id_rsa.pub", "r") or error("Failed to read public k
 $k = fread($public_key_file, filesize("../id_rsa.pub"));
 fclose($public_key_file);
 $public_key = stripped_key($k);
-
-# remove expired entities and links
-$query = "DELETE FROM entity WHERE signature!='' AND expires < $now";
-$mysqli->query($query) or error($mysqli->error);
-$query = "DELETE FROM link WHERE NOT EXISTS (SELECT NULL FROM entity WHERE id=endorser OR id=endorsed)";
-$mysqli->query($query) or error($mysqli->error);
 
 # insert endorser and endorsed in entities, links
 foreach($endorsements as $endorsement) {
