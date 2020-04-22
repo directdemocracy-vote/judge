@@ -105,8 +105,12 @@ foreach($endorsements as $endorsement) {
   }
   $mysqli->query($query) or error($mysqli->error);
   if (isset($endorsement->revoke) && $endorsement->revoke) {
-    # FIXME: handle self-revocation
-    $query = "DELETE FROM link WHERE endorser=$endorser AND endorsed=$endorsed";
+    if ($endorser == $endorsed) {  # self revoke
+      $query = "DELETE FROM entity WHERE id=$endorser";
+      $mysqli->query($query) or error($mysqli->error);
+      $query = "DELETE FROM link WHERE endorsed=$endorsed OR endorser=$endorser";
+    } else
+      $query = "DELETE FROM link WHERE endorser=$endorser AND endorsed=$endorsed";
   } else
     $query = "INSERT IGNORE INTO link(endorser, endorsed) VALUES($endorser, $endorsed)";
   $mysqli->query($query) or error($mysqli->error);
