@@ -124,7 +124,7 @@ $query = "SELECT COUNT(*) AS N FROM entity";
 $result = $mysqli->query($query) or error($mysqli->error);
 $count = $result->fetch_assoc();
 $N = intval($count['N']);
-$threshold = 1.0 / $N;
+$threshold = 0.5 / $N;
 $one_year = intval($now + 1 * 365.25 * 24 * 60 * 60 * 1000);
 
 for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
