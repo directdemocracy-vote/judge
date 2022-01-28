@@ -25,5 +25,10 @@ if ($entity) {
   $reputation = 0;
   $endorsed = 'false';
 }
+$query = "SELECT COUNT(*) AS N FROM entity";
+$result = $mysqli->query($query) or error($mysqli->error);
+$count = $result->fetch_assoc();
+$N = intval($count['N']);
+$reputation *= $N;
 die("{\"reputation\":$reputation,\"endorsed\":$endorsed}");
 ?>
