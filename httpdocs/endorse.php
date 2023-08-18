@@ -76,7 +76,8 @@ if ($endorsements)
     $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE `key`='$endorsement->key'";  # endorser
     $result = $mysqli->query($query) or error($mysqli->error);
     if (!$result->num_rows) {
-      $response = file_get_contents("$notary/publication.php?key=$endorsement->key", false, stream_context_create($options));
+      $key = urlencode($endorsement->key);
+      $response = file_get_contents("$notary/publication.php?key=$key", false, stream_context_create($options));
       $endorser = json_decode($response);
       if (isset($endorser->error))
         error("Trying to get $notary/publication.php?key=$endorsement->key, however $endorser->error");
