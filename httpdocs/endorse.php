@@ -118,9 +118,9 @@ if ($endorsements)
       $distance = "-1";  # one of them is not a citizen (maybe a judge, a notary or a station)
     else
       $distance = "ST_Distance_Sphere(POINT($endorsed->latitude, $endorsed->longitude), POINT($endorser->latitude, $endorser->longitude))";
-    $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, `date`) "
+    $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
             ."VALUES($endorser->id, $endorsed->id, $distance, $endorsement->revoke, $endorsement->published) "
-            ."ON DUPLICATE KEY UPDATE `revoke` = $endorsement->revoke, `date` = $endorsement->published;";    
+            ."ON DUPLICATE KEY UPDATE `revoke` = $endorsement->revoke, date = $endorsement->published;";    
     $mysqli->query($query) or error($mysqli->error);
   }
 
@@ -140,22 +140,19 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
   $result = $mysqli->query($query) or error($mysqli->error);
   while($participant = $result->fetch_assoc()) {
     $id = intval($participant['id']);
-    $query = "SELECT endorser FROM link WHERE endorsed=$id";
+    $query = "SELECT link.endorser, link.distance, link.`revoke`, link.date, COUNT(participant.*) AS links, participant.reputation "
+            ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE endorsed=$id";
     $r0 = $mysqli->query($query) or error($mysqli->error);
     $sum = 0;
     while($link = $r0->fetch_assoc()) {
       $endorser = $link['endorser'];
-      $query = "SELECT COUNT(*) AS c FROM link WHERE endorser=$endorser";
-      $r1 = $mysqli->query($query) or error($mysqli->error);
-      $count = $r1->fetch_assoc();
-      $Lj = intval($count['c']);
-      $r1->free();
-      $query = "SELECT reputation FROM participant WHERE id=$endorser";
-      $r1 = $mysqli->query($query) or error($mysqli->error);
-      $e = $r1->fetch_assoc();
-      $PRj = floatval($e['reputation']);
-      $r1->free();
-      $sum += $PRj / $Lj;
+      $distance = ($link['distance'] === '-1') ? 0 : floatval(floatval($link['distance']) / 1000);  # expressed in km
+      $revoke = ($link['revoke'] === '0') ? 1 : -1;
+      $now = intval(microtime(true) * 1000);  # milliseconds
+      $age = floatval(($now - intval($link['date']) / (365.25 * 86400000));  # years
+      $links = intval($link['links']);
+      $reputation = floatval($link['reputation']);
+      $sum += $revoke * $reputation / $links / (1 + $distance) / (1 + $age);
     }
     $r0->free();
     $PR = (1 - $d) / $N + $d * $sum;
