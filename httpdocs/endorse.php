@@ -1,7 +1,7 @@
 <?php
 require_once '../php/database.php';
 
-$version = '0.0.1';
+$version = '0.0.2';
 $notary = 'https://notary.directdemocracy.vote';
 
 function error($message) {
@@ -58,9 +58,6 @@ if ($N==0) {
 } else
   $initial = 1.0 / $N;
 
-$query = "UPDATE participant SET reputation=$initial WHERE signature=''";
-$mysqli->query($query) or error($mysqli->error);
-
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
 $url = "$notary/publications.php?type=endorsement&published_from=$last_update";
@@ -68,53 +65,61 @@ $response = file_get_contents($url, false, stream_context_create($options));
 $endorsements = json_decode($response);
 if (isset($endorsements->error))
   error($endorsements->error);
-if (!$endorsements)
-  die("No endorsements to process.");
 $public_key_file = fopen("../id_rsa.pub", "r") or error("Failed to read public key file");
 $k = fread($public_key_file, filesize("../id_rsa.pub"));
 fclose($public_key_file);
 $public_key = stripped_key($k);
 
 # insert endorser and endorsed in entities, links
-foreach($endorsements as $endorsement) {
-  if ($endorsement->key == $public_key)  # ignore mine
-    continue;
-  $query = "SELECT id FROM participant WHERE `key`='$endorsement->key'";  # endorser
-  $result = $mysqli->query($query) or error($mysqli->error);
-  if (!$result->num_rows) {
-    $query = "INSERT IGNORE INTO participant(`key`, signature, reputation, endorsed, changed) "
-            ."VALUES('$endorsement->key', '', $initial, 0, 0) ";
-    $mysqli->query($query) or error("$query $mysqli->error");
-    $endorser = $mysqli->insert_id;
-  } else {
-    $row = $result->fetch_assoc();
-    $endorser = $row['id'];
-  }
-  $signature = $endorsement->endorsedSignature;
-  $query = "SELECT id FROM participant WHERE `key`='$key' AND signature='$signature'";
-  $result = $mysqli->query($query) or error($mysqli->error);
-  if (!$result->num_rows) {
-    $query = "INSERT INTO participant(`key`, signature, reputation, endorsed, changed) "
-            ."VALUES('$key', '$signature', $initial, 0, 0) "
-            ."ON DUPLICATE KEY UPDATE signature='$signature'";
-    $mysqli->query($query) or error($mysqli->error);
-    $endorsed = $mysqli->insert_id;
-  } else {
-    $row = $result->fetch_assoc();
-    $endorsed = $row['id'];
-  }
-  $mysqli->query($query) or error($mysqli->error);
-  if (isset($endorsement->revoke) && $endorsement->revoke) {
-    if ($endorser == $endorsed) {  # self revoke
-      $query = "DELETE FROM participant WHERE id=$endorser";
-      $mysqli->query($query) or error($mysqli->error);
-      $query = "DELETE FROM link WHERE endorsed=$endorsed OR endorser=$endorser";
+if ($endorsements)
+  foreach($endorsements as $endorsement) {
+    if ($endorsement->key == $public_key)  # ignore mine
+      continue;
+    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE `key`='$endorsement->key'";  # endorser
+    $result = $mysqli->query($query) or error($mysqli->error);
+    if (!$result->num_rows) {
+      $response = file_get_content("$notary/publication.php?key=$endorsement->key", false, stream_context_create($options));
+      $endorser = json_decode($response);
+      if (isset($endorser->error))
+        error($endorser->error);
+      if (!isset($endorser->latitude))
+        $endorser->latitude = 0;
+      if (!isset($endorser->longitude))
+        $endorser->longitude = 0;
+      if ($endorser->key !== $endorsement->key)
+        die("Key mismatch for endorser in notary database.");
+      $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, endorsed, changed) "
+              ."VALUES('$endorser->key', '$endorser->signature', POINT($endorser->longitude, $endorser->latitude), 0, 0, 0) ";
+      $mysqli->query($query) or error("$query $mysqli->error");
+      $endorser->id = $mysqli->insert_id;
     } else
-      $query = "DELETE FROM link WHERE endorser=$endorser AND endorsed=$endorsed";
-  } else
-    $query = "INSERT IGNORE INTO link(endorser, endorsed) VALUES($endorser, $endorsed)";
-  $mysqli->query($query) or error($mysqli->error);
-}
+      $endorser = $result->fetch_object();
+    $query = "SELECT id FROM participant WHERE signature='$endorsement->endorsedSignature'";
+    $result = $mysqli->query($query) or error($mysqli->error);
+    if (!$result->num_rows) {
+      $fingerprint = sha1($endorsement->endorsedSignature);
+      $response = file_get_content("$notary/publication.php?fingerprint=$fingerprint", false, stream_context_create($options));
+      $endorsed = json_decode($response);
+      if (isset($endorsed->error))
+        error($endorsed->error);
+      if (!isset($endorsed->latitude))
+        $endorsed->latitude = 0;
+      if (!isset($endorsed->longitude))
+        $endorsed->longitude = 0;
+      if ($endorsed->signature !== $endorsement->endorsedSignature)
+        die("Key mismatch for endorsed in notary database.");
+      $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, endorsed, changed) "
+              ."VALUES('$endorsed->key', '$endorsed->signature', POINT($endorsed->longitude, $endorsed->latitude), $initial, 0, 0) ";
+      $mysqli->query($query) or error("$query $mysqli->error");
+      $endorsed = $mysqli->insert_id;
+    } else
+      $endorsed = $result->fetch_object();
+
+    $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, `date`) "
+            ."VALUES($endorser, $endorsed, ST_Distance_Sphere(POINT(-87.6770458, 41.9631174),POINT(-73.9898293, 40.7628267)), $endorsement->revoke, $endorsement->published) "
+            ."ON DUPLICATE UPDATE `revoke` = $endorsement->revoke, `date` = $endorsement->published;";    
+    $mysqli->query($query) or error($mysqli->error);
+  }
 
 # run page rank algorithm, see https://en.wikipedia.org/wiki/PageRank
 $d = 0.85;  # d is the damping parameter (default value is 0.85)
