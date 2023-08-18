@@ -2,7 +2,7 @@
 require_once '../php/database.php';
 
 $version = '0.0.1';
-$publisher = 'https://publisher.directdemocracy.vote';
+$notary = 'https://notary.directdemocracy.vote';
 
 function error($message) {
   if ($message[0] != '{')
@@ -63,7 +63,7 @@ $mysqli->query($query) or error($mysqli->error);
 
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
-$url = "$publisher/publications.php?type=endorsement&published_from=$last_update";
+$url = "$notary/publications.php?type=endorsement&published_from=$last_update";
 $response = file_get_contents($url, false, stream_context_create($options));
 $endorsements = json_decode($response);
 if (isset($endorsements->error))
@@ -193,7 +193,7 @@ while($entity = $result->fetch_assoc()) {
                                    'content' => $data,
                                    'header' => "Content-Type: application/json\r\n" .
                                                "Accept: application/json\r\n"));
-  $response = file_get_contents("$publisher/publish.php", false, stream_context_create($options));
+  $response = file_get_contents("$notary/publish.php", false, stream_context_create($options));
   $json = json_decode($response);
   if ($json == NULL)
     die($response);
