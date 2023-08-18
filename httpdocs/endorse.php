@@ -141,7 +141,7 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
   while($participant = $result->fetch_assoc()) {
     $id = intval($participant['id']);
     $query = "SELECT link.endorser, link.distance, link.`revoke`, link.date, (SELECT COUNT(*) FROM link AS l WHERE l.endorser=link.endorser) AS links, participant.reputation "
-            ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE endorsed=$id";
+            ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id";
     $r0 = $mysqli->query($query) or error($mysqli->error);
     $sum = 0;
     while($link = $r0->fetch_assoc()) {
