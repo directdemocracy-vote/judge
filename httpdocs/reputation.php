@@ -15,17 +15,17 @@ if (!isset($_GET['key']))
 $response = file_get_contents("$myself/endorse.php");
 
 $key = $mysqli->escape_string($_GET['key']);
-$query = "SELECT reputation, endorsed FROM entity WHERE `key`='$key'";
+$query = "SELECT reputation, endorsed FROM participant WHERE `key`='$key'";
 $result = $mysqli->query($query) or die("{\"error\":\"$mysqli->error\"}");
-$entity = $result->fetch_assoc();
-if ($entity) {
-  $reputation = floatval($entity['reputation']);
-  $endorsed = $entity['endorsed'] == '1' ? 'true' : 'false';
+$participant = $result->fetch_assoc();
+if ($participant) {
+  $reputation = floatval($participant['reputation']);
+  $endorsed = $participant['endorsed'] == '1' ? 'true' : 'false';
 } else {
   $reputation = 0;
   $endorsed = 'false';
 }
-$query = "SELECT COUNT(*) AS N FROM entity";
+$query = "SELECT COUNT(*) AS N FROM participant";
 $result = $mysqli->query($query) or error($mysqli->error);
 $count = $result->fetch_assoc();
 $N = intval($count['N']);
