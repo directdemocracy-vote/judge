@@ -83,7 +83,7 @@ foreach($endorsements as $endorsement) {
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
     $query = "INSERT IGNORE INTO entity(`key`, signature, reputation, endorsed, changed) "
-            ."VALUES('$endorsement->key', '', $initial, 0, 0, 0) ";
+            ."VALUES('$endorsement->key', '', $initial, 0, 0) ";
     $mysqli->query($query) or error("$query $mysqli->error");
     $endorser = $mysqli->insert_id;
   } else {
