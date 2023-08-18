@@ -90,8 +90,7 @@ foreach($endorsements as $endorsement) {
     $row = $result->fetch_assoc();
     $endorser = $row['id'];
   }
-  $key = $endorsement->publication->key;
-  $signature = $endorsement->publication->signature;
+  $signature = $endorsement->endorsedSignature;
   $query = "SELECT id FROM entity WHERE `key`='$key' AND signature='$signature'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
