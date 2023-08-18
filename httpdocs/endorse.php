@@ -134,6 +134,9 @@ $query = "SELECT COUNT(*) AS N FROM participant";
 $result = $mysqli->query($query) or error($mysqli->error);
 $count = $result->fetch_assoc();
 $N = intval($count['N']);
+if ($N == 0)
+  die('Empty database.');
+
 $threshold = 0.5 / $N;
 
 for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
