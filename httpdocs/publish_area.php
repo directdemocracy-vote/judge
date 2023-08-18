@@ -48,10 +48,6 @@ $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
 $now = intval(microtime(true) * 1000);  # milliseconds
-if (isset($json->expires)) {
-  if ($json->expires > $now + 365.25 * 24 * 60 * 60 * 1000)
-  die("{\"status\":\"Already published area: $message\"}");
-}
 
 $url = "https://nominatim.openstreetmap.org/search?". $query . "zoom=10&polygon_geojson=1&format=json";
 $options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemocracy\r\n" ] ];
@@ -61,7 +57,6 @@ $search = json_decode($result);
 
 $schema = "https://directdemocracy.vote/json-schema/$version/area.schema.json";
 $area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => $now,
-              'expires' => $now + 2 * 365.25 * 24 * 60 * 60 * 1000,  # expires in 2 years
               'name' => $names, 'polygons' => null);
 if (count($search) == 0)
   die("Area not found: $message");
