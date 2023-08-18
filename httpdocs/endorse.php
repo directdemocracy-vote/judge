@@ -93,7 +93,7 @@ if ($endorsements)
       $endorser->id = $mysqli->insert_id;
     } else
       $endorser = $result->fetch_object();
-    $query = "SELECT id FROM participant WHERE signature='$endorsement->endorsedSignature'";
+    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature='$endorsement->endorsedSignature'";
     $result = $mysqli->query($query) or error($mysqli->error);
     if (!$result->num_rows) {
       $fingerprint = sha1($endorsement->endorsedSignature);
