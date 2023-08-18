@@ -109,7 +109,7 @@ if ($endorsements)
         die("Key mismatch for endorsed in notary database.");
       $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, endorsed, changed) "
               ."VALUES('$endorsed->key', '$endorsed->signature', POINT($endorsed->longitude, $endorsed->latitude), $initial, 0, 0) ";
-      $mysqli->query($query) or error("$query $mysqli->error");
+      $mysqli->query($query) or error($mysqli->error);
       $endorsed->id = $mysqli->insert_id;
     } else
       $endorsed->id = $result->fetch_object();
@@ -177,13 +177,13 @@ while($participant = $result->fetch_assoc()) {
   $endorsement = array('schema' => $schema,
                        'key' => $public_key,
                        'signature' => '',
-                       'published' => $now);
+                       'published' => $now,
+                       'endorsedSignature' => $participant['signature']);
   if ($participant['endorsed'] == 0) {
     $count_r++;
     $endorsement['revoke'] = true;
   } else
     $count_e++;
-  $endorsement['publication'] = array('key' => $participant['key'], 'signature' => $participant['signature']);
   $signature = '';
   $data = json_encode($endorsement, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
