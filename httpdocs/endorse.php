@@ -42,7 +42,7 @@ $query = "UPDATE status SET lastUpdate=$now";
 $mysqli->query($query) or error($mysqli->error);
 
 # remove expired entities and links
-$query = "DELETE FROM entity WHERE signature!='' AND expires < $now";
+$query = "DELETE FROM entity WHERE signature!=''";
 $mysqli->query($query) or error($mysqli->error);
 $query = "DELETE FROM link WHERE NOT EXISTS (SELECT NULL FROM entity WHERE id=endorser OR id=endorsed)";
 $mysqli->query($query) or error($mysqli->error);
@@ -81,7 +81,7 @@ foreach($endorsements as $endorsement) {
   $query = "SELECT id FROM entity WHERE `key`='$endorsement->key'";  # endorser
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
-    $query = "INSERT IGNORE INTO entity(`key`, signature, reputation, endorsed, expires, changed) "
+    $query = "INSERT IGNORE INTO entity(`key`, signature, reputation, endorsed, changed) "
             ."VALUES('$endorsement->key', '', $initial, 0, 0, 0) ";
     $mysqli->query($query) or error("$query $mysqli->error");
     $endorser = $mysqli->insert_id;
@@ -94,9 +94,9 @@ foreach($endorsements as $endorsement) {
   $query = "SELECT id FROM entity WHERE `key`='$key' AND signature='$signature'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
-    $query = "INSERT INTO entity(`key`, signature, reputation, endorsed, expires, changed) "
-            ."VALUES('$key', '$signature', $initial, 0, $endorsement->expires, 0) "
-            ."ON DUPLICATE KEY UPDATE signature='$signature', expires=$endorsement->expires";
+    $query = "INSERT INTO entity(`key`, signature, reputation, endorsed, changed) "
+            ."VALUES('$key', '$signature', $initial, 0, 0) "
+            ."ON DUPLICATE KEY UPDATE signature='$signature'";
     $mysqli->query($query) or error($mysqli->error);
     $endorsed = $mysqli->insert_id;
   } else {
@@ -128,7 +128,7 @@ $threshold = 0.5 / $N;
 $one_year = intval($now + 1 * 365.25 * 24 * 60 * 60 * 1000);
 
 for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
-  $query = "SELECT id FROM entity WHERE expires > 0";
+  $query = "SELECT id FROM entity";
   $result = $mysqli->query($query) or error($mysqli->error);
   while($entity = $result->fetch_assoc()) {
     $id = intval($entity['id']);
@@ -165,7 +165,7 @@ $count_r = 0;
 $table = '';
 $schema = "https://directdemocracy.vote/json-schema/$version/endorsement.schema.json";
 $private_key = openssl_get_privatekey("file://../id_rsa") or error("Failed to read private key file");
-$query = "SELECT id, `key`, signature, endorsed, reputation, expires FROM entity WHERE changed=1";
+$query = "SELECT id, `key`, signature, endorsed, reputation FROM entity WHERE changed=1";
 $result = $mysqli->query($query) or error($mysqli->error);
 while($entity = $result->fetch_assoc()) {
   $id = intval($entity['id']);
@@ -173,8 +173,7 @@ while($entity = $result->fetch_assoc()) {
   $endorsement = array('schema' => $schema,
                        'key' => $public_key,
                        'signature' => '',
-                       'published' => $now,
-                       'expires' => floatval($entity['expires']));
+                       'published' => $now);
   if ($entity['endorsed'] == 0) {
     $count_r++;
     $endorsement['revoke'] = true;
