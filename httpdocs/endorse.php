@@ -41,9 +41,7 @@ if ($last_update + $update_every * 1000 > $now)
 $query = "UPDATE status SET lastUpdate=$now";
 $mysqli->query($query) or error($mysqli->error);
 
-# remove expired participants and links
-$query = "DELETE FROM participant WHERE signature!=''";
-$mysqli->query($query) or error($mysqli->error);
+# remove broken links
 $query = "DELETE FROM link WHERE NOT EXISTS (SELECT NULL FROM participant WHERE id=endorser OR id=endorsed)";
 $mysqli->query($query) or error($mysqli->error);
 
@@ -81,7 +79,7 @@ if ($endorsements)
       $response = file_get_contents("$notary/publication.php?key=$endorsement->key", false, stream_context_create($options));
       $endorser = json_decode($response);
       if (isset($endorser->error))
-        error($endorser->error);
+        error("Trying to get $notary/publication.php?key=$endorsement->key, however $endorser->error");
       if (!isset($endorser->latitude))
         $endorser->latitude = 0;
       if (!isset($endorser->longitude))
