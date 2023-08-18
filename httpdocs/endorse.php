@@ -124,7 +124,8 @@ if ($endorsements)
     $mysqli->query($query) or error($mysqli->error);
   }
 
-# run page rank algorithm, see https://en.wikipedia.org/wiki/PageRank
+# run a modified page rank algorithm, see https://en.wikipedia.org/wiki/PageRank
+# the modification adds the revoke, distance and date in the equation
 $d = 0.85;  # d is the damping parameter (default value is 0.85)
 
 # N is the new total number of entities
@@ -152,7 +153,7 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
       $age = floatval(($now - intval($link['date'])) / (365.25 * 86400000));  # years
       $links = intval($link['links']);
       $reputation = floatval($link['reputation']);
-      $sum += $revoke * $reputation / $links / (1 + $distance) / (1 + $age);
+      $sum += 10 * $revoke * $reputation / $links / (1 + $distance) / (1 + $age);
     }
     $r0->free();
     $PR = (1 - $d) / $N + $d * $sum;
