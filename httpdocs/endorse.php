@@ -41,7 +41,7 @@ if ($last_update + $update_every * 1000 > $now)
 $query = "UPDATE status SET lastUpdate=$now";
 $mysqli->query($query) or error($mysqli->error);
 
-# remove broken links
+# remove broken links if any
 $query = "DELETE FROM link WHERE NOT EXISTS (SELECT NULL FROM participant WHERE id=endorser OR id=endorsed)";
 $mysqli->query($query) or error($mysqli->error);
 
@@ -140,7 +140,7 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
   $result = $mysqli->query($query) or error($mysqli->error);
   while($participant = $result->fetch_assoc()) {
     $id = intval($participant['id']);
-    $query = "SELECT link.endorser, link.distance, link.`revoke`, link.date, COUNT(participant.*) AS links, participant.reputation "
+    $query = "SELECT link.endorser, link.distance, link.`revoke`, link.date, (SELECT COUNT(*) FROM link AS l WHERE l.endorser=link.endorser) AS links, participant.reputation "
             ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE endorsed=$id";
     $r0 = $mysqli->query($query) or error($mysqli->error);
     $sum = 0;
