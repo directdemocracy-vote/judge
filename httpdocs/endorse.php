@@ -134,7 +134,6 @@ $result = $mysqli->query($query) or error($mysqli->error);
 $count = $result->fetch_assoc();
 $N = intval($count['N']);
 $threshold = 0.5 / $N;
-$one_year = intval($now + 1 * 365.25 * 24 * 60 * 60 * 1000);
 
 for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
   $query = "SELECT id FROM participant";
@@ -149,11 +148,10 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
       $endorser = $link['endorser'];
       $distance = ($link['distance'] === '-1') ? 0 : floatval(floatval($link['distance']) / 1000);  # expressed in km
       $revoke = ($link['revoke'] === '0') ? 1 : -1;
-      $now = intval(microtime(true) * 1000);  # milliseconds
       $age = floatval(($now - intval($link['date'])) / (365.25 * 86400000));  # years
       $links = intval($link['links']);
       $reputation = floatval($link['reputation']);
-      $sum += 10 * $revoke * $reputation / $links / (1 + $distance) / (1 + $age);
+      $sum += 100 * $revoke * $reputation / $links / (1 + $distance) / (1 + $age);
     }
     $r0->free();
     $PR = (1 - $d) / $N + $d * $sum;
