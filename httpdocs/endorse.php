@@ -187,7 +187,7 @@ while($entity = $result->fetch_assoc()) {
   if ($success === FALSE)
     error("Failed to sign endorsement");
   $endorsement['signature'] = base64_encode($signature);
-  # publish endorsement for citizen is allowed to vote by this trustee
+  # publish endorsement for citizen is allowed to vote by this judge
   $data = json_encode($endorsement, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   $options = array('http' => array('method' => 'POST',
                                    'content' => $data,
