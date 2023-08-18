@@ -120,7 +120,7 @@ if ($endorsements)
       $distance = "ST_Distance_Sphere(POINT($endorsed->latitude, $endorsed->longitude), POINT($endorser->latitude, $endorser->longitude))";
     $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, `date`) "
             ."VALUES($endorser->id, $endorsed->id, $distance, $endorsement->revoke, $endorsement->published) "
-            ."ON DUPLICATE UPDATE `revoke` = $endorsement->revoke, `date` = $endorsement->published;";    
+            ."ON DUPLICATE KEY UPDATE `revoke` = $endorsement->revoke, `date` = $endorsement->published;";    
     $mysqli->query($query) or error($mysqli->error);
   }
 
