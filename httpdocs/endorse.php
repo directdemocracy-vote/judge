@@ -112,7 +112,7 @@ if ($endorsements)
       $mysqli->query($query) or error($mysqli->error);
       $endorsed->id = $mysqli->insert_id;
     } else
-      $endorsed->id = $result->fetch_object();
+      $endorsed = $result->fetch_object();
     if (($endorsed->latitude == 0 && $endorsed->longitude == 0) ||
         ($endorser->latitude == 0 && $endorser->longitude == 0))
       $distance = "-1";  # one of them is not a citizen (maybe a judge, a notary or a station)
