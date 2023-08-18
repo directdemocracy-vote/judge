@@ -151,7 +151,7 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
       $age = floatval(($now - intval($link['date'])) / (365.25 * 86400000));  # years
       $links = intval($link['links']);
       $reputation = floatval($link['reputation']);
-      $sum += $revoke * $reputation / $links / (1 + $distance) / (1 + $age);
+      $sum += 10 * $revoke * $reputation / $links / (1 + $distance) / (1 + $age);
     }
     $r0->free();
     $PR = (1 - $d) / $N + $d * $sum;
