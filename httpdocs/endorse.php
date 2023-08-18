@@ -151,7 +151,7 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
     while($link = $r0->fetch_assoc()) {
       $endorser = $link['endorser'];
       $distance = ($link['distance'] === '-1') ? 0 : floatval(floatval($link['distance']) / 1000);  # expressed in km
-      $revoke = ($link['revoke'] === '0') ? 1 : -1;
+      $revoke = ($link['revoke'] === '0') ? 1 : 0;
       $age = floatval(($now - intval($link['date'])) / (365.25 * 86400000));  # years
       $links = intval($link['links']);
       $reputation = floatval($link['reputation']);
