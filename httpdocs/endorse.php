@@ -111,12 +111,16 @@ if ($endorsements)
       $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, endorsed, changed) "
               ."VALUES('$endorsed->key', '$endorsed->signature', POINT($endorsed->longitude, $endorsed->latitude), $initial, 0, 0) ";
       $mysqli->query($query) or error("$query $mysqli->error");
-      $endorsed = $mysqli->insert_id;
+      $endorsed->id = $mysqli->insert_id;
     } else
-      $endorsed = $result->fetch_object();
-
+      $endorsed->id = $result->fetch_object();
+    if (($endorsed->latitude == 0 && $endorsed->longitude == 0) ||
+        ($endorser->latitude == 0 && $endorser->longitude == 0))
+      $distance = "-1";  # one of them is not a citizen (maybe a judge, a notary or a station)
+    else
+      $distance = "ST_Distance_Sphere(POINT($endorsed->latitude, $endorsed->longitude), POINT($endorser->latitude, $endorser->longitude))";
     $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, `date`) "
-            ."VALUES($endorser, $endorsed, ST_Distance_Sphere(POINT(-87.6770458, 41.9631174),POINT(-73.9898293, 40.7628267)), $endorsement->revoke, $endorsement->published) "
+            ."VALUES($endorser->id, $endorsed->id, $distance, $endorsement->revoke, $endorsement->published) "
             ."ON DUPLICATE UPDATE `revoke` = $endorsement->revoke, `date` = $endorsement->published;";    
     $mysqli->query($query) or error($mysqli->error);
   }
