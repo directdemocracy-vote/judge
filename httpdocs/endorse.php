@@ -42,13 +42,13 @@ $query = "UPDATE status SET lastUpdate=$now";
 $mysqli->query($query) or error($mysqli->error);
 
 # remove expired entities and links
-$query = "DELETE FROM entity WHERE signature!=''";
+$query = "DELETE FROM participant WHERE signature!=''";
 $mysqli->query($query) or error($mysqli->error);
-$query = "DELETE FROM link WHERE NOT EXISTS (SELECT NULL FROM entity WHERE id=endorser OR id=endorsed)";
+$query = "DELETE FROM link WHERE NOT EXISTS (SELECT NULL FROM participant WHERE id=endorser OR id=endorsed)";
 $mysqli->query($query) or error($mysqli->error);
 
 # compute the initial reputation value from the number of entities
-$query = "SELECT COUNT(*) AS N FROM entity";
+$query = "SELECT COUNT(*) AS N FROM participant";
 $result = $mysqli->query($query) or error($mysqli->error);
 $count = $result->fetch_assoc();
 $N = intval($count['N']);
@@ -58,7 +58,7 @@ if ($N==0) {
 } else
   $initial = 1.0 / $N;
 
-$query = "UPDATE entity SET reputation=$initial WHERE signature=''";
+$query = "UPDATE participant SET reputation=$initial WHERE signature=''";
 $mysqli->query($query) or error($mysqli->error);
 
 $options = array('http' => array('method' => 'GET',
@@ -79,10 +79,10 @@ $public_key = stripped_key($k);
 foreach($endorsements as $endorsement) {
   if ($endorsement->key == $public_key)  # ignore mine
     continue;
-  $query = "SELECT id FROM entity WHERE `key`='$endorsement->key'";  # endorser
+  $query = "SELECT id FROM participant WHERE `key`='$endorsement->key'";  # endorser
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
-    $query = "INSERT IGNORE INTO entity(`key`, signature, reputation, endorsed, changed) "
+    $query = "INSERT IGNORE INTO participant(`key`, signature, reputation, endorsed, changed) "
             ."VALUES('$endorsement->key', '', $initial, 0, 0) ";
     $mysqli->query($query) or error("$query $mysqli->error");
     $endorser = $mysqli->insert_id;
@@ -91,10 +91,10 @@ foreach($endorsements as $endorsement) {
     $endorser = $row['id'];
   }
   $signature = $endorsement->endorsedSignature;
-  $query = "SELECT id FROM entity WHERE `key`='$key' AND signature='$signature'";
+  $query = "SELECT id FROM participant WHERE `key`='$key' AND signature='$signature'";
   $result = $mysqli->query($query) or error($mysqli->error);
   if (!$result->num_rows) {
-    $query = "INSERT INTO entity(`key`, signature, reputation, endorsed, changed) "
+    $query = "INSERT INTO participant(`key`, signature, reputation, endorsed, changed) "
             ."VALUES('$key', '$signature', $initial, 0, 0) "
             ."ON DUPLICATE KEY UPDATE signature='$signature'";
     $mysqli->query($query) or error($mysqli->error);
@@ -106,7 +106,7 @@ foreach($endorsements as $endorsement) {
   $mysqli->query($query) or error($mysqli->error);
   if (isset($endorsement->revoke) && $endorsement->revoke) {
     if ($endorser == $endorsed) {  # self revoke
-      $query = "DELETE FROM entity WHERE id=$endorser";
+      $query = "DELETE FROM participant WHERE id=$endorser";
       $mysqli->query($query) or error($mysqli->error);
       $query = "DELETE FROM link WHERE endorsed=$endorsed OR endorser=$endorser";
     } else
@@ -120,7 +120,7 @@ foreach($endorsements as $endorsement) {
 $d = 0.85;  # d is the damping parameter (default value is 0.85)
 
 # N is the new total number of entities
-$query = "SELECT COUNT(*) AS N FROM entity";
+$query = "SELECT COUNT(*) AS N FROM participant";
 $result = $mysqli->query($query) or error($mysqli->error);
 $count = $result->fetch_assoc();
 $N = intval($count['N']);
@@ -128,10 +128,10 @@ $threshold = 0.5 / $N;
 $one_year = intval($now + 1 * 365.25 * 24 * 60 * 60 * 1000);
 
 for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
-  $query = "SELECT id FROM entity";
+  $query = "SELECT id FROM participant";
   $result = $mysqli->query($query) or error($mysqli->error);
-  while($entity = $result->fetch_assoc()) {
-    $id = intval($entity['id']);
+  while($participant = $result->fetch_assoc()) {
+    $id = intval($participant['id']);
     $query = "SELECT endorser FROM link WHERE endorsed=$id";
     $r0 = $mysqli->query($query) or error($mysqli->error);
     $sum = 0;
@@ -142,7 +142,7 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
       $count = $r1->fetch_assoc();
       $Lj = intval($count['c']);
       $r1->free();
-      $query = "SELECT reputation FROM entity WHERE id=$endorser";
+      $query = "SELECT reputation FROM participant WHERE id=$endorser";
       $r1 = $mysqli->query($query) or error($mysqli->error);
       $e = $r1->fetch_assoc();
       $PRj = floatval($e['reputation']);
@@ -151,11 +151,11 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
     }
     $r0->free();
     $PR = (1 - $d) / $N + $d * $sum;
-    $query = "UPDATE entity SET reputation=$PR WHERE id=$id";
+    $query = "UPDATE participant SET reputation=$PR WHERE id=$id";
     $mysqli->query($query) or error($mysqli->error);
-    $query = "UPDATE entity SET endorsed=1, changed=1 WHERE id=$id AND endorsed=0 AND reputation>$threshold";
+    $query = "UPDATE participant SET endorsed=1, changed=1 WHERE id=$id AND endorsed=0 AND reputation>$threshold";
     $mysqli->query($query) or error($mysqli->error);
-    $query = "UPDATE entity SET endorsed=0, changed=1 WHERE id=$id AND endorsed=1 AND reputation<$threshold";
+    $query = "UPDATE participant SET endorsed=0, changed=1 WHERE id=$id AND endorsed=1 AND reputation<$threshold";
     $mysqli->query($query) or error($mysqli->error);
   }
 }
@@ -165,21 +165,21 @@ $count_r = 0;
 $table = '';
 $schema = "https://directdemocracy.vote/json-schema/$version/endorsement.schema.json";
 $private_key = openssl_get_privatekey("file://../id_rsa") or error("Failed to read private key file");
-$query = "SELECT id, `key`, signature, endorsed, reputation FROM entity WHERE changed=1";
+$query = "SELECT id, `key`, signature, endorsed, reputation FROM participant WHERE changed=1";
 $result = $mysqli->query($query) or error($mysqli->error);
-while($entity = $result->fetch_assoc()) {
-  $id = intval($entity['id']);
-  $table .= "$id:\t" . floatval($entity['reputation']) ."\n";
+while($participant = $result->fetch_assoc()) {
+  $id = intval($participant['id']);
+  $table .= "$id:\t" . floatval($participant['reputation']) ."\n";
   $endorsement = array('schema' => $schema,
                        'key' => $public_key,
                        'signature' => '',
                        'published' => $now);
-  if ($entity['endorsed'] == 0) {
+  if ($participant['endorsed'] == 0) {
     $count_r++;
     $endorsement['revoke'] = true;
   } else
     $count_e++;
-  $endorsement['publication'] = array('key' => $entity['key'], 'signature' => $entity['signature']);
+  $endorsement['publication'] = array('key' => $participant['key'], 'signature' => $participant['signature']);
   $signature = '';
   $data = json_encode($endorsement, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
@@ -199,7 +199,7 @@ while($entity = $result->fetch_assoc()) {
   if (isset($json->error))
     error(json_encode($json->error));
 
-  $query = "UPDATE entity SET changed=0";
+  $query = "UPDATE participant SET changed=0";
   $mysqli->query($query) or error($mysqli->error);
 }
 
