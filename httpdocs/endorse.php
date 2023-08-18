@@ -97,7 +97,7 @@ if ($endorsements)
     $result = $mysqli->query($query) or error($mysqli->error);
     if (!$result->num_rows) {
       $fingerprint = sha1($endorsement->endorsedSignature);
-      $response = file_get_content("$notary/publication.php?fingerprint=$fingerprint", false, stream_context_create($options));
+      $response = file_get_contents("$notary/publication.php?fingerprint=$fingerprint", false, stream_context_create($options));
       $endorsed = json_decode($response);
       if (isset($endorsed->error))
         error($endorsed->error);
