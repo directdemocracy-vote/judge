@@ -41,7 +41,7 @@ if ($last_update + $update_every * 1000 > $now)
 $query = "UPDATE status SET lastUpdate=$now";
 $mysqli->query($query) or error($mysqli->error);
 
-# remove expired entities and links
+# remove expired participants and links
 $query = "DELETE FROM participant WHERE signature!=''";
 $mysqli->query($query) or error($mysqli->error);
 $query = "DELETE FROM link WHERE NOT EXISTS (SELECT NULL FROM participant WHERE id=endorser OR id=endorsed)";
