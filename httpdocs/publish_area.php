@@ -1,6 +1,6 @@
 <?php
 $version = "0.0.1";
-$publisher = 'https://publisher.directdemocracy.vote';
+$notary = 'https://notary.directdemocracy.vote';
 
 function error($message) {
   if ($message[0] != '{')
@@ -43,7 +43,7 @@ $options = array('http' => array('method' => 'POST',
                                  'content' => $data,
                                  'header' => "Content-Type: application/json\r\n" .
                                              "Accept: application/json\r\n"));
-$response = file_get_contents("$publisher/area.php", false, stream_context_create($options));
+$response = file_get_contents("$notary/area.php", false, stream_context_create($options));
 $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
@@ -92,7 +92,7 @@ $options = array('http' => array('method' => 'POST',
                                  'content' => $area_data,
                                  'header' => "Content-Type: application/json\r\n" .
                                              "Accept: application/json\r\n"));
-$response = file_get_contents("$publisher/publish.php", false, stream_context_create($options));
+$response = file_get_contents("$notary/publish.php", false, stream_context_create($options));
 $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
