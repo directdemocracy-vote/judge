@@ -1,5 +1,5 @@
 <?php
-require_once '../php/database.php';
+require_once '../../php/database.php';
 
 $reputation_factor = 3;
 $version = '0.0.2';

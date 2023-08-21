@@ -32,8 +32,8 @@ if ($message)
   $message = substr($message, 0, -2);
 
 # check if the area is not already published with a validity of at least 1 year.
-$public_key_file = fopen("../id_rsa.pub", "r") or die("{\"error\":\"unable to open public key file\"}");
-$k = fread($public_key_file, filesize("../id_rsa.pub"));
+$public_key_file = fopen("../../id_rsa.pub", "r") or die("{\"error\":\"unable to open public key file\"}");
+$k = fread($public_key_file, filesize("../../id_rsa.pub"));
 fclose($public_key_file);
 $key = stripped_key($k);
 
@@ -72,7 +72,7 @@ if ($geojson->type == 'Polygon') {
 $area['polygons'] = &$polygons;
 # sign area
 $data = json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-$private_key = openssl_get_privatekey("file://../id_rsa");
+$private_key = openssl_get_privatekey("file://../../id_rsa");
 if ($private_key == FALSE)
   error("Failed to read private key.");
 $signature = '';
@@ -87,7 +87,7 @@ $options = array('http' => array('method' => 'POST',
                                  'content' => $area_data,
                                  'header' => "Content-Type: application/json\r\n" .
                                              "Accept: application/json\r\n"));
-$response = file_get_contents("$notary/publish.php", false, stream_context_create($options));
+$response = file_get_contents("$notary/ajax/publish.php", false, stream_context_create($options));
 $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
