@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>test.directdemocracy.vote</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/framework7-icons@5.0.5/css/framework7-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  </head>
+  <body>
+    <canvas id="worldMap" width="500" height="500" style="border:1px solid #000000;"></canvas>
+  </body>
+  <script type="module">
+    import World from './js/World.js';
+    import Arrow from './js/Arrow.js';
+
+    const c = document.getElementById("worldMap");
+    const ctx = c.getContext("2d");
+
+    World.init(ctx);
+
+    let scale = 1;
+    let idGenerator = 1  ;
+    let selection;
+
+    World.instance.ctx.scale(scale, scale)
+
+    const canvas = document.querySelector('canvas')
+    canvas.addEventListener('mousedown', function(e) {
+        getCursorPosition(canvas, e)
+    })
+
+    function draw() {
+      clear();
+      for (const citizen of World.instance.citizens.values()) {
+        World.instance.ctx.fillStyle = "red";
+        World.instance.ctx.fill(citizen.path);
+      }
+
+      for (const endorsement of World.instance.endorsements.values()) {
+        World.instance.ctx.fillStyle = "black";
+        World.instance.ctx.stroke(endorsement.line);
+        if (endorsement.arrowHead1)
+          World.instance.ctx.fill(endorsement.arrowHead1);
+      }
+    }
+
+    function drawPoint(x, y) {
+      const point = new Path2D();
+      point.arc(x / scale, y / scale, World.instance.basePointSize, 0, 2 * Math.PI);
+      World.instance.citizens.set(idGenerator++, {path: point, coords: [x, y]});
+      World.instance.ctx.fillStyle = "red";
+      World.instance.ctx.fill(point);
+    }
+
+
+    function drawEndorsment(id1, id2) {
+      for (const endorsement of World.instance.endorsements.values()) {
+        if ((id1 === endorsement.id1 || id1 === endorsement.id2) && (id1 === endorsement.id1 || id1 === endorsement.id2)) {
+
+        }
+      }
+
+      const id = idGenerator++;
+      const arrow = new Arrow(id, id1, id2);
+      World.instance.endorsements.set(id, arrow);
+      resetSelection();
+    }
+
+    function clear() {
+      World.instance.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function getCursorPosition(canvas, event) {
+      const rect = canvas.getBoundingClientRect()
+      const x = event.clientX - rect.left
+      const y = event.clientY - rect.top
+      const id = isOnPoint(x, y)
+      if (typeof id === 'undefined') {
+        if (typeof selection !== 'undefined') {
+          resetSelection()
+        } else
+          drawPoint(x, y);
+      } else {
+        if (typeof selection === 'undefined') {
+          changePointSize(id, World.instance.selectedPointSize)
+          selection = id;
+        } else {
+          drawEndorsment(selection, id)
+        }
+      }
+    }
+
+    function isOnPoint(x, y) {
+      for (const entry of World.instance.citizens.entries()) {
+        if (World.instance.ctx.isPointInPath(entry[1].path, x, y))
+          return entry[0];
+      }
+    }
+
+    function resetSelection() {
+      changePointSize(selection, World.instance.basePointSize);
+      selection = undefined;
+    }
+
+    function changePointSize(id, newSize) {
+      if (typeof id === 'undefined')
+        return;
+
+      const citizen = World.instance.citizens.get(id);
+      const coords = citizen.coords;
+      const path = new Path2D();
+      path.arc(coords[0] / scale, coords[1] / scale, newSize, 0, 2 * Math.PI);
+      World.instance.citizens.set(id, {path: path, coords: [coords[0], coords[1]]});
+      draw();
+    }
+  </script>
+</html>
