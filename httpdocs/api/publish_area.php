@@ -92,6 +92,6 @@ $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
 
-die("{\"status\":\"Published area: $message\"}");
+die("{\"signature\":\"$area[signature]\"}");
 
 ?>
