@@ -43,7 +43,7 @@ $options = array('http' => array('method' => 'POST',
                                  'content' => $data,
                                  'header' => "Content-Type: application/json\r\n" .
                                              "Accept: application/json\r\n"));
-$response = file_get_contents("$notary/area.php", false, stream_context_create($options));
+$response = file_get_contents("$notary/api/area.php", false, stream_context_create($options));
 $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
