@@ -20,11 +20,11 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: content-type");
 
-$names = '';
+$names = array();
 $query = '';
 $message = '';
 foreach($_GET as $key => $value) {
-  $names .= "$key=$value\n";
+  $names[] = "$key=$value";
   $query .= "$key=" . urlencode($value) . "&";
   $message .= "$value, ";
 }
