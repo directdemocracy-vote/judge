@@ -1,3 +1,4 @@
+import ArrowHead from './ArrowHead.js';
 import World from './World.js';
 
 export default class Arrow {
@@ -7,6 +8,10 @@ export default class Arrow {
   #idPoint1;
   #idPoint2;
   #line;
+  #x1;
+  #x2;
+  #y1;
+  #y2;
   constructor(id, idPoint1, idPoint2) {
     this.#id = id;
     this.#idPoint1 = idPoint1;
@@ -15,27 +20,54 @@ export default class Arrow {
     this.#line = new Path2D();
     const coords1 = World.instance.citizens.get(idPoint1).coords;
     const coords2 = World.instance.citizens.get(idPoint2).coords;
-    const [x1, y1] = this.intersection(coords1, coords2);
-    const [x2, y2] = this.intersection(coords2, coords1);
+    const [x1, y1] = this.#intersection(coords1, coords2);
+    const [x2, y2] = this.#intersection(coords2, coords1);
 
-    this.#line.moveTo(x1, y1);
-    this.#line.lineTo(x2, y2);
+    this.#x1 = x1;
+    this.#x2 = x2;
+    this.#y1 = y1;
+    this.#y2 = y2;
+
+    this.#line.moveTo(this.#x1, this.#y1);
+    this.#line.lineTo(this.#x2, this.#y2);
     World.instance.ctx.stroke(this.#line);
 
-    this.#arrowHead1 = this.canvasArrow(x1, y1, x2, y2, World.instance.arrowSize);
-    World.instance.ctx.fillStyle = "black";
-    World.instance.ctx.fill(this.#arrowHead1)
+    this.buildArrow(idPoint1, idPoint2);
   }
 
   get arrowHead1() {
     return this.#arrowHead1;
   }
 
+  get arrowHead2() {
+    return this.#arrowHead2;
+  }
+
+  get idPoint1() {
+    return this.#idPoint1;
+  }
+
+  get idPoint2() {
+    return this.#idPoint2;
+  }
+
   get line() {
     return this.#line;
   }
 
-  canvasArrow(fromx, fromy, tox, toy, r){
+  buildArrow(source, destination) {
+    const path = source === this.idPoint1 ? this.#pathArrow(this.#x1, this.#y1, this.#x2, this.#y2) : this.#pathArrow(this.#x2, this.#y2, this.#x1, this.#y1);
+    if (typeof this.#arrowHead1 === 'undefined')
+      this.#arrowHead1 = new ArrowHead(source, destination, path);
+    else
+      this.#arrowHead2 = new ArrowHead(source, destination, path);
+
+    World.instance.ctx.fillStyle = "black";
+    World.instance.ctx.fill(path)
+  }
+
+  #pathArrow(fromx, fromy, tox, toy){
+    const r = World.instance.arrowSize
     const path = new Path2D();
 
     let angle = Math.atan2(toy-fromy,tox-fromx)
@@ -61,7 +93,7 @@ export default class Arrow {
     return path
   }
 
-  intersection(coords1, coords2, arrow){
+  #intersection(coords1, coords2, arrow){
     const x1 = coords1[0];
     const y1 = coords1[1];
     const x2 = coords2[0];
