@@ -1,5 +1,5 @@
 <?php
-$version = "0.0.1";
+$version = "0.0.2";
 $notary = 'https://notary.directdemocracy.vote';
 
 function error($message) {
@@ -20,11 +20,11 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: content-type");
 
-$names = '';
+$names = array();
 $query = '';
 $message = '';
 foreach($_GET as $key => $value) {
-  $names .= "$key=$value\n";
+  $names[] = "$key=$value";
   $query .= "$key=" . urlencode($value) . "&";
   $message .= "$value, ";
 }
@@ -43,7 +43,7 @@ $options = array('http' => array('method' => 'POST',
                                  'content' => $data,
                                  'header' => "Content-Type: application/json\r\n" .
                                              "Accept: application/json\r\n"));
-$response = file_get_contents("$notary/area.php", false, stream_context_create($options));
+$response = file_get_contents("$notary/api/area.php", false, stream_context_create($options));
 $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
@@ -87,11 +87,11 @@ $options = array('http' => array('method' => 'POST',
                                  'content' => $area_data,
                                  'header' => "Content-Type: application/json\r\n" .
                                              "Accept: application/json\r\n"));
-$response = file_get_contents("$notary/ajax/publish.php", false, stream_context_create($options));
+$response = file_get_contents("$notary/api/publish.php", false, stream_context_create($options));
 $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
 
-die("{\"status\":\"Published area: $message\"}");
+die("{\"signature\":\"$area[signature]\"}");
 
 ?>
