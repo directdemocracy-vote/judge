@@ -9,6 +9,7 @@ export default class Citizen {
     this.#path = path;
     this.#coords = coords;
     this.#size = size;
+    this.#reputation = 0;
   }
 
   get id() {
@@ -29,6 +30,10 @@ export default class Citizen {
 
   set coords(newCoords) {
     this.#coords = newCoords;
+  }
+
+  get reputation() {
+    return this.#reputation;
   }
 
   get size() {

@@ -141,6 +141,16 @@
           if (typeof selection === 'undefined') {
             changePointSize(id, World.instance.selectedPointSize)
             selection = id;
+
+            const citizen = World.instance.citizens.get(id)
+            idPlaceholder.innerHTML = "";
+            const idDiv = document.createElement('div');
+            idDiv.innerHTML = "ID: " + id;
+            idPlaceholder.appendChild(idDiv);
+            const distanceDiv = document.createElement('div');
+            distanceDiv.innerHTML = "Reputation: " + citizen.reputation;
+            idPlaceholder.appendChild(distanceDiv);
+            revokeButton(id);
           } else {
             drawEndorsment(selection, id)
           }
@@ -161,6 +171,7 @@
           const distanceDiv = document.createElement('div');
           distanceDiv.innerHTML = "Distance: " + line.distance + "km";
           idPlaceholder.appendChild(distanceDiv);
+          revokeButton(id);
         }
       }
     }
@@ -182,6 +193,7 @@
     function resetSelection() {
       changePointSize(selection, World.instance.basePointSize);
       selection = undefined;
+      idPlaceholder.innerHTML = "";
     }
 
     function changePointSize(id, newSize) {
@@ -209,6 +221,29 @@
         World.instance.translatePosition.y = event.clientY - World.instance.startDragOffset.y;
         draw();
       }
+    }
+
+    function revokeButton(id) {
+      const button = document.createElement('button')
+      button.innerHTML = "Revoke";
+      button.onclick = () => {
+        if (World.instance.citizens.has(id)) {
+          World.instance.citizens.delete(id);
+          for (const endorsement of World.instance.endorsements.values()) {
+            if (endorsement.idPoint1 === id || endorsement.idPoint2 === id)
+              World.instance.endorsements.delete(endorsement.id);
+          }
+        } else {
+          for (const endorsement of World.instance.endorsements.values()) {
+            if (typeof endorsement.arrowHead1 !== 'undefined' && endorsement.arrowHead1.id === id ||
+              typeof endorsement.arrowHead2 !== 'undefined' && endorsement.arrowHead2.id === id)
+              World.instance.endorsements.delete(endorsement.id);
+          }
+        }
+        selection = undefined;
+        draw();
+      }
+      idPlaceholder.appendChild(button);
     }
   </script>
 </html>

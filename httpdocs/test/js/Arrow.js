@@ -35,6 +35,10 @@ export default class Arrow {
     return this.#distance;
   }
 
+  get id() {
+    return this.#id;
+  }
+
   get idPoint1() {
     return this.#idPoint1;
   }
