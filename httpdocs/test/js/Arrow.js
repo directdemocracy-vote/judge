@@ -4,6 +4,7 @@ import World from './World.js';
 export default class Arrow {
   #arrowHead1;
   #arrowHead2;
+  #distance;
   #id
   #idPoint1;
   #idPoint2;
@@ -17,21 +18,8 @@ export default class Arrow {
     this.#idPoint1 = idPoint1;
     this.#idPoint2 = idPoint2;
 
-    this.#line = new Path2D();
-    const coords1 = World.instance.citizens.get(idPoint1).coords;
-    const coords2 = World.instance.citizens.get(idPoint2).coords;
-    const [x1, y1] = this.#intersection(coords1, coords2);
-    const [x2, y2] = this.#intersection(coords2, coords1);
-
-    this.#x1 = x1;
-    this.#x2 = x2;
-    this.#y1 = y1;
-    this.#y2 = y2;
-
-    this.#line.moveTo(this.#x1, this.#y1);
-    this.#line.lineTo(this.#x2, this.#y2);
-    World.instance.ctx.stroke(this.#line);
-
+    this.#computeDistance();
+    this.buildLine();
     this.buildArrow(idPoint1, idPoint2);
   }
 
@@ -41,6 +29,10 @@ export default class Arrow {
 
   get arrowHead2() {
     return this.#arrowHead2;
+  }
+
+  get distance() {
+    return this.#distance;
   }
 
   get idPoint1() {
@@ -55,12 +47,40 @@ export default class Arrow {
     return this.#line;
   }
 
+  buildLine() {
+    this.#line = new Path2D();
+    let coords1 = World.instance.citizens.get(this.#idPoint1).coords;
+    coords1 = [coords1[0] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel), coords1[1] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel)];
+    let coords2 = World.instance.citizens.get(this.#idPoint2).coords;
+    coords2 = [coords2[0] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel), coords2[1] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel)];
+
+    const [x1, y1] = this.#intersection(coords1, coords2);
+    const [x2, y2] = this.#intersection(coords2, coords1);
+
+    this.#x1 = x1;
+    this.#x2 = x2;
+    this.#y1 = y1;
+    this.#y2 = y2;
+
+    this.#line.moveTo(this.#x1, this.#y1);
+    this.#line.lineTo(this.#x2, this.#y2);
+    World.instance.ctx.stroke(this.#line);
+  }
+
   buildArrow(source, destination) {
     const path = source === this.idPoint1 ? this.#pathArrow(this.#x1, this.#y1, this.#x2, this.#y2) : this.#pathArrow(this.#x2, this.#y2, this.#x1, this.#y1);
     if (typeof this.#arrowHead1 === 'undefined')
       this.#arrowHead1 = new ArrowHead(source, destination, path);
     else
       this.#arrowHead2 = new ArrowHead(source, destination, path);
+
+    World.instance.ctx.fillStyle = "black";
+    World.instance.ctx.fill(path)
+  }
+
+  rebuildArrowHead(arrowHead) {
+    const path = arrowHead.source === this.idPoint1 ? this.#pathArrow(this.#x1, this.#y1, this.#x2, this.#y2) : this.#pathArrow(this.#x2, this.#y2, this.#x1, this.#y1);
+    arrowHead.path = path;
 
     World.instance.ctx.fillStyle = "black";
     World.instance.ctx.fill(path)
@@ -115,5 +135,14 @@ export default class Arrow {
     const norm2 = Math.sqrt(Math.pow(x2 - x4, 2) + Math.pow(y2 - y4, 2));
 
     return norm1 < norm2 ? [x3, y3] : [x4, y4];
+  }
+
+  #computeDistance() {
+    const [x1, y1] =  World.instance.citizens.get(this.#idPoint1).coords;
+    const [x2, y2] =  World.instance.citizens.get(this.#idPoint2).coords;
+
+    const norm = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    this.#distance = norm * World.instance.pixelToMeterRatio / 1000;
+    this.#distance = this.#distance.toFixed(3);
   }
 }

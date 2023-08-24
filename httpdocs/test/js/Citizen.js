@@ -2,6 +2,7 @@ export default class Citizen {
   #coords;
   #id;
   #path
+  #reputation
   #size;
   constructor(id, path, coords, size) {
     this.#id = id;

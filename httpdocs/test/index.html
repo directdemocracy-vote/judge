@@ -10,18 +10,20 @@
   </head>
   <body>
     <canvas id="worldMap" width="512" height="512" style="border:1px solid #000000;"></canvas>
+    <div id="idPlaceholder" style="width: 512px; height: 512px; position: absolute; top: 0px; left: 600px"></div>
   </body>
   <script type="module">
     import World from './js/World.js';
     import Arrow from './js/Arrow.js';
     import Citizen from './js/Citizen.js';
 
-    const c = document.getElementById("worldMap");
+    const c = document.getElementById('worldMap');
     const ctx = c.getContext("2d");
 
     World.init(ctx, c);
 
-    let idGenerator = 1  ;
+    const idPlaceholder = document.getElementById('idPlaceholder');
+
     let selection;
 
     const canvas = document.querySelector('canvas')
@@ -73,11 +75,11 @@
 
       for (const endorsement of World.instance.endorsements.values()) {
         World.instance.ctx.fillStyle = "black";
-        World.instance.ctx.stroke(endorsement.line);
+        endorsement.buildLine();
         if (endorsement.arrowHead1)
-          World.instance.ctx.fill(endorsement.arrowHead1.path);
+          endorsement.rebuildArrowHead(endorsement.arrowHead1);
         if (endorsement.arrowHead2)
-          World.instance.ctx.fill(endorsement.arrowHead2.path);
+          endorsement.rebuildArrowHead(endorsement.arrowHead2);
       }
 
       World.instance.ctx.restore();
@@ -86,11 +88,10 @@
     function drawPoint(x, y) {
       const point = new Path2D();
       const coordX = (x - World.instance.translatePosition.x) * Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel);
-      console.log(coordX)
       const coordY = (y - World.instance.translatePosition.y) * Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel);
       point.arc(x, y, World.instance.basePointSize, 0, 2 * Math.PI);
 
-      const id = idGenerator++
+      const id = World.instance.idGenerator++
       const citizen = new Citizen(id, point, [coordX, coordY], World.instance.basePointSize);
       World.instance.citizens.set(id, citizen);
       draw();
@@ -112,7 +113,7 @@
         }
       }
 
-      const id = idGenerator++;
+      const id = World.instance.idGenerator++;
       const arrow = new Arrow(id, id1, id2);
       World.instance.endorsements.set(id, arrow);
       resetSelection();
@@ -144,14 +145,28 @@
             drawEndorsment(selection, id)
           }
         } else {
-          console.log("arrowHead")
+          let line;
+          for (const endorsement of World.instance.endorsements.values()) {
+            if ((endorsement.arrowHead1 && endorsement.arrowHead1.id === id) ||
+                  (endorsement.arrowHead2 && endorsement.arrowHead2.id === id)) {
+              line =  endorsement;
+              break;
+            }
+          }
+
+          idPlaceholder.innerHTML = "";
+          const idDiv = document.createElement('div');
+          idDiv.innerHTML = "ID: " + id;
+          idPlaceholder.appendChild(idDiv);
+          const distanceDiv = document.createElement('div');
+          distanceDiv.innerHTML = "Distance: " + line.distance + "km";
+          idPlaceholder.appendChild(distanceDiv);
         }
       }
     }
 
     function isOnPoint(x, y) {
       for (const entry of World.instance.citizens.entries()) {
-        console.log(entry[1].path)
         if (World.instance.ctx.isPointInPath(entry[1].path, x, y))
           return entry[0];
       }

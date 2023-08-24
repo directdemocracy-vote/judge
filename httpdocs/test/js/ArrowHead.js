@@ -24,6 +24,10 @@ export default class ArrowHead {
     return this.#path;
   }
 
+  set path(newPath) {
+    this.#path = newPath;
+  }
+
   get source() {
     return this.#source;
   }
