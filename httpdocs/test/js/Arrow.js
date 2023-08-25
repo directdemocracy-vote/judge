@@ -27,8 +27,16 @@ export default class Arrow {
     return this.#arrowHead1;
   }
 
+  set arrowHead1(newArrowHead1) {
+    this.#arrowHead1 = newArrowHead1;
+  }
+
   get arrowHead2() {
     return this.#arrowHead2;
+  }
+
+  set arrowHead2(newArrowHead2) {
+    this.#arrowHead2 = newArrowHead2;
   }
 
   get distance() {
@@ -51,7 +59,7 @@ export default class Arrow {
     return this.#line;
   }
 
-  buildLine() {
+  buildLine(showDistance) {
     this.#line = new Path2D();
     let coords1 = World.instance.citizens.get(this.#idPoint1).coords;
     coords1 = [coords1[0] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel), coords1[1] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel)];
@@ -69,6 +77,14 @@ export default class Arrow {
     this.#line.moveTo(this.#x1, this.#y1);
     this.#line.lineTo(this.#x2, this.#y2);
     World.instance.ctx.stroke(this.#line);
+
+    const centerX = (this.#x1 + this.#x2) / 2;
+    const centerY = (this.#y1 + this.#y2) / 2;
+
+    if (showDistance) {
+      World.instance.ctx.font = "10px serif";
+      World.instance.ctx.fillText(this.#distance, centerX, centerY);
+    }
   }
 
   buildArrow(source, destination) {

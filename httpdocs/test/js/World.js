@@ -9,6 +9,8 @@ export default class World {
   #mouseDown;
   #pixelToMeterRatio;
   #selectedPointSize;
+  #showDistance;
+  #showReputation;
   #startDragOffset;
   #translatePosition;
   #year;
@@ -34,6 +36,8 @@ export default class World {
     this.#zoomLevel = 17;
     this.#maxZoomLevel = 17;
     this.#pixelToMeterRatio = 0.6;
+
+    this.showReputation = false;
   }
 
   get arrowSize() {
@@ -78,6 +82,22 @@ export default class World {
 
   get pixelToMeterRatio() {
     return this.#pixelToMeterRatio;
+  }
+
+  get showReputation() {
+    return this.#showReputation;
+  }
+
+  set showReputation(newReputation) {
+    this.#showReputation = newReputation;
+  }
+
+  get showDistance() {
+    return this.#showDistance;
+  }
+
+  set showDistance(newDistance) {
+    this.#showDistance = newDistance;
   }
 
   get selectedPointSize() {
@@ -145,12 +165,30 @@ export default class World {
           const reputation = this.#citizens.get(source).reputation;
           sum += reputationFactor * reputation / linkedEndorsement.length / (1 + parseFloat(link.distance)) / (1 + age);
         }
-        console.log(citizen.id + " :" + sum)
 
         const newReputation = (1 - d) / N + (d * sum);
         citizen.reputation = newReputation;
         citizen.endorsed = newReputation > threshold;
       }
     }
+  }
+
+  computeStatistics() {
+    const statisticsPlaceholder = document.getElementById('statisticsPlaceholder');
+    statisticsPlaceholder.innerHTML = '';
+
+    const nbrCitizensDiv = document.createElement('div');
+    nbrCitizensDiv.innerHTML = 'Number of citizens: ' + this.#citizens.size;
+    statisticsPlaceholder.appendChild(nbrCitizensDiv);
+
+    const nbrCitizensEndorsedDiv = document.createElement('div');
+    let endorsed = 0;
+    for (const citizen of this.#citizens.values()) {
+      if (citizen.endorsed)
+        endorsed++;
+    }
+
+    nbrCitizensEndorsedDiv.innerHTML = 'Number of endorsed citizens: ' + endorsed;
+    statisticsPlaceholder.appendChild(nbrCitizensEndorsedDiv);
   }
 }

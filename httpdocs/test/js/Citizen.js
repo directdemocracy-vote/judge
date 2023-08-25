@@ -1,5 +1,6 @@
 export default class Citizen {
   #coords;
+  #endorsed;
   #id;
   #path
   #reputation
@@ -14,6 +15,14 @@ export default class Citizen {
 
   get id() {
     return this.#id;
+  }
+
+  get endorsed() {
+    return this.#endorsed;
+  }
+
+  set endorsed(newEndorsed) {
+    this.#endorsed = newEndorsed;
   }
 
   get path() {

@@ -1,0 +1,3 @@
+save/load file
+scale indicator
+stats of (number of assermented, average distance, average endorsement)

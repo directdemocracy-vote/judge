@@ -10,10 +10,13 @@
   </head>
   <body>
     <canvas id="worldMap" width="512" height="512" style="border:1px solid #000000;"></canvas>
-    <div id="idPlaceholder" style="width: 512px; height: 512px; position: absolute; top: 0px; left: 600px"></div>
+    <div id="idPlaceholder" style="width: 256px; height: 512px; position: absolute; top: 0px; left: 600px"></div>
+    <div id="statisticsPlaceholder" style="width: 256px; height: 512px; position: absolute; top: 0px; left: 900px"></div>
     <div id="menu">
       <button id="reputation">Compute reputation</button>
       <button id="age">Next year</button>
+      <button id="show-reputation">Show reputation</button>
+      <button id="show-distance">Show distance</button>
     </div>
   </body>
   <script type="module">
@@ -34,6 +37,12 @@
     }
     const ageButton = document.getElementById('age');
     ageButton.onclick = () => World.instance.year++;
+
+    const showReputationButton = document.getElementById('show-reputation');
+    showReputationButton.onclick = () => showReputation();
+
+    const showDistanceButton = document.getElementById('show-distance');
+    showDistanceButton.onclick = () => showDistance();
 
     let selection;
 
@@ -77,7 +86,9 @@
 
       for (const citizen of World.instance.citizens.values()) {
         const path = new Path2D();
-        path.arc(citizen.coords[0] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel), citizen.coords[1] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel), citizen.size, 0, 2 * Math.PI);
+        const coordX = citizen.coords[0] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel);
+        const coordY = citizen.coords[1] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel);
+        path.arc(coordX, coordY, citizen.size, 0, 2 * Math.PI);
         citizen.path = path;
 
         if (citizen.endorsed)
@@ -86,11 +97,16 @@
           World.instance.ctx.fillStyle = "red";
 
         World.instance.ctx.fill(path);
+
+        if (World.instance.showReputation) {
+          ctx.font = "10px serif";
+          ctx.fillText(citizen.reputation.toFixed(3), coordX - 11, coordY - 7);
+        }
       }
 
       for (const endorsement of World.instance.endorsements.values()) {
         World.instance.ctx.fillStyle = "black";
-        endorsement.buildLine();
+        endorsement.buildLine(World.instance.showDistance);
         if (endorsement.arrowHead1)
           endorsement.rebuildArrowHead(endorsement.arrowHead1);
         if (endorsement.arrowHead2)
@@ -98,6 +114,7 @@
       }
 
       World.instance.ctx.restore();
+      World.instance.computeStatistics();
     }
 
     function drawPoint(x, y) {
@@ -261,15 +278,43 @@
           }
         } else {
           for (const endorsement of World.instance.endorsements.values()) {
-            if (typeof endorsement.arrowHead1 !== 'undefined' && endorsement.arrowHead1.id === id ||
-              typeof endorsement.arrowHead2 !== 'undefined' && endorsement.arrowHead2.id === id)
-              World.instance.endorsements.delete(endorsement.id);
+            if (typeof endorsement.arrowHead1 !== 'undefined' && endorsement.arrowHead1.id === id) {
+              if (typeof endorsement.arrowHead2 !== 'undefined')
+                endorsement.arrowHead1 = undefined;
+              else
+                World.instance.endorsements.delete(endorsement.id);
+            } else if(typeof endorsement.arrowHead2 !== 'undefined' && endorsement.arrowHead2.id === id) {
+              if (typeof endorsement.arrowHead1 !== 'undefined')
+                endorsement.arrowHead2 = undefined;
+              else
+                World.instance.endorsements.delete(endorsement.id);
+            }
           }
         }
         selection = undefined;
         draw();
       }
       idPlaceholder.appendChild(button);
+    }
+
+    function showReputation() {
+      if (World.instance.showReputation)
+        showReputationButton.innerHTML = "Show reputation";
+      else
+        showReputationButton.innerHTML = "Hide reputation";
+
+      World.instance.showReputation = !World.instance.showReputation;
+      draw()
+    }
+
+    function showDistance() {
+      if (World.instance.showReputation)
+        showDistance.innerHTML = "Show distance(km)";
+      else
+        showDistance.innerHTML = "Hide distance(km)";
+
+      World.instance.showDistance = !World.instance.showDistance;
+      draw()
     }
   </script>
 </html>
