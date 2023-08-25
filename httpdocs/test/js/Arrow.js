@@ -74,9 +74,9 @@ export default class Arrow {
   buildArrow(source, destination) {
     const path = source === this.idPoint1 ? this.#pathArrow(this.#x1, this.#y1, this.#x2, this.#y2) : this.#pathArrow(this.#x2, this.#y2, this.#x1, this.#y1);
     if (typeof this.#arrowHead1 === 'undefined')
-      this.#arrowHead1 = new ArrowHead(source, destination, path);
+      this.#arrowHead1 = new ArrowHead(source, destination, path, World.instance.year);
     else
-      this.#arrowHead2 = new ArrowHead(source, destination, path);
+      this.#arrowHead2 = new ArrowHead(source, destination, path, World.instance.year);
 
     World.instance.ctx.fillStyle = "black";
     World.instance.ctx.fill(path)

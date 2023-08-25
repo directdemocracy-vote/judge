@@ -36,6 +36,10 @@ export default class Citizen {
     return this.#reputation;
   }
 
+  set reputation(newReputation) {
+    this.#reputation = newReputation;
+  }
+
   get size() {
     return this.#size;
   }
