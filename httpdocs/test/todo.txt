@@ -1,0 +1,3 @@
+bordure
+save/load file
+scale indicator
