@@ -436,7 +436,7 @@ export default class World {
   #loadWorld() {
     fetch('/test/ajax/list.php')
       .then(response => response.json())
-      .then(console.log(response));
+      .then(response => console.log(response));
   }
 
   #resetSelection() {

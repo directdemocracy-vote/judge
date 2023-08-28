@@ -6,7 +6,7 @@
   $worlds = array();
   foreach (new DirectoryIterator('../storage') as $file) {
     if($file->isDot()) continue;
-    array_push($array, $file);
+    array_push($worlds, $file);
   }
 
-  die(json_encode($array));
+  die(json_encode($worlds));
