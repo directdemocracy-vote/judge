@@ -56,4 +56,8 @@ export default class Citizen {
   set size(newSize) {
     this.#size = newSize;
   }
+
+  toJson(){
+    return { id: this.#id, coords: this.#coords};
+  }
 }

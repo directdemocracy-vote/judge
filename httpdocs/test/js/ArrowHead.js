@@ -37,4 +37,8 @@ export default class ArrowHead {
   get source() {
     return this.#source;
   }
+
+  toJson() {
+    return {id: this.#id, age: this.#age, source: this.#source, destination: this.#destination};
+  }
 }

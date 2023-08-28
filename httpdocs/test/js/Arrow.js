@@ -55,10 +55,6 @@ export default class Arrow {
     return this.#idPoint2;
   }
 
-  get line() {
-    return this.#line;
-  }
-
   buildLine(showDistance) {
     this.#line = new Path2D();
     let coords1 = World.instance.citizens.get(this.#idPoint1).coords;
@@ -163,6 +159,10 @@ export default class Arrow {
 
     const norm = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     this.#distance = norm * World.instance.pixelToMeterRatio / 1000;
-    this.#distance = this.#distance.toFixed(3);
+    this.#distance = parseFloat(this.#distance.toFixed(3));
+  }
+
+  toJson() {
+    return {id: this.#id, idPoint1: this.#idPoint1, idPoint2: this.#idPoint2, arrowHead1: this.#arrowHead1?.toJson(), arrowHead2: this.#arrowHead2?.toJson()};
   }
 }
