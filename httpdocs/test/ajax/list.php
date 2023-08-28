@@ -4,9 +4,9 @@
   }
 
   $worlds = array();
-  foreach (new DirectoryIterator('../storage/') as $file) {
+  foreach (new DirectoryIterator('../storage') as $file) {
     if($file->isDot()) continue;
-    array_push($worlds, $file);
+    array_push($worlds, $file->getFilename());
   }
 
   die(json_encode($worlds));
