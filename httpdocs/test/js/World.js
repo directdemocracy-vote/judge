@@ -83,6 +83,9 @@ export default class World {
     const saveButton = document.getElementById('save-world');
     saveButton.onclick = () => this.#saveWorld();
 
+    const loadButton = document.getElementById('load-world');
+    loadButton.onclick = () => this.#loadWorld();
+
     // prevent context menu to open
     this.#canvas.oncontextmenu = () => {return false;}
 
@@ -430,6 +433,12 @@ export default class World {
     }
   }
 
+  #load() {
+    fetch('/test/ajax/list.php')
+      .then(response => response.json())
+      .then(console.log(response));
+  }
+
   #resetSelection() {
     this.#changePointSize(this.#selection, this.#basePointSize);
     this.#selection = undefined;
@@ -478,7 +487,7 @@ export default class World {
       endorsements.push(endorsement.toJson());
 
     fetch('/test/ajax/save.php', { method: 'post', body: JSON.stringify({ name: name, citizens: citizens, endorsements: endorsements})})
-      .then(response => response.json())
+      .then(response => response.text())
       .then(response => console.log(response));
   }
 
