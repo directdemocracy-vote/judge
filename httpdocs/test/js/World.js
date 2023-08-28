@@ -433,7 +433,7 @@ export default class World {
     }
   }
 
-  #load() {
+  #loadWorld() {
     fetch('/test/ajax/list.php')
       .then(response => response.json())
       .then(console.log(response));
