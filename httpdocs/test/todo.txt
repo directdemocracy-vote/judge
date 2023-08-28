@@ -1,3 +1,4 @@
 bordure
 save/load file
 scale indicator
+change size of point depending on zoom
