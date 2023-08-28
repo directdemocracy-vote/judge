@@ -477,7 +477,9 @@ export default class World {
     for (const endorsement of this.#endorsements.values())
       endorsements.push(endorsement.toJson());
 
-    fetch('/test/ajax/save.php', { method: 'post', body: JSON.stringify({ name: name, citizens: citizens, endorsements: endorsements})});
+    fetch('/test/ajax/save.php', { method: 'post', body: JSON.stringify({ name: name, citizens: citizens, endorsements: endorsements})})
+      .then(response => response.json());
+      .then(response => console.log(response));
   }
 
   #showDistance() {
