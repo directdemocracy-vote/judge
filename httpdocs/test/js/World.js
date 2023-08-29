@@ -101,7 +101,7 @@ export default class World {
       console.log(this.#worldToLoad)
       fetch('/test/ajax/load.php', { method: 'post', body: JSON.stringify({ name: this.#worldToLoad})})
         .then(response => response.json())
-        .then(console.log(response));
+        .then(response => console.log(response));
       document.getElementById('load-menu').style.display = 'none';
       this.#worldToLoad = undefined;
 
