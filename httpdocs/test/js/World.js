@@ -458,6 +458,7 @@ export default class World {
 
               div.style.background = 'dodgerblue';
             }
+            menu.appendChild(div);
           }
         }
       });
