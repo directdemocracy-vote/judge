@@ -85,26 +85,13 @@ export default class World {
     saveButton.onclick = () => this.#saveWorld();
 
     const openLoadButton = document.getElementById('load-world');
-    openLoadButton.onclick = () => this.#loadWorld();
+    openLoadButton.onclick = () => this.#openWorldsPanel();
 
     const cancelButton = document.getElementById('cancel');
-    cancel.onclick = () => {
-      document.getElementById('load-menu').style.display = 'none';
-      this.#worldToLoad = undefined;
-    }
+    cancel.onclick = () => this.#closeWorldsPanel();
 
     const loadButton = document.getElementById('load');
-    loadButton.onclick = () => {
-      if (typeof this.#worldToLoad === 'undefined')
-        return;
-
-      fetch('/test/storage/' + this.#worldToLoad)
-        .then(response => response.json())
-        .then(response => console.log(response));
-      document.getElementById('load-menu').style.display = 'none';
-      this.#worldToLoad = undefined;
-
-    }
+    loadButton.onclick = () => this.#loadWorld();
 
     // prevent context menu to open
     this.#canvas.oncontextmenu = () => {return false;}
@@ -120,8 +107,6 @@ export default class World {
       else if (this.#zoomLevel > this.#maxZoomLevel)
         this.#zoomLevel = this.#maxZoomLevel;
       this.#draw(true);
-
-
     });
 
     this.#canvas.addEventListener('mouseup', () => this.#mouseDown = false);
@@ -197,6 +182,10 @@ export default class World {
     this.#draw();
   }
 
+  #closeWorldsPanel() {
+    document.getElementById('load-menu').style.display = 'none';
+    this.#worldToLoad = undefined;
+  }
 
   #computeReputation() {
     // damping parameter
@@ -454,6 +443,19 @@ export default class World {
   }
 
   #loadWorld() {
+    if (typeof this.#worldToLoad === 'undefined')
+      return;
+
+    fetch('/test/storage/' + this.#worldToLoad)
+      .then(response => response.json())
+      .then(response => console.log(response));
+
+    World.init();
+
+    this.#closeWorldsPanel();
+  }
+
+  #openWorldsPanel() {
     document.getElementById('load-menu').style.display = 'block'
     const menu = document.getElementById('world-menu');
     fetch('/test/ajax/list.php')
