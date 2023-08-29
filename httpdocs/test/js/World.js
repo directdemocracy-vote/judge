@@ -453,7 +453,7 @@ export default class World {
         for (const citizen of response.citizens) {
           if (citizen.id >= this.#idGenerator)
             this.#idGenerator = citizen.id + 1;
-          this.#citizens.set(citizen.id, undefined, citizen.coords, this.#basePointSize);
+          this.#citizens.set(citizen.id, new Citizen(citizen.id, undefined, citizen.coords, this.#basePointSize));
         }
 
         this.#draw();
