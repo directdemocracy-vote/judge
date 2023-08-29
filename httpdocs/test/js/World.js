@@ -23,11 +23,12 @@ export default class World {
   #showReputationButton;
   #startDragOffset;
   #translatePosition;
+  #worldToLoad;
   #year;
   #zoomLevel;
   constructor() {
     this.#canvas = document.getElementById('worldMap');
-    this.#ctx = this.#canvas.getContext("2d");
+    this.#ctx = this.#canvas.getContext('2d');
 
     this.#citizens = new Map();
     this.#endorsements = new Map();
@@ -77,7 +78,7 @@ export default class World {
 
     });
 
-    this.#canvas.addEventListener("mousemove", event => this.#translateViewpoint(event));
+    this.#canvas.addEventListener('mousemove', event => this.#translateViewpoint(event));
 
 
     const saveButton = document.getElementById('save-world');
@@ -107,9 +108,9 @@ export default class World {
 
     });
 
-    this.#canvas.addEventListener("mouseup", () => this.#mouseDown = false);
-    this.#canvas.addEventListener("mouseover", () => this.#mouseDown = false);
-    this.#canvas.addEventListener("mouseout", () => this.#mouseDown = false);
+    this.#canvas.addEventListener('mouseup', () => this.#mouseDown = false);
+    this.#canvas.addEventListener('mouseover', () => this.#mouseDown = false);
+    this.#canvas.addEventListener('mouseout', () => this.#mouseDown = false);
 
   }
 
@@ -265,13 +266,13 @@ export default class World {
 
       const averageDistanceDiv = document.createElement('div');
       const averageDistance = (totalDistance / nbrEndorsements).toFixed(3);
-      averageDistanceDiv.innerHTML = "Average distance of endorsements: " + averageDistance + "km";
+      averageDistanceDiv.innerHTML = 'Average distance of endorsements: ' + averageDistance + 'km';
       statisticsPlaceholder.appendChild(averageDistanceDiv);
 
       const medianDistanceDiv = document.createElement('div');
       distanceList.sort(this.#sort);
       const medianDistance = distanceList.length % 2 === 0 ? ((distanceList[distanceList.length / 2 - 1] + distanceList[distanceList.length / 2]) / 2) : distanceList[(distanceList.length + 1) / 2 - 1];
-      medianDistanceDiv.innerHTML = "Median distance of endorsements: " + medianDistance + "km";
+      medianDistanceDiv.innerHTML = 'Median distance of endorsements: ' + medianDistance + 'km';
       statisticsPlaceholder.appendChild(medianDistanceDiv);90
     }
   }
@@ -293,20 +294,20 @@ export default class World {
       citizen.path = path;
 
       if (citizen.endorsed)
-        this.#ctx.fillStyle = "green";
+        this.#ctx.fillStyle = 'green';
       else
-        this.#ctx.fillStyle = "red";
+        this.#ctx.fillStyle = 'red';
 
       this.#ctx.fill(path);
 
       if (this.#displayReputation) {
-        this.#ctx.font = "10px serif";
+        this.#ctx.font = '10px serif';
         this.#ctx.fillText(citizen.reputation.toFixed(3), coordX - 11, coordY - 7);
       }
     }
 
     for (const endorsement of this.#endorsements.values()) {
-      this.#ctx.fillStyle = "black";
+      this.#ctx.fillStyle = 'black';
       endorsement.buildLine(this.#displayDistance);
       if (endorsement.arrowHead1)
         endorsement.rebuildArrowHead(endorsement.arrowHead1);
@@ -374,12 +375,12 @@ export default class World {
           this.#selection = id;
 
           const citizen = this.#citizens.get(id)
-          this.#idPlaceholder.innerHTML = "";
+          this.#idPlaceholder.innerHTML = '';
           const idDiv = document.createElement('div');
-          idDiv.innerHTML = "ID: " + id;
+          idDiv.innerHTML = 'ID: ' + id;
           this.#idPlaceholder.appendChild(idDiv);
           const distanceDiv = document.createElement('div');
-          distanceDiv.innerHTML = "Reputation: " + citizen.reputation;
+          distanceDiv.innerHTML = 'Reputation: ' + citizen.reputation;
           this.#idPlaceholder.appendChild(distanceDiv);
           this.#revokeButton(id);
         } else {
@@ -400,16 +401,16 @@ export default class World {
           }
         }
 
-        this.#idPlaceholder.innerHTML = "";
+        this.#idPlaceholder.innerHTML = '';
         const idDiv = document.createElement('div');
-        idDiv.innerHTML = "ID: " + id;
+        idDiv.innerHTML = 'ID: ' + id;
         this.#idPlaceholder.appendChild(idDiv);
         const distanceDiv = document.createElement('div');
-        distanceDiv.innerHTML = "Distance: " + line.distance + "km";
+        distanceDiv.innerHTML = 'Distance: ' + line.distance + 'km';
         this.#idPlaceholder.appendChild(distanceDiv);
         const ageDiv = document.createElement('div');
         const age = head === 1 ? line.arrowHead1.age : line.arrowHead2.age;
-        ageDiv.innerHTML = "Year: " + age;
+        ageDiv.innerHTML = 'Year: ' + age;
         this.#idPlaceholder.appendChild(ageDiv);
         this.#revokeButton(id);
       }
@@ -438,22 +439,39 @@ export default class World {
 
   #loadWorld() {
     document.getElementById('load-menu').style.display = 'block'
+    const menu = document.getElementById('world-menu');
     fetch('/test/ajax/list.php')
       .then(response => response.json())
       .then(response => {
-        console.log(response)
+        for (const name of response) {
+          if (name === ''.gitignore')
+            continue;
+          else {
+            const div = document.createElement('div');
+            div.className = 'world';
+            div.innerHTML = response;
+            div.onclick = () => {
+              this.#worldToLoad = response;
+              const worlds = document.getElementsByClassName('world');
+              for (const world of worlds)
+                world.style.background = 'transparent';
+
+              div.style.background = 'dodgerblue';
+            }
+          }
+        }
       });
   }
 
   #resetSelection() {
     this.#changePointSize(this.#selection, this.#basePointSize);
     this.#selection = undefined;
-    this.#idPlaceholder.innerHTML = "";
+    this.#idPlaceholder.innerHTML = '';
   }
 
   #revokeButton(id) {
     const button = document.createElement('button')
-    button.innerHTML = "Revoke";
+    button.innerHTML = 'Revoke';
     button.onclick = () => {
       if (this.#citizens.has(id)) {
         this.#citizens.delete(id);
@@ -499,9 +517,9 @@ export default class World {
 
   #showDistance() {
     if (this.#displayDistance)
-      this.#showDistanceButton.innerHTML = "Show distance (km)";
+      this.#showDistanceButton.innerHTML = 'Show distance (km)';
     else
-      this.#showDistanceButton.innerHTML = "Hide distance (km)";
+      this.#showDistanceButton.innerHTML = 'Hide distance (km)';
 
     this.#displayDistance = !this.#displayDistance;
     this.#draw()
@@ -509,9 +527,9 @@ export default class World {
 
   #showReputation() {
     if (this.#displayReputation)
-      this.#showReputationButton.innerHTML = "Show reputation";
+      this.#showReputationButton.innerHTML = 'Show reputation';
     else
-      this.#showReputationButton.innerHTML = "Hide reputation";
+      this.#showReputationButton.innerHTML = 'Hide reputation';
 
     this.#displayReputation = !this.#displayReputation;
     this.#draw()
