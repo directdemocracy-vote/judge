@@ -1,0 +1,29 @@
+.load-menu {
+  width: 200px;
+  height: 300px;
+  top: calc(50% - 150px);
+  left: calc(50% - 100px);
+  position: absolute;
+  border: 1px black solid;
+  background-color: lightgrey;
+  display: none;
+}
+
+.load-button {
+  width: 42%;
+  margin-left: 5%;
+  margin-top: 8px;
+}
+
+.world-menu {
+  height: 85%;
+  width: 90%;
+  margin-left: 5%;
+  margin-top: 5%;
+  background: white;
+  overflow: scroll;
+}
+
+.world-menu div:hover {
+  background: lightskyblue;
+}

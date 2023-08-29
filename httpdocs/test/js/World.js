@@ -83,8 +83,11 @@ export default class World {
     const saveButton = document.getElementById('save-world');
     saveButton.onclick = () => this.#saveWorld();
 
-    const loadButton = document.getElementById('load-world');
-    loadButton.onclick = () => this.#loadWorld();
+    const openLoadButton = document.getElementById('load-world');
+    openLoadButton.onclick = () => this.#loadWorld();
+
+    const cancelButton = document.getElementById('cancel');
+    cancel.onclick = () => document.getElementById('load-menu').style.display = 'none';
 
     // prevent context menu to open
     this.#canvas.oncontextmenu = () => {return false;}
@@ -269,7 +272,7 @@ export default class World {
       distanceList.sort(this.#sort);
       const medianDistance = distanceList.length % 2 === 0 ? ((distanceList[distanceList.length / 2 - 1] + distanceList[distanceList.length / 2]) / 2) : distanceList[(distanceList.length + 1) / 2 - 1];
       medianDistanceDiv.innerHTML = "Median distance of endorsements: " + medianDistance + "km";
-      statisticsPlaceholder.appendChild(medianDistanceDiv);
+      statisticsPlaceholder.appendChild(medianDistanceDiv);90
     }
   }
 
@@ -434,9 +437,12 @@ export default class World {
   }
 
   #loadWorld() {
+    document.getElementById('load-menu').style.display = 'block'
     fetch('/test/ajax/list.php')
       .then(response => response.json())
-      .then(response => console.log(response));
+      .then(response => {
+        console.log(response)
+      });
   }
 
   #resetSelection() {
