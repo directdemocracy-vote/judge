@@ -455,7 +455,7 @@ export default class World {
             this.#idGenerator = citizen.id + 1;
           this.#citizens.set(citizen.id, undefined, citizen.coords, this.#basePointSize);
         }
-      };
+      });
 
     this.#closeWorldsPanel();
   }
