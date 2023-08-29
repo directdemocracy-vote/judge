@@ -511,8 +511,10 @@ export default class World {
             }
             const deleteButton = document.createElement('div');
             deleteButton.className = 'trash';
-            menu.appendChild(div);
-            menu.appendChild(deleteButton);
+            const container = document.createElement('div');
+            container.appendChild(div);
+            container.appendChild(deleteButton);
+            menu.appendChild(container);
           }
         }
       });
