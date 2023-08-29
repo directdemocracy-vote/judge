@@ -175,6 +175,7 @@ export default class World {
     console.log("askPassword")
     this.#closeWorldsPanel();
     document.getElementById('password-menu').style.display = 'block';
+    document.getElementById('send-delete').innerText = "Delete " + name;
   }
 
 
