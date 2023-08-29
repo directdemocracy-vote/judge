@@ -1,4 +1,5 @@
 import Arrow from './Arrow.js';
+import ArrowHead from './ArrowHead.js';
 import Citizen from './Citizen.js';
 
 export default class World {
