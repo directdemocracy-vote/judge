@@ -94,6 +94,9 @@ export default class World {
     const loadButton = document.getElementById('load');
     loadButton.onclick = () => this.#loadWorld();
 
+    const cancelDelete = document.getElementById('cancel');
+    cancelDelete.onclick = () => document.getElementById('password-menu').style.display = 'none';
+
     // prevent context menu to open
     this.#canvas.oncontextmenu = () => {return false;}
 
@@ -170,7 +173,7 @@ export default class World {
 
   #askPassword() {
     this.#closeWorldsPanel();
-    
+    document.getElementById('password-menu').style.display = 'block';
   }
 
 
