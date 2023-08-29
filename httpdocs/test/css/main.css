@@ -44,4 +44,16 @@
   background-size: contain;
   border: none;
   position: absolute;
+  cursor: pointer;
+}
+
+.password-menu{
+  width: 300px;
+  height: 50px;
+  top: calc(50% - 25px);
+  left: calc(50% - 150px);
+  position: absolute;
+  border: 1px black solid;
+  background-color: lightgrey;
+  display: none;
 }

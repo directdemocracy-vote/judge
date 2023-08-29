@@ -168,6 +168,11 @@ export default class World {
     World.instance = new World();
   }
 
+  #askPassword() {
+    this.#closeWorldsPanel();
+    
+  }
+
 
   #changePointSize(id, newSize) {
     if (typeof id === 'undefined')
@@ -511,6 +516,7 @@ export default class World {
             }
             const deleteButton = document.createElement('button');
             deleteButton.className = 'trash';
+            deleteButton.onlick () => this.#askPassword(name);
             const container = document.createElement('div');
             container.className = 'container';
             container.appendChild(div);
