@@ -541,8 +541,6 @@ export default class World {
     this.#zoomLevel = 17;
     this.#maxZoomLevel = 17;
     this.#pixelToMeterRatio = 0.6;
-
-    this.#displayReputation = false;
   }
 
   #revokeButton(id) {
