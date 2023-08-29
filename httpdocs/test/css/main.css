@@ -31,3 +31,11 @@
 .world {
   cursor: pointer;
 }
+
+.trash {
+  background-image: url(images/delete.svg);
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  background-size: contain;
+}

@@ -509,10 +509,10 @@ export default class World {
 
               div.style.background = 'dodgerblue';
             }
-            const deleteButton = document.createElement('span');
-            deleteButton.style.background = '../images/delete.svg';
-            div.appendChild(deleteButton);
+            const deleteButton = document.createElement('div');
+            deleteButton.className = 'trash';
             menu.appendChild(div);
+            menu.appendChild(deleteButton);
           }
         }
       });
