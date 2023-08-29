@@ -468,7 +468,7 @@ export default class World {
             div.className = 'world';
             div.innerHTML = name;
             div.onclick = () => {
-              this.#worldToLoad = response;
+              this.#worldToLoad = name;
               const worlds = document.getElementsByClassName('world');
               for (const world of worlds)
                 world.style.background = 'transparent';
