@@ -6,8 +6,8 @@ export default class ArrowHead {
   #id;
   #path;
   #source;
-  constructor(source, destination, path, age) {
-    this.#id = World.instance.idGenerator++;
+  constructor(id, source, destination, age, path) {
+    this.#id = id;
     this.#age = age;
     this.#source = source;
     this.#destination = destination;

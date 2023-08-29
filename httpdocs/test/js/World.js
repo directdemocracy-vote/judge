@@ -456,6 +456,28 @@ export default class World {
           this.#citizens.set(citizen.id, new Citizen(citizen.id, undefined, citizen.coords, this.#basePointSize));
         }
 
+        for (const endorsement of response.endorsements) {
+          if (endorsement.id >= this.#idGenerator)
+            this.#idGenerator = endorsement.id + 1;
+
+          let newEndorsement = new Arrow(endorsement.id, endorsement.idPoint1, endorsement.idPoint2);
+          if (typeof endorsement.arrowHead1 !== 'undefined'){
+            if (endorsement.arrowHead1.id >= this.#idGenerator)
+              this.#idGenerator = endorsement.arrowHead1.id + 1;
+            if (endorsement.arrowHead1.age >= this.#year)
+              this.#year = endorsement.arrowHead1.age;
+            newEndorsement.arrowHead1 = new ArrowHead(endorsement.arrowHead1.id, endorsement.arrowHead1.source, endorsement.arrowHead1.destination, endorsement.arrowHead1.age)
+          }
+
+          if (typeof endorsement.arrowHead2 !== 'undefined'){
+            if (endorsement.arrowHead2.id >= this.#idGenerator)
+              this.#idGenerator = endorsement.arrowHead2.id + 1;
+            if (endorsement.arrowHead2.age >= this.#year)
+              this.#year = endorsement.arrowHead2.age;
+            newEndorsement.arrowHead2 = new ArrowHead(endorsement.arrowHead2.id, endorsement.arrowHead2.source, endorsement.arrowHead2.destination, endorsement.arrowHead2.age)
+          }
+        }
+
         this.#draw();
       });
 
