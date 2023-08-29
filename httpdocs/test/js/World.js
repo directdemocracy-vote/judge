@@ -477,6 +477,8 @@ export default class World {
               this.#year = endorsement.arrowHead2.age;
             newEndorsement.arrowHead2 = new ArrowHead(endorsement.arrowHead2.id, endorsement.arrowHead2.source, endorsement.arrowHead2.destination, endorsement.arrowHead2.age)
           }
+
+          this.#endorsements.set(newEndorsement.id, newEndorsement);
         }
 
         this.#draw();
