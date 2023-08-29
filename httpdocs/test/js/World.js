@@ -98,8 +98,7 @@ export default class World {
       if (typeof this.#worldToLoad === 'undefined')
         return;
 
-      console.log(this.#worldToLoad)
-      fetch('/test/ajax/load.php', { method: 'post', body: JSON.stringify({ name: this.#worldToLoad})})
+      fetch('/test/storage/' + this.#worldToLoad)
         .then(response => response.json())
         .then(response => console.log(response));
       document.getElementById('load-menu').style.display = 'none';
