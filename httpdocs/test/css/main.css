@@ -20,6 +20,11 @@
   margin-left: 5%;
 }
 
+.password-field {
+  width: 191px;
+  margin-left: 9px;
+}
+
 .world-menu {
   height: 85%;
   width: 90%;
