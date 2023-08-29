@@ -94,7 +94,7 @@ export default class World {
     const loadButton = document.getElementById('load');
     loadButton.onclick = () => this.#loadWorld();
 
-    const cancelDelete = document.getElementById('cancel');
+    const cancelDelete = document.getElementById('cancel-delete');
     cancelDelete.onclick = () => document.getElementById('password-menu').style.display = 'none';
 
     // prevent context menu to open
