@@ -88,7 +88,23 @@ export default class World {
     openLoadButton.onclick = () => this.#loadWorld();
 
     const cancelButton = document.getElementById('cancel');
-    cancel.onclick = () => document.getElementById('load-menu').style.display = 'none';
+    cancel.onclick = () => {
+      document.getElementById('load-menu').style.display = 'none';
+      this.#worldToLoad = undefined;
+    }
+
+    const loadButton = document.getElementById('load');
+    loadButton.onclick = () => {
+      if (typeof this.#worldToLoad === 'undefined')
+        return;
+
+      fetch('/test/ajax/load.php', { method: 'post', body: JSON.stringify({ name: this.#worldToLoad})})
+        .then(response => response.json())
+        .then(console.log(response));
+      document.getElementById('load-menu').style.display = 'none';
+      this.#worldToLoad = undefined;
+
+    }
 
     // prevent context menu to open
     this.#canvas.oncontextmenu = () => {return false;}

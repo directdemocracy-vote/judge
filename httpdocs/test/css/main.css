@@ -27,3 +27,7 @@
 .world-menu div:hover {
   background: lightskyblue;
 }
+
+.world {
+  cursor: pointer;
+}

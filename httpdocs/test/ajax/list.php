@@ -10,3 +10,4 @@
   }
 
   die(json_encode($worlds));
+?>
