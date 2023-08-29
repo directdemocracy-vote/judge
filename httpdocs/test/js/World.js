@@ -447,16 +447,17 @@ export default class World {
 
     fetch('/test/storage/' + this.#worldToLoad)
       .then(response => response.json())
-      .then(response => console.log(response));
+      .then(response => {
+        this.#resetWorld();
+
+        for (const citizen of response.citizens) {
+          if (citizen.id >= this.#idGenerator)
+            this.#idGenerator = citizen.id + 1;
+          this.#citizens.set(citizen.id, undefined, citizen.coords, this.#basePointSize);
+        }
+      }
 
     this.#closeWorldsPanel();
-    this.#resetWorld();
-
-    for (const citizen of response.citizens) {
-      if (citizen.id >= this.#idGenerator)
-        this.#idGenerator = citizen.id + 1;
-      this.#citizens.set(citizen.id, undefined, citizen.coords, this.#basePointSize);
-    }
   }
 
   #openWorldsPanel() {
