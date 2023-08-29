@@ -490,6 +490,7 @@ export default class World {
   #openWorldsPanel() {
     document.getElementById('load-menu').style.display = 'block'
     const menu = document.getElementById('world-menu');
+    menu.innerHTML = '';
     fetch('/test/ajax/list.php')
       .then(response => response.json())
       .then(response => {
