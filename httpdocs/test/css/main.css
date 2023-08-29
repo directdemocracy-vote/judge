@@ -30,10 +30,11 @@
 
 .world {
   cursor: pointer;
+  display: inline-block;
 }
 
 .trash {
-  background-image: url(images/delete.svg);
+  background-image: url(../images/delete.svg);
   width: 18px;
   height: 18px;
   display: inline-block;
