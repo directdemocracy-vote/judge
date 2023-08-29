@@ -24,12 +24,13 @@
   overflow: scroll;
 }
 
-.world-menu div:hover {
+.container {
+  cursor: pointer;
   background: lightskyblue;
 }
 
 .world {
-  cursor: pointer;
+  display: inline-block;
 }
 
 .trash {
