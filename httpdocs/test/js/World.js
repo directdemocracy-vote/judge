@@ -519,7 +519,7 @@ export default class World {
             }
             const deleteButton = document.createElement('button');
             deleteButton.className = 'trash';
-            deleteButton.onlick () => this.#askPassword(name);
+            deleteButton.onlick = () => this.#askPassword(name);
             const container = document.createElement('div');
             container.className = 'container';
             container.appendChild(div);
