@@ -511,7 +511,7 @@ export default class World {
             }
             const deleteButton = document.createElement('span');
             deleteButton.style.background = '../images/delete.svg';
-            div.appendChild(delete);
+            div.appendChild(deleteButton);
             menu.appendChild(div);
           }
         }
