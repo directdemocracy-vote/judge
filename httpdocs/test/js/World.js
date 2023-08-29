@@ -509,7 +509,7 @@ export default class World {
 
               div.style.background = 'dodgerblue';
             }
-            const deleteButton = document.createElement('div');
+            const deleteButton = document.createElement('button');
             deleteButton.className = 'trash';
             const container = document.createElement('div');
             container.appendChild(div);
