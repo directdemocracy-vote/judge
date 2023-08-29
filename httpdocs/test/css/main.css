@@ -15,6 +15,11 @@
   margin-top: 8px;
 }
 
+.pass-button {
+  width: 42%;
+  margin-left: 5%;
+}
+
 .world-menu {
   height: 85%;
   width: 90%;
