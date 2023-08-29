@@ -89,7 +89,7 @@ export default class World {
     openLoadButton.onclick = () => this.#openWorldsPanel();
 
     const cancelButton = document.getElementById('cancel');
-    cancel.onclick = () => this.#closeWorldsPanel();
+    cancelButton.onclick = () => this.#closeWorldsPanel();
 
     const loadButton = document.getElementById('load');
     loadButton.onclick = () => this.#loadWorld();
@@ -172,6 +172,7 @@ export default class World {
   }
 
   #askPassword(name) {
+    console.log("askPassword")
     this.#closeWorldsPanel();
     document.getElementById('password-menu').style.display = 'block';
   }
