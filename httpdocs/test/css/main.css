@@ -26,6 +26,9 @@
 
 .container {
   cursor: pointer;
+}
+
+.container:hover {
   background: lightskyblue;
 }
 
@@ -35,7 +38,7 @@
 
 .trash {
   background-image: url(../images/delete.svg);
-  background-color: white;
+  background-color: transparent;
   width: 24px;
   height: 24px;
   background-size: contain;
