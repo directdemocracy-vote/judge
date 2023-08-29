@@ -50,7 +50,7 @@ export default class World {
     this.#maxZoomLevel = 17;
     this.#pixelToMeterRatio = 0.6;
 
-    this.displayReputation = false;
+    this.#displayReputation = false;
 
     this.#idPlaceholder = document.getElementById('idPlaceholder');
     this.#reputationButton = document.getElementById('reputation');
@@ -112,7 +112,6 @@ export default class World {
     this.#canvas.addEventListener('mouseup', () => this.#mouseDown = false);
     this.#canvas.addEventListener('mouseover', () => this.#mouseDown = false);
     this.#canvas.addEventListener('mouseout', () => this.#mouseDown = false);
-
   }
 
   get arrowSize() {
@@ -450,9 +449,14 @@ export default class World {
       .then(response => response.json())
       .then(response => console.log(response));
 
-    World.init();
-
     this.#closeWorldsPanel();
+    this.#resetWorld();
+
+    for (const citizen of response.citizens) {
+      if (citizen.id >= this.#idGenerator)
+        this.#idGenerator = citizen.id + 1;
+      this.#citizens.set(citizen.id, undefined, citizen.coords, this.#basePointSize);
+    }
   }
 
   #openWorldsPanel() {
@@ -486,6 +490,30 @@ export default class World {
     this.#changePointSize(this.#selection, this.#basePointSize);
     this.#selection = undefined;
     this.#idPlaceholder.innerHTML = '';
+  }
+
+  #resetWorld() {
+    this.#citizens = new Map();
+    this.#endorsements = new Map();
+
+    this.#idGenerator = 1;
+    this.#year = 2023;
+
+    this.#basePointSize = 5;
+    this.#arrowSize = 5;
+    this.#selectedPointSize = 12;
+
+    this.#startDragOffset = {};
+    this.#mouseDown = false;
+    this.#translatePosition = {
+        x: 0,
+        y: 0
+      };
+    this.#zoomLevel = 17;
+    this.#maxZoomLevel = 17;
+    this.#pixelToMeterRatio = 0.6;
+
+    this.#displayReputation = false;
   }
 
   #revokeButton(id) {
