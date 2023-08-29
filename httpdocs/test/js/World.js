@@ -443,6 +443,7 @@ export default class World {
     fetch('/test/ajax/list.php')
       .then(response => response.json())
       .then(response => {
+        console.log(typeof response)
         for (const name of response) {
           if (name === '.gitignore')
             continue;
