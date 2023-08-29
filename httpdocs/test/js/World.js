@@ -171,7 +171,7 @@ export default class World {
     World.instance = new World();
   }
 
-  #askPassword() {
+  #askPassword(name) {
     this.#closeWorldsPanel();
     document.getElementById('password-menu').style.display = 'block';
   }
@@ -515,7 +515,7 @@ export default class World {
               for (const world of worlds)
                 world.style.background = 'transparent';
 
-              div.style.background = 'dodgerblue';
+              div.parentNode.style.background = 'dodgerblue';
             }
             const deleteButton = document.createElement('button');
             deleteButton.className = 'trash';
