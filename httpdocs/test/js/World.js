@@ -443,14 +443,13 @@ export default class World {
     fetch('/test/ajax/list.php')
       .then(response => response.json())
       .then(response => {
-        console.log(typeof response)
         for (const name of response) {
           if (name === '.gitignore')
             continue;
           else {
             const div = document.createElement('div');
             div.className = 'world';
-            div.innerHTML = response;
+            div.innerHTML = name;
             div.onclick = () => {
               this.#worldToLoad = response;
               const worlds = document.getElementsByClassName('world');
