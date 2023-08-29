@@ -514,13 +514,13 @@ export default class World {
               this.#worldToLoad = name;
               const worlds = document.getElementsByClassName('world');
               for (const world of worlds)
-                world.style.background = 'transparent';
+                world.parentNode.style.background = 'transparent';
 
               div.parentNode.style.background = 'dodgerblue';
             }
             const deleteButton = document.createElement('button');
             deleteButton.className = 'trash';
-            deleteButton.onlick = () => this.#askPassword(name);
+            deleteButton.onclick = () => this.#askPassword(name);
             const container = document.createElement('div');
             container.className = 'container';
             container.appendChild(div);
