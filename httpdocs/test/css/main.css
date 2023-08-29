@@ -35,9 +35,10 @@
 
 .trash {
   background-image: url(../images/delete.svg);
+  background-color: white;
   width: 24px;
   height: 24px;
-  display: inline-block;
   background-size: contain;
-  border: 0px;
+  border: none;
+  position: absolute;
 }
