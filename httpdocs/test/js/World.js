@@ -509,8 +509,8 @@ export default class World {
 
               div.style.background = 'dodgerblue';
             }
-            const delete = document.createElement('span');
-            delete.style.background = '../images/delete.svg';
+            const deleteButton = document.createElement('span');
+            deleteButton.style.background = '../images/delete.svg';
             div.appendChild(delete);
             menu.appendChild(div);
           }
