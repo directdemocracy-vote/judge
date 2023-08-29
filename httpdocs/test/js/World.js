@@ -499,6 +499,7 @@ export default class World {
             continue;
           else {
             const div = document.createElement('div');
+            div.className = 'world';
             div.innerHTML = name;
             div.onclick = () => {
               this.#worldToLoad = name;
@@ -511,7 +512,7 @@ export default class World {
             const deleteButton = document.createElement('button');
             deleteButton.className = 'trash';
             const container = document.createElement('div');
-            container.className = 'world';
+            container.className = 'container';
             container.appendChild(div);
             container.appendChild(deleteButton);
             menu.appendChild(container);
