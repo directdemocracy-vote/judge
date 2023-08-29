@@ -444,7 +444,7 @@ export default class World {
       .then(response => response.json())
       .then(response => {
         for (const name of response) {
-          if (name === ''.gitignore')
+          if (name === '.gitignore')
             continue;
           else {
             const div = document.createElement('div');
