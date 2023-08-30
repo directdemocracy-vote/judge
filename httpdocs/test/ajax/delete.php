@@ -11,7 +11,7 @@
 
   $name = $data->name;
   $password = $data->password;
-  die($name);
+  die("The name ".$name);
 
   require '../../../php/database.php';
   if($password === $database_password) {
