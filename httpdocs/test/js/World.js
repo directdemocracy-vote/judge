@@ -178,7 +178,6 @@ export default class World {
   }
 
   #askPassword(name) {
-    console.log("askPassword")
     this.#closeWorldsPanel();
     document.getElementById('password-menu').style.display = 'block';
   }
