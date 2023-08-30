@@ -15,5 +15,5 @@
   require '../../../php/database.php';
   if($password === $database_password) {
     $name = '../storage/'.$name;
-      die(basename($name));
+      die(basename(dirname($name)));
   }

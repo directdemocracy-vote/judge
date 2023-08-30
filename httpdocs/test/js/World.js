@@ -620,6 +620,7 @@ export default class World {
     fetch('/test/ajax/delete.php', { method: 'post', body: JSON.stringify({ name: this.#selectedWorld, password: document.getElementById('password').value})});
 
     this.#selectedWorld = undefined;
+    document.getElementById('password-menu').style.display = 'none';
   }
 
   #showDistance() {
