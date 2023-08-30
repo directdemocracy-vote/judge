@@ -20,11 +20,11 @@ export default class World {
   #reputationButton;
   #selection;
   #selectedPointSize;
+  #selectedWorld;
   #showDistanceButton;
   #showReputationButton;
   #startDragOffset;
   #translatePosition;
-  #worldToLoad;
   #year;
   #zoomLevel;
   constructor() {
@@ -95,7 +95,13 @@ export default class World {
     loadButton.onclick = () => this.#loadWorld();
 
     const cancelDelete = document.getElementById('cancel-delete');
-    cancelDelete.onclick = () => document.getElementById('password-menu').style.display = 'none';
+    cancelDelete.onclick = () => {
+      this.#selectedWorld = undefined;
+      document.getElementById('password-menu').style.display = 'none';
+    }
+
+    const sendDelete = document.getElementById('send-delete');
+    sendDelete.onclick = () => this.#sendDelete();
 
     // prevent context menu to open
     this.#canvas.oncontextmenu = () => {return false;}
@@ -193,7 +199,7 @@ export default class World {
 
   #closeWorldsPanel() {
     document.getElementById('load-menu').style.display = 'none';
-    this.#worldToLoad = undefined;
+    this.#selectedWorld = undefined;
   }
 
   #computeReputation() {
@@ -452,10 +458,10 @@ export default class World {
   }
 
   #loadWorld() {
-    if (typeof this.#worldToLoad === 'undefined')
+    if (typeof this.#selectedWorld === 'undefined')
       return;
 
-    fetch('/test/storage/' + this.#worldToLoad)
+    fetch('/test/storage/' + this.#selectedWorld)
       .then(response => response.json())
       .then(response => {
         this.#resetWorld();
@@ -511,7 +517,7 @@ export default class World {
             div.className = 'world';
             div.innerHTML = name;
             div.onclick = () => {
-              this.#worldToLoad = name;
+              this.#selectedWorld = name;
               const worlds = document.getElementsByClassName('world');
               for (const world of worlds)
                 world.parentNode.style.background = 'transparent';
@@ -520,7 +526,10 @@ export default class World {
             }
             const deleteButton = document.createElement('button');
             deleteButton.className = 'trash';
-            deleteButton.onclick = () => this.#askPassword(name);
+            deleteButton.onclick = () => {
+              this.#selectedWorld = name;
+              this.#askPassword();
+            }
             const container = document.createElement('div');
             container.className = 'container';
             container.appendChild(div);
@@ -603,6 +612,12 @@ export default class World {
     fetch('/test/ajax/save.php', { method: 'post', body: JSON.stringify({ name: name, citizens: citizens, endorsements: endorsements})})
       .then(response => response.text())
       .then(response => console.log(response));
+  }
+
+  #sendDelete() {
+    fetch('/test/ajax/delete.php', { method: 'post', body: JSON.stringify({ name: name, password: document.getElementById('password').value})});
+
+    this.#selectedWorld = undefined;
   }
 
   #showDistance() {
