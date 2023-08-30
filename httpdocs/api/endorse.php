@@ -64,7 +64,7 @@ $response = file_get_contents($url, false, stream_context_create($options));
 $endorsements = json_decode($response);
 if (isset($endorsements->error))
   error($endorsements->error);
-$public_key_file = fopen("../id_rsa.pub", "r") or error("Failed to read public key file");
+$public_key_file = fopen("../../id_rsa.pub", "r") or error("Failed to read public key file");
 $k = fread($public_key_file, filesize("../id_rsa.pub"));
 fclose($public_key_file);
 $public_key = stripped_key($k);
