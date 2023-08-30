@@ -614,7 +614,7 @@ export default class World {
   }
 
   #sendDelete() {
-    fetch('/test/ajax/delete.php', { method: 'post', body: JSON.stringify({ name: name, password: document.getElementById('password').value})});
+    fetch('/test/ajax/delete.php', { method: 'post', body: JSON.stringify({ name: this.#selectedWorld, password: document.getElementById('password').value})});
 
     this.#selectedWorld = undefined;
   }
