@@ -614,6 +614,7 @@ export default class World {
   }
 
   #sendDelete() {
+    console.log(this.#selectedWorld)
     fetch('/test/ajax/delete.php', { method: 'post', body: JSON.stringify({ name: this.#selectedWorld, password: document.getElementById('password').value})});
 
     this.#selectedWorld = undefined;
