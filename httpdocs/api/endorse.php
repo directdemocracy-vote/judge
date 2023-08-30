@@ -172,7 +172,7 @@ $count_e = 0;
 $count_r = 0;
 $table = '';
 $schema = "https://directdemocracy.vote/json-schema/$version/endorsement.schema.json";
-$private_key = openssl_get_privatekey("file://../id_rsa") or error("Failed to read private key file");
+$private_key = openssl_get_privatekey("file://../../id_rsa") or error("Failed to read private key file");
 $query = "SELECT id, `key`, signature, endorsed, reputation FROM participant WHERE changed=1";
 $result = $mysqli->query($query) or error($mysqli->error);
 while($participant = $result->fetch_assoc()) {
