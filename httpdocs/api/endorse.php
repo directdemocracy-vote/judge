@@ -200,7 +200,7 @@ while($participant = $result->fetch_assoc()) {
                                    'content' => $data,
                                    'header' => "Content-Type: application/json\r\n" .
                                                "Accept: application/json\r\n"));
-  $response = file_get_contents("$notary/publish.php", false, stream_context_create($options));
+  $response = file_get_contents("$notary/api/publish.php", false, stream_context_create($options));
   $json = json_decode($response);
   if ($json == NULL)
     die($response);
