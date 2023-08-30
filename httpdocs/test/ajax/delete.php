@@ -10,7 +10,7 @@
     die("Missing parameter");
 
   $name = $data->name;
-  $password = $data->password:
+  $password = $data->password;
   die($name);
 
   require '../../../php/database.php';
