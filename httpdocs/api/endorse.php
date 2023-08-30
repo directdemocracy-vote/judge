@@ -78,10 +78,10 @@ if ($endorsements)
     $result = $mysqli->query($query) or error($mysqli->error);
     if (!$result->num_rows) {
       $key = urlencode($endorsement->key);
-      $response = file_get_contents("$notary/publication.php?key=$key", false, stream_context_create($options));
+      $response = file_get_contents("$notary/api/publication.php?key=$key", false, stream_context_create($options));
       $endorser = json_decode($response);
       if (isset($endorser->error))
-        error("Trying to get $notary/publication.php?key=$endorsement->key, however $endorser->error");
+        error("Trying to get $notary/api/publication.php?key=$endorsement->key, however $endorser->error");
       if (!isset($endorser->latitude))
         $endorser->latitude = 0;
       if (!isset($endorser->longitude))
@@ -98,7 +98,7 @@ if ($endorsements)
     $result = $mysqli->query($query) or error($mysqli->error);
     if (!$result->num_rows) {
       $fingerprint = sha1($endorsement->endorsedSignature);
-      $response = file_get_contents("$notary/publication.php?fingerprint=$fingerprint", false, stream_context_create($options));
+      $response = file_get_contents("$notary/api/publication.php?fingerprint=$fingerprint", false, stream_context_create($options));
       $endorsed = json_decode($response);
       if (isset($endorsed->error))
         error($endorsed->error);
