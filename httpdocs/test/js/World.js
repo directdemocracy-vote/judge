@@ -610,11 +610,13 @@ export default class World {
 
     fetch('/test/ajax/save.php', { method: 'post', body: JSON.stringify({ name: name, citizens: citizens, endorsements: endorsements})})
       .then(response => response.text())
-      .then(response => console.log(response));
+      .then(response => {
+        if (response !== '')
+          console.error(response)
+      });
   }
 
   #sendDelete() {
-    console.log(this.#selectedWorld)
     fetch('/test/ajax/delete.php', { method: 'post', body: JSON.stringify({ name: this.#selectedWorld, password: document.getElementById('password').value})});
 
     this.#selectedWorld = undefined;
