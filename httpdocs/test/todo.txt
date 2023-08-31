@@ -1,4 +1,8 @@
-bordure
-save/load file
-scale indicator
 change size of point depending on zoom
+tests
+samples worlds
+generator:
+  - add to existing, or create new
+  - 5 endorsements ( with variance 10 ) / gaussian
+  - endorsements: more probability to have close ones
+  - 90% of mutal endorsements

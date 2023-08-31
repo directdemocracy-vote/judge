@@ -1,11 +1,13 @@
 import Arrow from './Arrow.js';
 import ArrowHead from './ArrowHead.js';
 import Citizen from './Citizen.js';
+import Generator from './Generator.js';
 
 export default class World {
   #ageButton;
   #arrowSize;
   #basePointSize;
+  #borders;
   #canvas;
   #ctx;
   #citizens;
@@ -44,7 +46,7 @@ export default class World {
     this.#startDragOffset = {};
     this.#mouseDown = false;
     this.#translatePosition = {
-        x: 0,
+        x: -256,
         y: 0
       };
     this.#zoomLevel = 17;
@@ -53,6 +55,8 @@ export default class World {
 
     this.#displayReputation = false;
 
+    this.#borders = [];
+    this.#borders.push([0,0], [0, Math.pow(2.0, this.#maxZoomLevel) * 256 -1], [Math.pow(2, this.#maxZoomLevel) * 256 -1, Math.pow(2, this.#maxZoomLevel)  * 256 -1], [Math.pow(2, this.#maxZoomLevel)  * 256 -1, 0]);
     this.#idPlaceholder = document.getElementById('idPlaceholder');
     this.#reputationButton = document.getElementById('reputation');
     this.#reputationButton.onclick = () => {
@@ -107,21 +111,37 @@ export default class World {
     this.#canvas.oncontextmenu = () => {return false;}
 
     this.#canvas.addEventListener('wheel', event => {
-      if (event.deltaY < 0)
+      if (event.deltaY < 0) {
         this.#zoomLevel += 1;
-      else
+        if (this.#zoomLevel <= this.#maxZoomLevel) {
+          this.#translatePosition.x = this.#translatePosition.x * 2 - 256;
+          this.#translatePosition.y = this.#translatePosition.y * 2 - 256;
+        }
+      } else {
         this.#zoomLevel -=1;
+        if (this.#zoomLevel >= 1) {
+          const centralCoordinateX = 256 - this.#translatePosition.x;
+          const centralCoordinateY = 256 - this.#translatePosition.y;
+          this.#translatePosition.x += centralCoordinateX / 2;
+          this.#translatePosition.y += centralCoordinateY / 2;
+        }
+      }
 
       if (this.#zoomLevel <= 0)
         this.#zoomLevel = 1;
       else if (this.#zoomLevel > this.#maxZoomLevel)
         this.#zoomLevel = this.#maxZoomLevel;
+
+      console.log(this.#zoomLevel)
       this.#draw(true);
     });
 
     this.#canvas.addEventListener('mouseup', () => this.#mouseDown = false);
     this.#canvas.addEventListener('mouseover', () => this.#mouseDown = false);
     this.#canvas.addEventListener('mouseout', () => this.#mouseDown = false);
+
+    this.#drawScaleIndicator();
+    new Generator();
   }
 
   get arrowSize() {
@@ -168,11 +188,6 @@ export default class World {
     return this.#zoomLevel;
   }
 
-  set zoomLevel(newZoomLevel) {
-    console.log(newZoomLevel)
-    this.#zoomLevel = newZoomLevel;
-  }
-
   static init(){
     World.instance = new World();
   }
@@ -196,6 +211,10 @@ export default class World {
     this.#draw();
   }
 
+  #clear() {
+    this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
+  }
+
   #closeWorldsPanel() {
     document.getElementById('load-menu').style.display = 'none';
     this.#selectedWorld = undefined;
@@ -204,7 +223,7 @@ export default class World {
   #computeReputation() {
     // damping parameter
     const d = 0.85;
-    const reputationFactor = 3;
+    const reputationFactor = 1.5;
 
     // TODO add the webservices to the count
     const N = this.#citizens.size;
@@ -243,7 +262,7 @@ export default class World {
     statisticsPlaceholder.innerHTML = '';
 
     const nbrCitizensDiv = document.createElement('div');
-    nbrCitizensDiv.innerHTML = 'Number of citizens: ' + this.#citizens.size;
+    nbrCitizensDiv.textContent = 'Number of citizens: ' + this.#citizens.size;
     statisticsPlaceholder.appendChild(nbrCitizensDiv);
 
     const nbrCitizensEndorsedDiv = document.createElement('div');
@@ -253,7 +272,7 @@ export default class World {
         endorsed++;
     }
 
-    nbrCitizensEndorsedDiv.innerHTML = 'Number of endorsed citizens: ' + endorsed;
+    nbrCitizensEndorsedDiv.textContent = 'Number of endorsed citizens: ' + endorsed;
     statisticsPlaceholder.appendChild(nbrCitizensEndorsedDiv);
 
     const nbrEndorsementsDiv = document.createElement('div');
@@ -274,30 +293,26 @@ export default class World {
         distanceList.push(endorsement.distance);
       }
     }
-    nbrEndorsementsDiv.innerHTML = 'Number of endorsements: ' + nbrEndorsements;
+    nbrEndorsementsDiv.textContent = 'Number of endorsements: ' + nbrEndorsements;
     statisticsPlaceholder.appendChild(nbrEndorsementsDiv);
 
     if (nbrEndorsements > 0) {
       const nbrDoubleEndorsementsDiv = document.createElement('div');
       const percent = doubleEndorsements / this.#endorsements.size * 100;
-      nbrDoubleEndorsementsDiv.innerHTML = 'Number of mutual endorsements: ' + doubleEndorsements + ' (' + percent.toFixed(2) + '%)';
+      nbrDoubleEndorsementsDiv.textContent = 'Number of mutual endorsements: ' + doubleEndorsements + ' (' + percent.toFixed(2) + '%)';
       statisticsPlaceholder.appendChild(nbrDoubleEndorsementsDiv);
 
       const averageDistanceDiv = document.createElement('div');
       const averageDistance = (totalDistance / nbrEndorsements).toFixed(3);
-      averageDistanceDiv.innerHTML = 'Average distance of endorsements: ' + averageDistance + 'km';
+      averageDistanceDiv.textContent = 'Average distance of endorsements: ' + averageDistance + 'km';
       statisticsPlaceholder.appendChild(averageDistanceDiv);
 
       const medianDistanceDiv = document.createElement('div');
       distanceList.sort(this.#sort);
       const medianDistance = distanceList.length % 2 === 0 ? ((distanceList[distanceList.length / 2 - 1] + distanceList[distanceList.length / 2]) / 2) : distanceList[(distanceList.length + 1) / 2 - 1];
-      medianDistanceDiv.innerHTML = 'Median distance of endorsements: ' + medianDistance + 'km';
+      medianDistanceDiv.textContent = 'Median distance of endorsements: ' + medianDistance + 'km';
       statisticsPlaceholder.appendChild(medianDistanceDiv);90
     }
-  }
-
-  #clear() {
-    this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
   }
 
   #draw() {
@@ -334,20 +349,20 @@ export default class World {
         endorsement.rebuildArrowHead(endorsement.arrowHead2);
     }
 
+    this.#ctx.beginPath();
+    this.#ctx.moveTo(this.#borders[0][0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) - 5, this.#borders[0][1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) - 5);
+    this.#ctx.lineTo(this.#borders[1][0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) - 5, this.#borders[1][1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) + 5);
+    this.#ctx.lineTo(this.#borders[2][0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) + 5, this.#borders[2][1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) + 5);
+    this.#ctx.lineTo(this.#borders[3][0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) + 5, this.#borders[3][1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) - 5);
+    this.#ctx.closePath();
+    this.#ctx.lineWidth = 10;
+    this.#ctx.stroke();
+
     this.#ctx.restore();
+
+    this.#drawScaleIndicator();
+
     this.#computeStatistics();
-  }
-
-  #drawPoint(x, y) {
-    const point = new Path2D();
-    const coordX = (x - this.#translatePosition.x) * Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
-    const coordY = (y - this.#translatePosition.y) * Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
-    point.arc(x, y, this.#basePointSize, 0, 2 * Math.PI);
-
-    const id = this.#idGenerator++
-    const citizen = new Citizen(id, point, [coordX, coordY], this.#basePointSize);
-    this.#citizens.set(id, citizen);
-    this.#draw();
   }
 
   #drawEndorsement(id1, id2) {
@@ -374,6 +389,42 @@ export default class World {
     this.#resetSelection();
   }
 
+  #drawScaleIndicator() {
+    this.#ctx.beginPath();
+    this.#ctx.moveTo(425, 480);
+    this.#ctx.lineTo(480, 480);
+    this.#ctx.lineWidth = 1;
+    this.#ctx.stroke();
+
+    this.#ctx.beginPath();
+    this.#ctx.moveTo(425, 475);
+    this.#ctx.lineTo(425, 485);
+    this.#ctx.lineWidth = 1;
+    this.#ctx.stroke();
+
+    this.#ctx.beginPath();
+    this.#ctx.moveTo(480, 475);
+    this.#ctx.lineTo(480, 485);
+    this.#ctx.lineWidth = 1;
+    this.#ctx.stroke();
+
+    this.#ctx.font = '11px serif';
+    const distance = (55 * Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) * this.#pixelToMeterRatio / 1000).toFixed(2);
+    this.#ctx.fillText(distance + 'km', 428, 478);
+  }
+
+  #drawPoint(x, y) {
+    const point = new Path2D();
+    const coordX = (x - this.#translatePosition.x) * Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
+    const coordY = (y - this.#translatePosition.y) * Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
+    point.arc(x, y, this.#basePointSize, 0, 2 * Math.PI);
+
+    const id = this.#idGenerator++
+    const citizen = new Citizen(id, point, [coordX, coordY], this.#basePointSize);
+    this.#citizens.set(id, citizen);
+    this.#draw();
+  }
+
   #getCursorPosition(event) {
     const rect = this.#canvas.getBoundingClientRect()
     const x = event.clientX - rect.left;
@@ -396,11 +447,14 @@ export default class World {
           const citizen = this.#citizens.get(id)
           this.#idPlaceholder.innerHTML = '';
           const idDiv = document.createElement('div');
-          idDiv.innerHTML = 'ID: ' + id;
+          idDiv.textContent = 'ID: ' + id;
           this.#idPlaceholder.appendChild(idDiv);
-          const distanceDiv = document.createElement('div');
-          distanceDiv.innerHTML = 'Reputation: ' + citizen.reputation;
-          this.#idPlaceholder.appendChild(distanceDiv);
+          const reputationDiv = document.createElement('div');
+          reputationDiv.textContent = 'Reputation: ' + citizen.reputation;
+          this.#idPlaceholder.appendChild(reputationDiv);
+          const coordsDiv = document.createElement('div');
+          coordsDiv.textContent = "Coordinates: " + citizen.coords[0] + ", " + citizen.coords[1];
+          this.#idPlaceholder.appendChild(coordsDiv);
           this.#revokeButton(id);
         } else {
           this.#drawEndorsement(this.#selection, id)
@@ -422,14 +476,14 @@ export default class World {
 
         this.#idPlaceholder.innerHTML = '';
         const idDiv = document.createElement('div');
-        idDiv.innerHTML = 'ID: ' + id;
+        idDiv.textContent = 'ID: ' + id;
         this.#idPlaceholder.appendChild(idDiv);
         const distanceDiv = document.createElement('div');
-        distanceDiv.innerHTML = 'Distance: ' + line.distance + 'km';
+        distanceDiv.textContent = 'Distance: ' + line.distance + 'km';
         this.#idPlaceholder.appendChild(distanceDiv);
         const ageDiv = document.createElement('div');
         const age = head === 1 ? line.arrowHead1.age : line.arrowHead2.age;
-        ageDiv.innerHTML = 'Year: ' + age;
+        ageDiv.textContent = 'Year: ' + age;
         this.#idPlaceholder.appendChild(ageDiv);
         this.#revokeButton(id);
       }
@@ -463,7 +517,7 @@ export default class World {
     fetch('/test/storage/' + this.#selectedWorld)
       .then(response => response.json())
       .then(response => {
-        this.#resetWorld();
+        this.resetWorld();
 
         for (const citizen of response.citizens) {
           if (citizen.id >= this.#idGenerator)
@@ -514,7 +568,7 @@ export default class World {
           else {
             const div = document.createElement('div');
             div.className = 'world';
-            div.innerHTML = name;
+            div.textContent = name;
             div.onclick = () => {
               this.#selectedWorld = name;
               const worlds = document.getElementsByClassName('world');
@@ -545,7 +599,7 @@ export default class World {
     this.#idPlaceholder.innerHTML = '';
   }
 
-  #resetWorld() {
+  resetWorld() {
     this.#citizens = new Map();
     this.#endorsements = new Map();
 
@@ -569,7 +623,7 @@ export default class World {
 
   #revokeButton(id) {
     const button = document.createElement('button')
-    button.innerHTML = 'Revoke';
+    button.textContent = 'Revoke';
     button.onclick = () => {
       if (this.#citizens.has(id)) {
         this.#citizens.delete(id);
@@ -625,9 +679,9 @@ export default class World {
 
   #showDistance() {
     if (this.#displayDistance)
-      this.#showDistanceButton.innerHTML = 'Show distance (km)';
+      this.#showDistanceButton.textContent = 'Show distance (km)';
     else
-      this.#showDistanceButton.innerHTML = 'Hide distance (km)';
+      this.#showDistanceButton.textContent = 'Hide distance (km)';
 
     this.#displayDistance = !this.#displayDistance;
     this.#draw()
@@ -635,9 +689,9 @@ export default class World {
 
   #showReputation() {
     if (this.#displayReputation)
-      this.#showReputationButton.innerHTML = 'Show reputation';
+      this.#showReputationButton.textContent = 'Show reputation';
     else
-      this.#showReputationButton.innerHTML = 'Hide reputation';
+      this.#showReputationButton.textContent = 'Hide reputation';
 
     this.#displayReputation = !this.#displayReputation;
     this.#draw()

@@ -67,3 +67,14 @@
   background-color: lightgrey;
   display: none;
 }
+
+/* World Generator */
+.generator {
+  height: 240px;
+  width: 206px;
+  position: absolute;
+  top: calc(50% - 150px);
+  left: calc(50% - 103px);
+  border: 1px black solid;
+  background-color: lightgrey;
+}
