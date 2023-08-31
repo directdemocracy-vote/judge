@@ -18,7 +18,7 @@ export default class Arrow {
     this.#idPoint1 = idPoint1;
     this.#idPoint2 = idPoint2;
 
-    this.#computeDistance();
+    this.#distance = Arrow.computeDistance(idPoint1, idPoint2);
     this.buildLine();
     this.buildArrow(idPoint1, idPoint2);
   }
@@ -153,13 +153,13 @@ export default class Arrow {
     return norm1 < norm2 ? [x3, y3] : [x4, y4];
   }
 
-  #computeDistance() {
-    const [x1, y1] =  World.instance.citizens.get(this.#idPoint1).coords;
-    const [x2, y2] =  World.instance.citizens.get(this.#idPoint2).coords;
+  static computeDistance(idPoint1, idPoint2) {
+    const [x1, y1] =  World.instance.citizens.get(idPoint1).coords;
+    const [x2, y2] =  World.instance.citizens.get(idPoint2).coords;
 
     const norm = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-    this.#distance = norm * World.instance.pixelToMeterRatio / 1000;
-    this.#distance = parseFloat(this.#distance.toFixed(3));
+    let distance = norm * World.instance.pixelToMeterRatio / 1000;
+    return parseFloat(distance.toFixed(3));
   }
 
   toJson() {

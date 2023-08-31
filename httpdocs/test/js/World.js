@@ -61,7 +61,7 @@ export default class World {
     this.#reputationButton = document.getElementById('reputation');
     this.#reputationButton.onclick = () => {
       this.#computeReputation();
-      this.#draw()
+      this.draw()
     }
 
     // Initialize buttons
@@ -133,7 +133,7 @@ export default class World {
         this.#zoomLevel = this.#maxZoomLevel;
 
       console.log(this.#zoomLevel)
-      this.#draw(true);
+      this.draw();
     });
 
     this.#canvas.addEventListener('mouseup', () => this.#mouseDown = false);
@@ -208,7 +208,7 @@ export default class World {
     path.arc(coords[0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel), coords[1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel), newSize, 0, 2 * Math.PI);
     citizen.path = path;
     citizen.size = newSize;
-    this.#draw();
+    this.draw();
   }
 
   #clear() {
@@ -315,7 +315,7 @@ export default class World {
     }
   }
 
-  #draw() {
+  draw() {
     this.#clear();
     this.#ctx.save();
     this.#ctx.translate(this.#translatePosition.x, this.#translatePosition.y);
@@ -422,7 +422,7 @@ export default class World {
     const id = this.#idGenerator++
     const citizen = new Citizen(id, point, [coordX, coordY], this.#basePointSize);
     this.#citizens.set(id, citizen);
-    this.#draw();
+    this.draw();
   }
 
   #getCursorPosition(event) {
@@ -549,7 +549,7 @@ export default class World {
           this.#endorsements.set(newEndorsement.id, newEndorsement);
         }
 
-        this.#draw();
+        this.draw();
       });
 
     this.#closeWorldsPanel();
@@ -647,7 +647,7 @@ export default class World {
         }
       }
       this.#selection = undefined;
-      this.#draw();
+      this.draw();
     }
     this.#idPlaceholder.appendChild(button);
   }
@@ -684,7 +684,7 @@ export default class World {
       this.#showDistanceButton.textContent = 'Hide distance (km)';
 
     this.#displayDistance = !this.#displayDistance;
-    this.#draw()
+    this.draw()
   }
 
   #showReputation() {
@@ -694,7 +694,7 @@ export default class World {
       this.#showReputationButton.textContent = 'Hide reputation';
 
     this.#displayReputation = !this.#displayReputation;
-    this.#draw()
+    this.draw()
   }
 
   #sort(a, b) {
@@ -709,7 +709,7 @@ export default class World {
     if (this.#mouseDown) {
       this.#translatePosition.x = event.clientX - this.#startDragOffset.x;
       this.#translatePosition.y = event.clientY - this.#startDragOffset.y;
-      this.#draw();
+      this.draw();
     }
   }
 }
