@@ -98,6 +98,9 @@ export default class World {
     const loadButton = document.getElementById('load');
     loadButton.onclick = () => this.#loadWorld();
 
+    const generateButton = document.getElementById('generate-world');
+    generateButton.onclick = () => document.getElementById('generator').style.display = 'block';
+
     const cancelDelete = document.getElementById('cancel-delete');
     cancelDelete.onclick = () => {
       this.#selectedWorld = undefined;
@@ -158,6 +161,10 @@ export default class World {
 
   get citizens() {
     return this.#citizens;
+  }
+
+  get endorsements() {
+    return this.#endorsements;
   }
 
   get idGenerator() {
@@ -440,7 +447,7 @@ export default class World {
         this.#drawPoint(x, y);
     } else {
       if (this.#citizens.has(id)) {
-        if (typeof this.#selection === 'undefined') {
+        if (typeof this.#selection === 'undefined' || this.#selection === id) {
           this.#changePointSize(id, this.#selectedPointSize)
           this.#selection = id;
 
@@ -455,6 +462,11 @@ export default class World {
           const coordsDiv = document.createElement('div');
           coordsDiv.textContent = "Coordinates: " + citizen.coords[0] + ", " + citizen.coords[1];
           this.#idPlaceholder.appendChild(coordsDiv);
+          const endorsedByDiv = document.createElement('div');
+          let string = "";
+          citizen.endorsedBy.forEach(value => string += value + " ");
+          endorsedByDiv.textContent = "endorsedBy: " + string;
+          this.#idPlaceholder.appendChild(endorsedByDiv);
           this.#revokeButton(id);
         } else {
           this.#drawEndorsement(this.#selection, id)

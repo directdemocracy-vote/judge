@@ -77,4 +77,5 @@
   left: calc(50% - 103px);
   border: 1px black solid;
   background-color: lightgrey;
+  display: none;
 }

@@ -1,6 +1,7 @@
 export default class Citizen {
   #coords;
   #endorsed;
+  #endorsedBy;
   #id;
   #path
   #reputation
@@ -11,6 +12,7 @@ export default class Citizen {
     this.#coords = coords;
     this.#size = size;
     this.#reputation = 0;
+    this.#endorsedBy = new Set();
   }
 
   get id() {
@@ -23,6 +25,10 @@ export default class Citizen {
 
   set endorsed(newEndorsed) {
     this.#endorsed = newEndorsed;
+  }
+
+  get endorsedBy() {
+    return this.#endorsedBy;
   }
 
   get path() {

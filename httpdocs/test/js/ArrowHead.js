@@ -12,6 +12,7 @@ export default class ArrowHead {
     this.#source = source;
     this.#destination = destination;
     this.#path = path;
+    World.instance.citizens.get(destination).endorsedBy.add(source);
   }
 
   get age() {

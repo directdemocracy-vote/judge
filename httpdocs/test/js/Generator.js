@@ -1,5 +1,6 @@
 import World from './World.js';
 import Arrow from './Arrow.js';
+import ArrowHead from './ArrowHead.js';
 import Citizen from './Citizen.js';
 
 export default class Generator {
@@ -7,6 +8,7 @@ export default class Generator {
   constructor() {
     this.#generator = document.createElement('div');
     this.#generator.className = 'generator';
+    this.#generator.id = 'generator';
 
     this.#inputFacilitator('Number of Citizens', 'generator-citizens')
     this.#inputFacilitator('Radius (km)', 'generator-radius');
@@ -109,16 +111,28 @@ export default class Generator {
       }
 
       ranking.sort(this.#sortByProba);
-      let i = 0;
-      while (endorsements < citizen.endorsementToGet) {
-        if (i === ranking.length)
+      let i = -1;
+      while (citizen.endorsedBy.size < citizen.endorsementToGet) {
+        if (i === ranking.length - 1)
           break;
+        i++;
 
-        i++
+        const endorser = World.instance.citizens.get(ranking[i][1]);
+        // citizen has endorse endorser but it was not reciprocal
+        if (endorser.endorsedBy.has(citizen.id))
+          continue;
+
+        const arrow = new Arrow(World.instance.idGenerator++, endorser.id, citizen.id);
+
+        const random = Math.random();
+
+        if (random < 0.9)
+          arrow.arrowHead2 = new ArrowHead(World.instance.idGenerator++, citizen.id, endorser.id, World.instance.year, undefined);
+
+        World.instance.endorsements.set(arrow.id, arrow);
       }
-
-      break;
     }
+    World.instance.draw();
   }
 
   #setNumberEndorsement() {
