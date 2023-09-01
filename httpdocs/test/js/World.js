@@ -17,7 +17,6 @@ export default class World {
   #idGenerator;
   #idPlaceholder;
   #maxZoomLevel;
-  #minDistance;
   #mouseDown;
   #pixelToMeterRatio;
   #reputationButton;
@@ -39,7 +38,6 @@ export default class World {
 
     this.#idGenerator = 1;
     this.#year = 2023;
-    this.#minDistance = 0.57;
 
     this.#basePointSize = 5;
     this.#arrowSize = 5;
@@ -169,10 +167,6 @@ export default class World {
     return this.#endorsements;
   }
 
-  get minDistance() {
-    return this.#minDistance;
-  }
-
   get idGenerator() {
     return this.#idGenerator;
   }
@@ -236,7 +230,6 @@ export default class World {
   #computeReputation() {
     // damping parameter
     const d = 0.85;
-    const reputationFactor = 1.5;
 
     // TODO add the webservices to the count
     const N = this.#citizens.size;
@@ -260,8 +253,7 @@ export default class World {
           const source = headNumber === 1 ? link.arrowHead1.source : link.arrowHead2.source;
           const age = headNumber === 1 ? this.#year - link.arrowHead1.age : this.#year - link.arrowHead2.age;
           const reputation = this.#citizens.get(source).reputation;
-          const distance = link.distance < this.#minDistance ? this.#minDistance : link.distance
-          sum += reputationFactor * reputation / linkedEndorsement.length / (1 + distance) / (1 + age);
+          sum += reputation / linkedEndorsement.length;
         }
 
         const newReputation = (1 - d) / N + (d * sum);

@@ -106,7 +106,7 @@ export default class Generator {
         let distance = Arrow.computeDistance(citizen.id, id);
         if (distance < 1)
           distance = 1;
-        const p = Math.random() * 1 / Math.sqrt(this.minDistance);
+        const p = Math.random() * 1 / Math.sqrt(distance);
         ranking.push([p, id]);
       }
 
