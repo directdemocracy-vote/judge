@@ -12,18 +12,21 @@ export default class World {
   #ctx;
   #citizens;
   #displayDistance;
+  #displayId;
   #displayReputation;
   #endorsements;
   #idGenerator;
   #idPlaceholder;
   #maxZoomLevel;
   #mouseDown;
+  #nbrCitizensEndorsed;
   #pixelToMeterRatio;
   #reputationButton;
   #selection;
   #selectedPointSize;
   #selectedWorld;
   #showDistanceButton;
+  #showIdButton;
   #showReputationButton;
   #startDragOffset;
   #threshold;
@@ -43,6 +46,8 @@ export default class World {
     this.#basePointSize = 5;
     this.#arrowSize = 5;
     this.#selectedPointSize = 12;
+
+    this.#nbrCitizensEndorsed = 0;
 
     this.#startDragOffset = {};
     this.#mouseDown = false;
@@ -74,6 +79,9 @@ export default class World {
 
     this.#showDistanceButton = document.getElementById('show-distance');
     this.#showDistanceButton.onclick = () => this.#showDistance();
+
+    this.#showIdButton = document.getElementById('show-id');
+    this.#showIdButton.onclick = () => this.#showId();
 
     // Initialize mouse listener
     this.#canvas.addEventListener('mousedown', event => {
@@ -238,7 +246,12 @@ export default class World {
   #computeReputation() {
     this.#threshold = 0.5;
 
-    for (let i = 0; i < 13; i++) {
+    for (let i = 0; i < 1; i++) {
+      this.#nbrCitizensEndorsed = 0;
+      for (const citizen of this.#citizens.values()) {
+        if (citizen.endorsed)
+          this.#nbrCitizensEndorsed++;
+      }
       for (const citizen of this.#citizens.values()) {
         let sum = 0;
         const linkedEndorsement = [];
@@ -259,7 +272,7 @@ export default class World {
           sum += reputation;
         }
 
-        citizen.reputation = this.#reputationFunction(2 + sum);
+        citizen.reputation = this.#reputationFunction(2 / (1 + Math.sqrt(this.#nbrCitizensEndorsed)) + sum);
         citizen.endorsed = citizen.reputation > this.#threshold;
       }
     }
@@ -281,13 +294,7 @@ export default class World {
     statisticsPlaceholder.appendChild(nbrCitizensDiv);
 
     const nbrCitizensEndorsedDiv = document.createElement('div');
-    let endorsed = 0;
-    for (const citizen of this.#citizens.values()) {
-      if (citizen.endorsed)
-        endorsed++;
-    }
-
-    nbrCitizensEndorsedDiv.textContent = 'Number of endorsed citizens: ' + endorsed;
+    nbrCitizensEndorsedDiv.textContent = 'Number of endorsed citizens: ' + this.#nbrCitizensEndorsed;
     statisticsPlaceholder.appendChild(nbrCitizensEndorsedDiv);
 
     const nbrEndorsementsDiv = document.createElement('div');
@@ -358,6 +365,11 @@ export default class World {
       if (this.#displayReputation) {
         this.#ctx.font = '10px serif';
         this.#ctx.fillText(citizen.reputation.toFixed(3), coordX - 11, coordY - 7);
+      }
+
+      if (this.#displayId) {
+        this.#ctx.font = '12px serif';
+        this.#ctx.fillText(citizen.id, coordX - 11, coordY - 7);
       }
     }
 
@@ -703,6 +715,7 @@ export default class World {
 
   runTest(url) {
     this.#computeReputation()
+    this.draw()
     fetch('https://judge.directdemocracy.vote/test/tests/' + url)
       .then(response => response.json())
       .then(response => {
@@ -750,6 +763,16 @@ export default class World {
       this.#showDistanceButton.textContent = 'Hide distance (km)';
 
     this.#displayDistance = !this.#displayDistance;
+    this.draw()
+  }
+
+  #showId() {
+    if (this.#displayId)
+      this.#showIdButton.textContent = 'Show id';
+    else
+      this.#showIdButton.textContent = 'Hide id';
+
+    this.#displayId = !this.#displayId;
     this.draw()
   }
 
