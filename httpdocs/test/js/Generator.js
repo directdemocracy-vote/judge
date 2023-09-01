@@ -90,12 +90,9 @@ export default class Generator {
     console.log(distribution);
 
     for (const citizen of World.instance.citizens.values()) {
-      ids = this.#shuffle(ids);
       let ranking = [];
 
-      // TODO Check number of existing endorsements (induced by reciprocal ones)
-      let endorsements = 0;
-      if (endorsements >= citizen.endorsementToGet)
+      if (citizen.endorsedBy.length >= citizen.endorsementToGet)
         break;
 
       for (const id of ids ) {
@@ -112,6 +109,7 @@ export default class Generator {
 
       ranking.sort(this.#sortByProba);
       let i = -1;
+      console.log(ranking)
       while (citizen.endorsedBy.size < citizen.endorsementToGet) {
         if (i === ranking.length - 1)
           break;
@@ -145,10 +143,10 @@ export default class Generator {
 
   #sortByProba(a, b) {
     if (a[0] > b[0])
-      return 1;
+      return -1;
     else if (a[0] == b[0])
       return 0;
-    return -1
+    return 1
   }
 
   // https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve
@@ -172,24 +170,5 @@ export default class Generator {
       number += min; // offset to min
     }
     return number;
-  }
-
-  #shuffle(array) {
-    let currentIndex = array.length;
-    let randomIndex;
-
-    // While there remain elements to shuffle.
-    while (currentIndex > 0) {
-
-      // Pick a remaining element.
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-
-      // And swap it with the current element.
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex], array[currentIndex]];
-    }
-
-    return array;
   }
 }

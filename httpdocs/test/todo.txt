@@ -1,5 +1,6 @@
 change size of point depending on zoom
 tests
 samples worlds
+Remove id from endorsedBy when deleting node/citizen
 generator:
   - add to existing, or create new

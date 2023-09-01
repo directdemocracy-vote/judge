@@ -136,7 +136,6 @@ export default class World {
       else if (this.#zoomLevel > this.#maxZoomLevel)
         this.#zoomLevel = this.#maxZoomLevel;
 
-      console.log(this.#zoomLevel)
       this.draw();
     });
 
@@ -234,7 +233,8 @@ export default class World {
 
     // TODO add the webservices to the count
     const N = this.#citizens.size;
-    this.#threshold = 0.8 / N;
+    // this.#threshold = 0.8 / N;
+    this.#threshold = 0.5;
 
     for (let i = 0; i < 13; i++) {
       for (const citizen of this.#citizens.values()) {
@@ -254,10 +254,11 @@ export default class World {
           const source = headNumber === 1 ? link.arrowHead1.source : link.arrowHead2.source;
           const age = headNumber === 1 ? this.#year - link.arrowHead1.age : this.#year - link.arrowHead2.age;
           const reputation = this.#citizens.get(source).reputation;
-          sum += reputation / linkedEndorsement.length;
+          // sum += reputation / linkedEndorsement.length;
+          sum += reputation;
         }
-
-        const newReputation = (1 - d) / N + (d * sum);
+        const newReputation = 1 / (1 + Math.exp(-sum + 3));
+        // const newReputation = (1 - d) / N + (d * sum);
         citizen.reputation = newReputation;
         citizen.endorsed = newReputation > this.#threshold;
       }
@@ -473,6 +474,9 @@ export default class World {
           citizen.endorsedBy.forEach(value => string += value + " ");
           endorsedByDiv.textContent = "endorsedBy: " + string;
           this.#idPlaceholder.appendChild(endorsedByDiv);
+          const endorsementToGetDiv = document.createElement('div');
+          endorsementToGetDiv.textContent = "Endorsement to get: " + citizen.endorsementToGet;
+          this.#idPlaceholder.appendChild(endorsementToGetDiv);
           this.#revokeButton(id);
         } else {
           this.#drawEndorsement(this.#selection, id)
