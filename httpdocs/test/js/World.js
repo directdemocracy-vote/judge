@@ -252,7 +252,7 @@ export default class World {
         }
 
         citizen.reputation = this.#reputationFunction(sum);
-        citizen.endorsed = newReputation > this.#threshold;
+        citizen.endorsed = citizen.reputation > this.#threshold;
       }
     }
   }
