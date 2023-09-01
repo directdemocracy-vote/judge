@@ -251,7 +251,7 @@ export default class World {
           sum += reputation;
         }
 
-        citizen.reputation = this.#reputationFunction(sum);
+        citizen.reputation = this.#reputationFunction(0.4 + sum);
         citizen.endorsed = citizen.reputation > this.#threshold;
       }
     }
