@@ -364,9 +364,9 @@ export default class World {
     for (const endorsement of this.#endorsements.values()) {
       this.#ctx.fillStyle = 'black';
       endorsement.buildLine(this.#displayDistance);
-      if (endorsement.arrowHead1)
+      if (typeof endorsement.arrowHead1 !== 'undefined')
         endorsement.rebuildArrowHead(endorsement.arrowHead1);
-      if (endorsement.arrowHead2)
+      if (typeof endorsement.arrowHead2 !== 'undefined')
         endorsement.rebuildArrowHead(endorsement.arrowHead2);
     }
 
@@ -546,12 +546,12 @@ export default class World {
 
     let url = 'https://judge.directdemocracy.vote/test/';
     if (test)
-      url += 'test/';
+      url += 'tests/';
     else
       url += ' storage/';
 
 
-    fetch('https://judge.directdemocracy.vote/test/storage/' + this.#selectedWorld)
+    fetch(url + this.#selectedWorld)
       .then(response => response.json())
       .then(response => {
         this.resetWorld();
@@ -567,7 +567,19 @@ export default class World {
             this.#idGenerator = endorsement.id + 1;
 
           let newEndorsement = new Arrow(endorsement.id, endorsement.idPoint1, endorsement.idPoint2);
+
+          // Reset the arrowHead to get rid of the default ones.
+          if (typeof newEndorsement.arrowHead1 !== 'undefined') {
+            this.#citizens.get(newEndorsement.arrowHead1.destination).endorsedBy.delete(newEndorsement.arrowHead1.source);
+            newEndorsement.arrowHead1 = undefined;
+          }
+          if (typeof newEndorsement.arrowHead2 !== 'undefined') {
+            this.#citizens.get(newEndorsement.arrowHead2.destination).endorsedBy.delete(newEndorsement.arrowHead2.source);
+            newEndorsement.arrowHead2 = undefined;
+          }
+
           if (typeof endorsement.arrowHead1 !== 'undefined'){
+            if (endorsement.arrowHead1.destination === 13)
             if (endorsement.arrowHead1.id >= this.#idGenerator)
               this.#idGenerator = endorsement.arrowHead1.id + 1;
             if (endorsement.arrowHead1.age >= this.#year)
@@ -576,6 +588,8 @@ export default class World {
           }
 
           if (typeof endorsement.arrowHead2 !== 'undefined'){
+            if (endorsement.arrowHead2.destination === 13)
+              console.log("destination 13")
             if (endorsement.arrowHead2.id >= this.#idGenerator)
               this.#idGenerator = endorsement.arrowHead2.id + 1;
             if (endorsement.arrowHead2.age >= this.#year)
@@ -689,8 +703,16 @@ export default class World {
     this.#idPlaceholder.appendChild(button);
   }
 
-  #runTest(url) {
-
+  runTest(url) {
+    this.#computeReputation()
+    fetch('https://judge.directdemocracy.vote/test/tests/' + url)
+      .then(response => response.json())
+      .then(response => {
+        for (const assermentedID of response.assermented) {
+          if (!this.#citizens.get(assermentedID).assermented)
+            console.log(assermentedID + " should be assermented but is not.")
+        }
+      });
   }
 
   #saveWorld() {
