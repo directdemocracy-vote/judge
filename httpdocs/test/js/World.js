@@ -539,9 +539,17 @@ export default class World {
     }
   }
 
-  loadWorld() {
+
+  loadWorld(test) {
     if (typeof this.#selectedWorld === 'undefined')
       return;
+
+    let url = 'https://judge.directdemocracy.vote/test/';
+    if (test)
+      url += 'test/';
+    else
+      url += ' storage/';
+
 
     fetch('https://judge.directdemocracy.vote/test/storage/' + this.#selectedWorld)
       .then(response => response.json())
