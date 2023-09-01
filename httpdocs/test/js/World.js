@@ -712,6 +712,11 @@ export default class World {
           if (!this.#citizens.get(assermentedID).assermented)
             console.log(assermentedID + " should be assermented but is not.")
         }
+
+        for (const assermentedID of response.nonAssermented) {
+          if (this.#citizens.get(assermentedID).nonAssermented)
+            console.log(assermentedID + " should not be assermented but is.")
+        }
       });
   }
 
