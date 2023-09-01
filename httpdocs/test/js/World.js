@@ -228,12 +228,6 @@ export default class World {
   }
 
   #computeReputation() {
-    // damping parameter
-    const d = 0.85;
-
-    // TODO add the webservices to the count
-    const N = this.#citizens.size;
-    // this.#threshold = 0.8 / N;
     this.#threshold = 0.5;
 
     for (let i = 0; i < 13; i++) {
@@ -254,15 +248,20 @@ export default class World {
           const source = headNumber === 1 ? link.arrowHead1.source : link.arrowHead2.source;
           const age = headNumber === 1 ? this.#year - link.arrowHead1.age : this.#year - link.arrowHead2.age;
           const reputation = this.#citizens.get(source).reputation;
-          // sum += reputation / linkedEndorsement.length;
           sum += reputation;
         }
-        const newReputation = 1 / (1 + Math.exp(-sum + 3));
-        // const newReputation = (1 - d) / N + (d * sum);
-        citizen.reputation = newReputation;
+
+        citizen.reputation = this.#reputationFunction(sum);
         citizen.endorsed = newReputation > this.#threshold;
       }
     }
+  }
+
+  #reputationFunction(x) {
+    if (x < 3)
+      return Math.pow(x, 2) / 18;
+    else
+      return 1 - (0.75 / (x - 1.5));
   }
 
   #computeStatistics() {

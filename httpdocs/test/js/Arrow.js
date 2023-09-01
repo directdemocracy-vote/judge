@@ -91,7 +91,7 @@ export default class Arrow {
       this.#arrowHead2 = new ArrowHead(World.instance.idGenerator++, source, destination, World.instance.year, path);
 
     World.instance.ctx.fillStyle = "black";
-    World.instance.ctx.fill(path)
+    World.instance.ctx.fill(path);
   }
 
   rebuildArrowHead(arrowHead) {
