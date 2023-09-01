@@ -26,6 +26,7 @@ export default class World {
   #showDistanceButton;
   #showReputationButton;
   #startDragOffset;
+  #threshold;
   #translatePosition;
   #year;
   #zoomLevel;
@@ -233,7 +234,7 @@ export default class World {
 
     // TODO add the webservices to the count
     const N = this.#citizens.size;
-    const threshold = 0.8 / N;
+    this.#threshold = 0.8 / N;
 
     for (let i = 0; i < 13; i++) {
       for (const citizen of this.#citizens.values()) {
@@ -258,7 +259,7 @@ export default class World {
 
         const newReputation = (1 - d) / N + (d * sum);
         citizen.reputation = newReputation;
-        citizen.endorsed = newReputation > threshold;
+        citizen.endorsed = newReputation > this.#threshold;
       }
     }
   }
@@ -307,6 +308,12 @@ export default class World {
       const percent = doubleEndorsements / this.#endorsements.size * 100;
       nbrDoubleEndorsementsDiv.textContent = 'Number of mutual endorsements: ' + doubleEndorsements + ' (' + percent.toFixed(2) + '%)';
       statisticsPlaceholder.appendChild(nbrDoubleEndorsementsDiv);
+
+      if (typeof this.#threshold !== 'undefined') {
+        const thresholdDiv = document.createElement('div');
+        thresholdDiv.textContent = "Threshold: " + this.#threshold;
+        statisticsPlaceholder.appendChild(thresholdDiv);
+      }
 
       const averageDistanceDiv = document.createElement('div');
       const averageDistance = (totalDistance / nbrEndorsements).toFixed(3);
