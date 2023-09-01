@@ -109,7 +109,6 @@ export default class Generator {
 
       ranking.sort(this.#sortByProba);
       let i = -1;
-      console.log(ranking)
       while (citizen.endorsedBy.size < citizen.endorsementToGet) {
         if (i === ranking.length - 1)
           break;
@@ -135,8 +134,14 @@ export default class Generator {
 
   #setNumberEndorsement() {
     let n = parseInt(this.#randomNormal(-10, 20, 1));
-    if (n < 0)
+    if (n < 0) {
+      if (n === -1)
+        n = 1;
+      else if (n === -2 || n === -3)
+        n = 0;
+
       n = this.#setNumberEndorsement();
+    }
 
     return n;
   }
