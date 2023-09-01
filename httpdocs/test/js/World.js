@@ -97,7 +97,7 @@ export default class World {
     cancelButton.onclick = () => this.#closeWorldsPanel();
 
     const loadButton = document.getElementById('load');
-    loadButton.onclick = () => this.#loadWorld();
+    loadButton.onclick = () => this.loadWorld();
 
     const generateButton = document.getElementById('generate-world');
     generateButton.onclick = () => document.getElementById('generator').style.display = 'block';
@@ -181,6 +181,14 @@ export default class World {
 
   get pixelToMeterRatio() {
     return this.#pixelToMeterRatio;
+  }
+
+  get selectedWorld() {
+    return this.#selectedWorld;
+  }
+
+  set selectedWorld(newSelectedWorld) {
+    this.#selectedWorld = newSelectedWorld;
   }
 
   get year() {
@@ -531,11 +539,11 @@ export default class World {
     }
   }
 
-  #loadWorld() {
+  loadWorld() {
     if (typeof this.#selectedWorld === 'undefined')
       return;
 
-    fetch('/test/storage/' + this.#selectedWorld)
+    fetch('https://judge.directdemocracy.vote/test/storage/' + this.#selectedWorld)
       .then(response => response.json())
       .then(response => {
         this.resetWorld();
@@ -671,6 +679,10 @@ export default class World {
       this.draw();
     }
     this.#idPlaceholder.appendChild(button);
+  }
+
+  #runTest(url) {
+
   }
 
   #saveWorld() {
