@@ -42,7 +42,7 @@
 
     World.init();
     World.instance.selectedWorld = '20Citizen1km.json'
-    World.instance.loadWorld(true);
-    World.instance.runTest('20Citizen1km_soluce.json');
+    World.instance.loadWorld(true)
+      .then(() => World.instance.runTest('20Citizen1km_soluce.json'));
   </script>
 </html>

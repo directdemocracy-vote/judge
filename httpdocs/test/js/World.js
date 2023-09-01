@@ -259,7 +259,7 @@ export default class World {
           sum += reputation;
         }
 
-        citizen.reputation = this.#reputationFunction(0.4 + sum);
+        citizen.reputation = this.#reputationFunction(2 + sum);
         citizen.endorsed = citizen.reputation > this.#threshold;
       }
     }
@@ -550,10 +550,10 @@ export default class World {
     else
       url += ' storage/';
 
-
-    fetch(url + this.#selectedWorld)
+    return fetch(url + this.#selectedWorld)
       .then(response => response.json())
       .then(response => {
+        this.#closeWorldsPanel();
         this.resetWorld();
 
         for (const citizen of response.citizens) {
@@ -602,8 +602,6 @@ export default class World {
 
         this.draw();
       });
-
-    this.#closeWorldsPanel();
   }
 
   #openWorldsPanel() {
@@ -709,12 +707,12 @@ export default class World {
       .then(response => response.json())
       .then(response => {
         for (const assermentedID of response.assermented) {
-          if (!this.#citizens.get(assermentedID).assermented)
+          if (!this.#citizens.get(assermentedID).endorsed)
             console.log(assermentedID + " should be assermented but is not.")
         }
 
         for (const assermentedID of response.nonAssermented) {
-          if (this.#citizens.get(assermentedID).nonAssermented)
+          if (this.#citizens.get(assermentedID).endorsed)
             console.log(assermentedID + " should not be assermented but is.")
         }
       });
