@@ -2,6 +2,7 @@ import World from './World.js';
 import Arrow from './Arrow.js';
 import ArrowHead from './ArrowHead.js';
 import Citizen from './Citizen.js';
+import {computeDistance} from './utility.js';
 
 export default class Generator {
   #generator;
@@ -57,8 +58,8 @@ export default class Generator {
   }
 
   #generateWorld(reset) {
-    const nbrCitizens = document.getElementById('generator-citizens').value;
-    const maxRadius = document.getElementById('generator-radius').value;
+    const nbrCitizens = parseInt(document.getElementById('generator-citizens').value);
+    const maxRadius = parseFloat(document.getElementById('generator-radius').value);
     const centerX = parseFloat(document.getElementById('generator-x').value);
     const centerY = parseFloat(document.getElementById('generator-y').value);
     if (reset)
@@ -69,18 +70,33 @@ export default class Generator {
       distribution.set(i, 0);
 
     let ids = []
-    for (let i = 0; i < nbrCitizens; i++) {
+    const initialNumberofCitizen = World.instance.citizens.size;
+    let trials = 0;
+    while (World.instance.citizens.size < nbrCitizens + initialNumberofCitizen && trials < nbrCitizens * 3) {
       let x, y;
+      trials++;
       do {
         const angle = (Math.random() * 2 - 1) * Math.PI;
         const radius = Math.sqrt(Math.random()) * maxRadius;
-        x = (centerX + radius * Math.cos(angle)) * 1000 / 0.6;
-        y= (centerY + radius * Math.sin(angle)) * 1000 / 0.6;
+        x = (centerX + radius * Math.cos(angle)) * 1000 / World.instance.pixelToMeterRatio;
+        y = (centerY + radius * Math.sin(angle)) * 1000 / World.instance.pixelToMeterRatio;
       } while (x < 0 || y < 0 || x > 512*Math.pow(2, World.instance.maxZoomLevel) || y > 512*Math.pow(2, World.instance.maxZoomLevel))
+
+      let tooClose = false;
+      for (const neighbour of World.instance.citizens.values()) {
+        const coords = neighbour.coords;
+        const distance = computeDistance(x, y, coords[0], coords[1])
+        if (distance < 0.005) {
+          tooClose = true
+          break;
+        }
+      }
+      if (tooClose)
+        continue
 
       const id = World.instance.idGenerator++;
       ids.push(id);
-      const citizen = new Citizen(id, undefined, [x, y], World.instance.basePointSize)
+      const citizen = new Citizen(id, undefined, [x, y])
       citizen.endorsementToGet = this.#setNumberEndorsement();
       distribution.set(citizen.endorsementToGet, distribution.get(citizen.endorsementToGet) + 1);
       World.instance.citizens.set(id, citizen);
@@ -100,7 +116,7 @@ export default class Generator {
           continue;
 
         const citizen2 = World.instance.citizens.get(id);
-        let distance = Arrow.computeDistance(citizen.id, id);
+        let distance = computeDistance(citizen.coords[0], citizen.coords[1], citizen2.coords[0], citizen2.coords[1]);
         if (distance < 1)
           distance = 1;
         const p = Math.random() * 1 / Math.sqrt(distance);

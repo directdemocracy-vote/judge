@@ -2,11 +2,10 @@ import Arrow from './Arrow.js';
 import ArrowHead from './ArrowHead.js';
 import Citizen from './Citizen.js';
 import Generator from './Generator.js';
+import {computeDistance} from './utility.js';
 
 export default class World {
   #ageButton;
-  #arrowSize;
-  #basePointSize;
   #borders;
   #canvas;
   #ctx;
@@ -23,7 +22,6 @@ export default class World {
   #pixelToMeterRatio;
   #reputationButton;
   #selection;
-  #selectedPointSize;
   #selectedWorld;
   #showDistanceButton;
   #showIdButton;
@@ -43,10 +41,6 @@ export default class World {
     this.#idGenerator = 1;
     this.#year = 2023;
 
-    this.#basePointSize = 5;
-    this.#arrowSize = 5;
-    this.#selectedPointSize = 12;
-
     this.#nbrCitizensEndorsed = 0;
 
     this.#startDragOffset = {};
@@ -55,9 +49,9 @@ export default class World {
         x: -256,
         y: 0
       };
-    this.#zoomLevel = 17;
-    this.#maxZoomLevel = 17;
-    this.#pixelToMeterRatio = 0.6;
+    this.#zoomLevel = 20;
+    this.#maxZoomLevel = 20;
+    this.#pixelToMeterRatio = 0.075;
 
     this.#displayReputation = false;
 
@@ -155,14 +149,6 @@ export default class World {
     new Generator();
   }
 
-  get arrowSize() {
-    return this.#arrowSize;
-  }
-
-  get basePointSize() {
-    return this.#basePointSize;
-  }
-
   get ctx() {
     return this.#ctx;
   }
@@ -215,23 +201,22 @@ export default class World {
     World.instance = new World();
   }
 
+  #arrowSize() {
+    const r = Math.ceil(World.instance.zoomLevel / 2);
+    let angle = 0;
+    const x1 = r*Math.cos(angle);
+    const y1 = r*Math.sin(angle);
+
+    angle += (1/3)*(2*Math.PI)
+    const x2 = r*Math.cos(angle);
+    const y2 = r*Math.sin(angle);
+
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  }
+
   #askPassword(name) {
     document.getElementById('load-menu').style.display = 'none';
     document.getElementById('password-menu').style.display = 'block';
-  }
-
-
-  #changePointSize(id, newSize) {
-    if (typeof id === 'undefined')
-      return;
-
-    const citizen = this.#citizens.get(id);
-    const coords = citizen.coords;
-    const path = new Path2D();
-    path.arc(coords[0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel), coords[1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel), newSize, 0, 2 * Math.PI);
-    citizen.path = path;
-    citizen.size = newSize;
-    this.draw();
   }
 
   #clear() {
@@ -355,7 +340,10 @@ export default class World {
       const path = new Path2D();
       const coordX = citizen.coords[0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
       const coordY = citizen.coords[1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
-      path.arc(coordX, coordY, citizen.size, 0, 2 * Math.PI);
+      if (this.#selection === citizen.id)
+        path.arc(coordX, coordY, Math.ceil(this.#zoomLevel / 2) + 2, 0, 2 * Math.PI);
+      else
+        path.arc(coordX, coordY, Math.ceil(this.#zoomLevel / 2), 0, 2 * Math.PI);
       citizen.path = path;
 
       if (citizen.endorsed)
@@ -378,11 +366,19 @@ export default class World {
 
     for (const endorsement of this.#endorsements.values()) {
       this.#ctx.fillStyle = 'black';
-      endorsement.buildLine(this.#displayDistance);
-      if (typeof endorsement.arrowHead1 !== 'undefined')
-        endorsement.rebuildArrowHead(endorsement.arrowHead1);
-      if (typeof endorsement.arrowHead2 !== 'undefined')
-        endorsement.rebuildArrowHead(endorsement.arrowHead2);
+      let arrowSize = this.#arrowSize();
+      // Number of pixels between the two points
+      let availablePixels = endorsement.distance / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) / this.#pixelToMeterRatio * 1000;
+      availablePixels -= Math.ceil(World.instance.zoomLevel / 2) + 2 * arrowSize; // substract the radius and the arrows
+
+      if (availablePixels > 0) {
+        endorsement.buildLine(this.#displayDistance);
+        if (typeof endorsement.arrowHead1 !== 'undefined')
+          endorsement.rebuildArrowHead(endorsement.arrowHead1);
+        if (typeof endorsement.arrowHead2 !== 'undefined')
+          endorsement.rebuildArrowHead(endorsement.arrowHead2);
+      } else if (availablePixels > -2 * arrowSize)
+        endorsement.buildLine(this.#displayDistance, true);
     }
 
     this.#ctx.beginPath();
@@ -445,18 +441,22 @@ export default class World {
     this.#ctx.stroke();
 
     this.#ctx.font = '11px serif';
-    const distance = (55 * Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) * this.#pixelToMeterRatio / 1000).toFixed(2);
-    this.#ctx.fillText(distance + 'km', 428, 478);
+    const distance = (55 * Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) * this.#pixelToMeterRatio / 1000).toFixed(3);
+    this.#ctx.fillText(distance + 'km', 426, 478);
   }
 
   #drawPoint(x, y) {
     const point = new Path2D();
     const coordX = (x - this.#translatePosition.x) * Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
     const coordY = (y - this.#translatePosition.y) * Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
-    point.arc(x, y, this.#basePointSize, 0, 2 * Math.PI);
-
+    for (const neighbour of this.#citizens.values()) {
+      const coords = neighbour.coords;
+      const distance = computeDistance(coordX, coordY, coords[0], coords[1])
+      if (distance < 0.005)
+        return;
+    }
     const id = this.#idGenerator++
-    const citizen = new Citizen(id, point, [coordX, coordY], this.#basePointSize);
+    const citizen = new Citizen(id, undefined, [coordX, coordY]);
     this.#citizens.set(id, citizen);
     this.draw();
   }
@@ -477,9 +477,8 @@ export default class World {
     } else {
       if (this.#citizens.has(id)) {
         if (typeof this.#selection === 'undefined' || this.#selection === id) {
-          this.#changePointSize(id, this.#selectedPointSize)
           this.#selection = id;
-
+          this.draw();
           const citizen = this.#citizens.get(id)
           this.#idPlaceholder.innerHTML = '';
           const idDiv = document.createElement('div');
@@ -541,19 +540,18 @@ export default class World {
   }
 
   #isOnPoint(x, y) {
-    for (const entry of this.#citizens.entries()) {
-      if (this.#ctx.isPointInPath(entry[1].path, x, y))
-        return entry[0];
-    }
-
     for (const entry of this.#endorsements.entries()) {
       if (typeof entry[1].arrowHead1 !== 'undefined' && this.#ctx.isPointInPath(entry[1].arrowHead1.path, x, y))
         return entry[1].arrowHead1.id;
       if (typeof entry[1].arrowHead2 !== 'undefined' && this.#ctx.isPointInPath(entry[1].arrowHead2.path, x, y))
         return entry[1].arrowHead2.id;
     }
-  }
 
+    for (const entry of this.#citizens.entries()) {
+      if (this.#ctx.isPointInPath(entry[1].path, x, y))
+        return entry[0];
+    }
+  }
 
   loadWorld(test) {
     if (typeof this.#selectedWorld === 'undefined')
@@ -574,7 +572,7 @@ export default class World {
         for (const citizen of response.citizens) {
           if (citizen.id >= this.#idGenerator)
             this.#idGenerator = citizen.id + 1;
-          this.#citizens.set(citizen.id, new Citizen(citizen.id, undefined, citizen.coords, this.#basePointSize));
+          this.#citizens.set(citizen.id, new Citizen(citizen.id, undefined, citizen.coords));
         }
 
         for (const endorsement of response.endorsements) {
@@ -658,9 +656,9 @@ export default class World {
   }
 
   #resetSelection() {
-    this.#changePointSize(this.#selection, this.#basePointSize);
     this.#selection = undefined;
     this.#idPlaceholder.innerHTML = '';
+    this.draw();
   }
 
   resetWorld() {
@@ -670,19 +668,15 @@ export default class World {
     this.#idGenerator = 1;
     this.#year = 2023;
 
-    this.#basePointSize = 5;
-    this.#arrowSize = 5;
-    this.#selectedPointSize = 12;
-
     this.#startDragOffset = {};
     this.#mouseDown = false;
     this.#translatePosition = {
         x: 0,
         y: 0
       };
-    this.#zoomLevel = 17;
-    this.#maxZoomLevel = 17;
-    this.#pixelToMeterRatio = 0.6;
+    this.#zoomLevel = 20;
+    this.#maxZoomLevel = 20;
+    this.#pixelToMeterRatio = 0.075;
   }
 
   #revokeButton(id) {

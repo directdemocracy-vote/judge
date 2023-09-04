@@ -5,12 +5,10 @@ export default class Citizen {
   #id;
   #path
   #reputation
-  #size;
-  constructor(id, path, coords, size) {
+  constructor(id, path, coords) {
     this.#id = id;
     this.#path = path;
     this.#coords = coords;
-    this.#size = size;
     this.#reputation = 0;
     this.#endorsedBy = new Set();
   }
@@ -53,14 +51,6 @@ export default class Citizen {
 
   set reputation(newReputation) {
     this.#reputation = newReputation;
-  }
-
-  get size() {
-    return this.#size;
-  }
-
-  set size(newSize) {
-    this.#size = newSize;
   }
 
   toJson(){

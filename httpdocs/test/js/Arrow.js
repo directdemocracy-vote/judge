@@ -1,5 +1,6 @@
 import ArrowHead from './ArrowHead.js';
 import World from './World.js';
+import {computeDistance} from './utility.js';
 
 export default class Arrow {
   #arrowHead1;
@@ -17,8 +18,9 @@ export default class Arrow {
     this.#id = id;
     this.#idPoint1 = idPoint1;
     this.#idPoint2 = idPoint2;
-
-    this.#distance = Arrow.computeDistance(idPoint1, idPoint2);
+    const coords1 = World.instance.citizens.get(idPoint1).coords;
+    const coords2 = World.instance.citizens.get(idPoint2).coords;
+    this.#distance = computeDistance(coords1[0], coords1[1], coords2[0], coords2[1]);
     this.buildLine();
     this.buildArrow(idPoint1, idPoint2);
   }
@@ -55,15 +57,15 @@ export default class Arrow {
     return this.#idPoint2;
   }
 
-  buildLine(showDistance) {
+  buildLine(showDistance, arrow) {
     this.#line = new Path2D();
     let coords1 = World.instance.citizens.get(this.#idPoint1).coords;
     coords1 = [coords1[0] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel), coords1[1] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel)];
     let coords2 = World.instance.citizens.get(this.#idPoint2).coords;
     coords2 = [coords2[0] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel), coords2[1] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel)];
 
-    const [x1, y1] = this.#intersection(coords1, coords2);
-    const [x2, y2] = this.#intersection(coords2, coords1);
+    const [x1, y1] = this.#intersection(coords1, coords2, arrow);
+    const [x2, y2] = this.#intersection(coords2, coords1, arrow);
 
     this.#x1 = x1;
     this.#x2 = x2;
@@ -103,7 +105,7 @@ export default class Arrow {
   }
 
   #pathArrow(fromx, fromy, tox, toy){
-    const r = World.instance.arrowSize
+    const r = Math.ceil(World.instance.zoomLevel / 2)
     const path = new Path2D();
 
     let angle = Math.atan2(toy-fromy,tox-fromx)
@@ -141,7 +143,8 @@ export default class Arrow {
 
     const A = Math.pow(a,2) + 1;
     const B = 2*((a*b) - (a*y1) -  x1);
-    const C = Math.pow(y1,2) - Math.pow(World.instance.basePointSize + World.instance.arrowSize,2) + Math.pow(x1,2) - (2*b*y1) + Math.pow(b,2);
+    let base = !arrow ? Math.ceil(World.instance.zoomLevel / 2) + Math.ceil(World.instance.zoomLevel / 2) :  Math.ceil(World.instance.zoomLevel / 2)
+    const C = Math.pow(y1,2) - Math.pow(base,2) + Math.pow(x1,2) - (2*b*y1) + Math.pow(b,2);
     const y3 = a * ((-B + Math.sqrt(Math.pow(B,2) - 4 * A*C)) / (2 * A)) + b;
     const x3 = (y3 - b) / a;
     const y4 = a * ((-B - Math.sqrt(Math.pow(B,2) - 4 * A*C)) / (2 * A)) + b;
@@ -151,15 +154,6 @@ export default class Arrow {
     const norm2 = Math.sqrt(Math.pow(x2 - x4, 2) + Math.pow(y2 - y4, 2));
 
     return norm1 < norm2 ? [x3, y3] : [x4, y4];
-  }
-
-  static computeDistance(idPoint1, idPoint2) {
-    const [x1, y1] =  World.instance.citizens.get(idPoint1).coords;
-    const [x2, y2] =  World.instance.citizens.get(idPoint2).coords;
-
-    const norm = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-    let distance = norm * World.instance.pixelToMeterRatio / 1000;
-    return parseFloat(distance.toFixed(3));
   }
 
   toJson() {
