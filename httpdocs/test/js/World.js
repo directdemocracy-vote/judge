@@ -563,7 +563,7 @@ export default class World {
     if (test)
       url += 'tests/';
     else
-      url += ' storage/';
+      url += 'storage/';
 
     return fetch(url + this.#selectedWorld)
       .then(response => response.json())
