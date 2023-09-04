@@ -248,10 +248,13 @@ export default class World {
 
     for (let i = 0; i < 1; i++) {
       this.#nbrCitizensEndorsed = 0;
+      let totalReputation = 0;
       for (const citizen of this.#citizens.values()) {
         if (citizen.endorsed)
           this.#nbrCitizensEndorsed++;
+        totalReputation += citizen.reputation;
       }
+
       for (const citizen of this.#citizens.values()) {
         let sum = 0;
         const linkedEndorsement = [];
@@ -272,7 +275,7 @@ export default class World {
           sum += reputation;
         }
 
-        citizen.reputation = this.#reputationFunction(2 / (1 + Math.sqrt(this.#nbrCitizensEndorsed)) + sum);
+        citizen.reputation = this.#reputationFunction(2 / (1 + Math.sqrt(totalReputation)) + sum);
         citizen.endorsed = citizen.reputation > this.#threshold;
       }
     }
