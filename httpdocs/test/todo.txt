@@ -1,4 +1,3 @@
-change size of point depending on zoom
 change size of arrow when clicked on
 tests
 samples worlds

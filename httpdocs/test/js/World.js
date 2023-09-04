@@ -16,7 +16,9 @@ export default class World {
   #endorsements;
   #idGenerator;
   #idPlaceholder;
+  #maximumReputation
   #maxZoomLevel;
+  #minimumReputation;
   #mouseDown;
   #nbrCitizensEndorsed;
   #pixelToMeterRatio;
@@ -28,6 +30,7 @@ export default class World {
   #showReputationButton;
   #startDragOffset;
   #threshold;
+  #totalReputation;
   #translatePosition;
   #year;
   #zoomLevel;
@@ -53,7 +56,9 @@ export default class World {
     this.#maxZoomLevel = 20;
     this.#pixelToMeterRatio = 0.075;
 
-    this.#displayReputation = false;
+    this.#totalReputation = 0;
+    this.#minimumReputation = 0;
+    this.#maximumReputation = 0;
 
     this.#borders = [];
     this.#borders.push([0,0], [0, Math.pow(2.0, this.#maxZoomLevel) * 256 -1], [Math.pow(2, this.#maxZoomLevel) * 256 -1, Math.pow(2, this.#maxZoomLevel)  * 256 -1], [Math.pow(2, this.#maxZoomLevel)  * 256 -1, 0]);
@@ -233,12 +238,14 @@ export default class World {
 
     for (let i = 0; i < 1; i++) {
       this.#nbrCitizensEndorsed = 0;
-      let totalReputation = 0;
+      this.#totalReputation = 0;
       for (const citizen of this.#citizens.values()) {
         if (citizen.endorsed)
           this.#nbrCitizensEndorsed++;
-        totalReputation += citizen.reputation;
+        this.#totalReputation += citizen.reputation;
       }
+      this.#maximumReputation = 0;
+      this.#minimumReputation = 1;
 
       for (const citizen of this.#citizens.values()) {
         let sum = 0;
@@ -260,7 +267,12 @@ export default class World {
           sum += reputation;
         }
 
-        citizen.reputation = this.#reputationFunction(2 / (1 + Math.sqrt(totalReputation)) + sum);
+        citizen.reputation = this.#reputationFunction(2 / (1 + Math.sqrt(this.#totalReputation)) + sum);
+        if (citizen.reputation < this.#minimumReputation)
+          this.#minimumReputation = citizen.reputation;
+        if (citizen.reputation > this.#maximumReputation)
+          this.#maximumReputation = citizen.reputation;
+
         citizen.endorsed = citizen.reputation > this.#threshold;
       }
     }
@@ -305,6 +317,18 @@ export default class World {
     }
     nbrEndorsementsDiv.textContent = 'Number of endorsements: ' + nbrEndorsements;
     statisticsPlaceholder.appendChild(nbrEndorsementsDiv);
+
+    const averageReputationDiv = document.createElement('div');
+    averageReputationDiv.textContent = 'Average reputation: ' + (this.#totalReputation / this.#citizens.size).toFixed(3);
+    statisticsPlaceholder.appendChild(averageReputationDiv);
+
+    const minimumReputationDiv = document.createElement('div');
+    minimumReputationDiv.textContent = 'Minimum reputation: ' + this.#minimumReputation.toFixed(3);
+    statisticsPlaceholder.appendChild(minimumReputationDiv);
+
+    const maximumReputationDiv = document.createElement('div');
+    maximumReputationDiv.textContent = 'Maximum reputation: ' + this.#maximumReputation.toFixed(3);
+    statisticsPlaceholder.appendChild(maximumReputationDiv);
 
     if (nbrEndorsements > 0) {
       const nbrDoubleEndorsementsDiv = document.createElement('div');
@@ -354,13 +378,13 @@ export default class World {
       this.#ctx.fill(path);
 
       if (this.#displayReputation) {
-        this.#ctx.font = '10px serif';
-        this.#ctx.fillText(citizen.reputation.toFixed(3), coordX - 11, coordY - 7);
+        this.#ctx.font = '12px serif';
+        this.#ctx.fillText(citizen.reputation.toFixed(3), coordX - 11, coordY - 12);
       }
 
       if (this.#displayId) {
-        this.#ctx.font = '12px serif';
-        this.#ctx.fillText(citizen.id, coordX - 11, coordY - 7);
+        this.#ctx.font = '13px serif';
+        this.#ctx.fillText(citizen.id, coordX - 10, coordY - 12);
       }
     }
 

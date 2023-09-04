@@ -80,7 +80,7 @@ export default class Arrow {
     const centerY = (this.#y1 + this.#y2) / 2;
 
     if (showDistance) {
-      World.instance.ctx.font = "10px serif";
+      World.instance.ctx.font = "12px serif";
       World.instance.ctx.fillText(this.#distance, centerX, centerY);
     }
   }
