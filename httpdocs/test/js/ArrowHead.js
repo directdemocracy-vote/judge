@@ -33,8 +33,7 @@ export default class ArrowHead {
   }
 
   set path(newPath) {
-    if (typeof newPath === 'undefined')
-      this.#path = newPath;
+    this.#path = newPath;
   }
 
   get source() {
