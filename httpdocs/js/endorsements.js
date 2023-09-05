@@ -11,7 +11,7 @@ window.onload = function() {
       }
       let table = document.createElement('table');
       let thead = document.createElement('thead');
-      table.classList.add('table is-striped');
+      table.classList.add('table', 'is-striped');
       table.appendChild(thead);
       let tr = document.createElement('tr');
       thead.appendChild(tr);
