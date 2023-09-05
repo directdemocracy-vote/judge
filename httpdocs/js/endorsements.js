@@ -47,6 +47,7 @@ window.onload = function() {
         tr.appendChild(td);
         td = document.createElement('td');
         if (endorsement.latest) {
+          td.setAttribute('align', 'center');
           const title = endorsement.revoke ? 'revoked' : 'endorsed';
           const color = endorsement.revoke ? 'red' : 'green';
           const icon = endorsement.revoke ? 'xmark_seal_fill' : 'checkmark_seal_fill';
