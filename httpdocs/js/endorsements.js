@@ -3,7 +3,7 @@ window.onload = function() {
   const notary = judge.replace('judge', 'notary');
   let content = document.getElementById('content');
   fetch(`${notary}/api/judge.php`, {method: 'POST', headers:{'Content-Type': 'application/x-www-form-urlencoded'}, body: `judge=${encodeURIComponent(judge)}`})
-    .then((reponse) => response.json())
+    .then((response) => response.json())
     .then((answer) => {
       if (answer.error) {
         console.log(answer.error);
