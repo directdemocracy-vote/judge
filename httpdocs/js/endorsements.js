@@ -1,27 +1,10 @@
 window.onload = function() {
   const judge = window.location.protocol + '//' + window.location.host;
   const notary = judge.replace('judge', 'notary');
-  console.log(judge);
   let content = document.getElementById('content');
-  let xhttp = new XMLHttpRequest();
-  xhttp.open('POST', `${notary}/api/judge.php`, true);
-  xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  xhttp.send('judge=' + encodeURIComponent(judge));
-  let title = document.createElement('div');
-  let p = document.createElement('p');
-  let a = document.createElement('a');
-  a.href = judge;
-  a.innerHTML = judge;
-  a.target = '_blank';
-  let b = document.createElement('b');
-  b.innerHTML = 'Judge: ';
-  p.appendChild(b);
-  p.appendChild(a);
-  title.appendChild(p);
-  content.appendChild(title);
-  xhttp.onload = function() {
-    if (this.status == 200) {
-      let answer = JSON.parse(this.responseText);
+  fetch(`${notary}/api/judge.php`, {method: 'POST', headers:{'Content-Type': 'application/x-www-form-urlencoded'}, body: `judge=${encodeURIComponent(judge)}`})
+    .then((reponse) => response.json())
+    .then((answer) => {
       if (answer.error) {
         console.log(answer.error);
         return;
@@ -61,6 +44,5 @@ window.onload = function() {
         tr.appendChild(td);
       }
       content.appendChild(table);
-    }
-  };
-};
+    });
+}
