@@ -153,10 +153,12 @@ export default class Generator {
 
   #setNumberEndorsement() {
     let n = parseInt(this.#randomNormal(-10, 20, 1));
+
+    // Artificially increase the number of 0 and 1 citizens
     if (n < 0) {
-      if (n === -1)
+      if (n === -1 || n < -4)
         n = 1;
-      else if (n === -2 || n === -3)
+      else if (n === -2 || n === -3 || n === -4)
         n = 0;
 
       n = this.#setNumberEndorsement();
