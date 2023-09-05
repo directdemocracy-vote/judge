@@ -513,8 +513,7 @@ export default class World {
 
     const id = this.#isOnPoint(xTranslated, yTranslated);
     if (typeof id === 'undefined') {
-      this.#selectedArrow = undefined;
-      if (typeof this.#selection !== 'undefined')
+      if (typeof this.#selection !== 'undefined' || typeof this.#selectedArrow !== 'undefined')
         this.#resetSelection();
       else
         this.#drawPoint(x, y);
