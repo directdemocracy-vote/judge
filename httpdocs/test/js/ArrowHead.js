@@ -12,6 +12,7 @@ export default class ArrowHead {
     this.#source = source;
     this.#destination = destination;
     this.#path = path;
+    World.instance.citizens.get(source).endorse.add(destination);
     World.instance.citizens.get(destination).endorsedBy.add(source);
   }
 
@@ -37,6 +38,11 @@ export default class ArrowHead {
 
   get source() {
     return this.#source;
+  }
+
+  prepareDelete() {
+    World.instance.citizens.get(this.#source).endorse.delete(this.#destination);
+    World.instance.citizens.get(this.#destination).endorsedBy.delete(this.#source);
   }
 
   toJson() {

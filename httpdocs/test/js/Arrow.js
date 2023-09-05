@@ -14,7 +14,7 @@ export default class Arrow {
   #x2;
   #y1;
   #y2;
-  constructor(id, idPoint1, idPoint2) {
+  constructor(id, idPoint1, idPoint2, simpleLine) {
     this.#id = id;
     this.#idPoint1 = idPoint1;
     this.#idPoint2 = idPoint2;
@@ -22,7 +22,8 @@ export default class Arrow {
     const coords2 = World.instance.citizens.get(idPoint2).coords;
     this.#distance = computeDistance(coords1[0], coords1[1], coords2[0], coords2[1]);
     this.buildLine();
-    this.buildArrow(idPoint1, idPoint2);
+    if (!simpleLine)
+      this.buildArrow(idPoint1, idPoint2);
   }
 
   get arrowHead1() {
@@ -100,7 +101,6 @@ export default class Arrow {
     const path = arrowHead.source === this.idPoint1 ? this.#pathArrow(this.#x1, this.#y1, this.#x2, this.#y2) : this.#pathArrow(this.#x2, this.#y2, this.#x1, this.#y1);
     arrowHead.path = path;
 
-    World.instance.ctx.fillStyle = "black";
     World.instance.ctx.fill(path)
   }
 

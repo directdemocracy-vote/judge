@@ -24,6 +24,7 @@ export default class World {
   #pixelToMeterRatio;
   #reputationButton;
   #selection;
+  #selectedArrow;
   #selectedWorld;
   #showDistanceButton;
   #showIdButton;
@@ -359,7 +360,6 @@ export default class World {
     this.#clear();
     this.#ctx.save();
     this.#ctx.translate(this.#translatePosition.x, this.#translatePosition.y);
-
     for (const citizen of this.#citizens.values()) {
       const path = new Path2D();
       const coordX = citizen.coords[0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
@@ -397,10 +397,20 @@ export default class World {
 
       if (availablePixels > 0) {
         endorsement.buildLine(this.#displayDistance);
-        if (typeof endorsement.arrowHead1 !== 'undefined')
+        if (typeof endorsement.arrowHead1 !== 'undefined') {
+          if (endorsement.arrowHead1.id === this.#selectedArrow)
+            this.#ctx.fillStyle = 'red';
+          else
+            this.#ctx.fillStyle = 'black';
           endorsement.rebuildArrowHead(endorsement.arrowHead1);
-        if (typeof endorsement.arrowHead2 !== 'undefined')
+        }
+        if (typeof endorsement.arrowHead2 !== 'undefined') {
+          if (endorsement.arrowHead2.id === this.#selectedArrow)
+            this.#ctx.fillStyle = 'red';
+          else
+            this.#ctx.fillStyle = 'black';
           endorsement.rebuildArrowHead(endorsement.arrowHead2);
+        }
       } else if (availablePixels > -2 * arrowSize)
         endorsement.buildLine(this.#displayDistance, true);
     }
@@ -494,6 +504,7 @@ export default class World {
 
     const id = this.#isOnPoint(xTranslated, yTranslated);
     if (typeof id === 'undefined') {
+      this.#selectedArrow = undefined;
       if (typeof this.#selection !== 'undefined') {
         this.#resetSelection()
       } else
@@ -502,6 +513,7 @@ export default class World {
       if (this.#citizens.has(id)) {
         if (typeof this.#selection === 'undefined' || this.#selection === id) {
           this.#selection = id;
+          this.#selectedArrow = undefined
           this.draw();
           const citizen = this.#citizens.get(id)
           this.#idPlaceholder.innerHTML = '';
@@ -514,8 +526,13 @@ export default class World {
           const coordsDiv = document.createElement('div');
           coordsDiv.textContent = "Coordinates: " + citizen.coords[0] + ", " + citizen.coords[1];
           this.#idPlaceholder.appendChild(coordsDiv);
-          const endorsedByDiv = document.createElement('div');
+          const endorseDiv = document.createElement('div');
           let string = "";
+          citizen.endorse.forEach(value => string += value + " ");
+          endorseDiv.textContent = "endorse: " + string;
+          this.#idPlaceholder.appendChild(endorseDiv);
+          const endorsedByDiv = document.createElement('div');
+          string = "";
           citizen.endorsedBy.forEach(value => string += value + " ");
           endorsedByDiv.textContent = "endorsedBy: " + string;
           this.#idPlaceholder.appendChild(endorsedByDiv);
@@ -541,6 +558,7 @@ export default class World {
           }
         }
 
+        this.#selectedArrow = id;
         this.#idPlaceholder.innerHTML = '';
         const idDiv = document.createElement('div');
         idDiv.textContent = 'ID: ' + id;
@@ -553,6 +571,7 @@ export default class World {
         ageDiv.textContent = 'Year: ' + age;
         this.#idPlaceholder.appendChild(ageDiv);
         this.#revokeButton(id);
+        this.draw();
       }
     }
   }
@@ -603,17 +622,7 @@ export default class World {
           if (endorsement.id >= this.#idGenerator)
             this.#idGenerator = endorsement.id + 1;
 
-          let newEndorsement = new Arrow(endorsement.id, endorsement.idPoint1, endorsement.idPoint2);
-
-          // Reset the arrowHead to get rid of the default ones.
-          if (typeof newEndorsement.arrowHead1 !== 'undefined') {
-            this.#citizens.get(newEndorsement.arrowHead1.destination).endorsedBy.delete(newEndorsement.arrowHead1.source);
-            newEndorsement.arrowHead1 = undefined;
-          }
-          if (typeof newEndorsement.arrowHead2 !== 'undefined') {
-            this.#citizens.get(newEndorsement.arrowHead2.destination).endorsedBy.delete(newEndorsement.arrowHead2.source);
-            newEndorsement.arrowHead2 = undefined;
-          }
+          let newEndorsement = new Arrow(endorsement.id, endorsement.idPoint1, endorsement.idPoint2, true);
 
           if (typeof endorsement.arrowHead1 !== 'undefined'){
             if (endorsement.arrowHead1.destination === 13)
@@ -625,8 +634,6 @@ export default class World {
           }
 
           if (typeof endorsement.arrowHead2 !== 'undefined'){
-            if (endorsement.arrowHead2.destination === 13)
-              console.log("destination 13")
             if (endorsement.arrowHead2.id >= this.#idGenerator)
               this.#idGenerator = endorsement.arrowHead2.id + 1;
             if (endorsement.arrowHead2.age >= this.#year)
@@ -681,6 +688,7 @@ export default class World {
 
   #resetSelection() {
     this.#selection = undefined;
+    this.#selectedArrow = undefined;
     this.#idPlaceholder.innerHTML = '';
     this.draw();
   }
@@ -708,6 +716,7 @@ export default class World {
     button.textContent = 'Revoke';
     button.onclick = () => {
       if (this.#citizens.has(id)) {
+        this.#citizens.get(id).prepareDelete();
         this.#citizens.delete(id);
         for (const endorsement of this.#endorsements.values()) {
           if (endorsement.idPoint1 === id || endorsement.idPoint2 === id)
@@ -716,11 +725,13 @@ export default class World {
       } else {
         for (const endorsement of this.#endorsements.values()) {
           if (typeof endorsement.arrowHead1 !== 'undefined' && endorsement.arrowHead1.id === id) {
+            endorsement.arrowHead1.prepareDelete();
             if (typeof endorsement.arrowHead2 !== 'undefined')
               endorsement.arrowHead1 = undefined;
             else
               this.#endorsements.delete(endorsement.id);
           } else if(typeof endorsement.arrowHead2 !== 'undefined' && endorsement.arrowHead2.id === id) {
+            endorsement.arrowHead2.prepareDelete();
             if (typeof endorsement.arrowHead1 !== 'undefined')
               endorsement.arrowHead2 = undefined;
             else
@@ -729,6 +740,7 @@ export default class World {
         }
       }
       this.#selection = undefined;
+      this.#selectedArrow = undefined;
       this.draw();
     }
     this.#idPlaceholder.appendChild(button);

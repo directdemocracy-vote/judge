@@ -1,7 +1,10 @@
+import World from './World.js';
+
 export default class Citizen {
   #coords;
   #endorsed;
   #endorsedBy;
+  #endorse;
   #id;
   #path
   #reputation
@@ -11,6 +14,7 @@ export default class Citizen {
     this.#coords = coords;
     this.#reputation = 0;
     this.#endorsedBy = new Set();
+    this.#endorse = new Set();
   }
 
   get id() {
@@ -23,6 +27,10 @@ export default class Citizen {
 
   set endorsed(newEndorsed) {
     this.#endorsed = newEndorsed;
+  }
+
+  get endorse() {
+    return this.#endorse;
   }
 
   get endorsedBy() {
@@ -51,6 +59,14 @@ export default class Citizen {
 
   set reputation(newReputation) {
     this.#reputation = newReputation;
+  }
+
+  prepareDelete() {
+    for (const id of this.#endorsedBy)
+      World.instance.citizens.get(id).endorse.delete(this.#id);
+
+    for (const id of this.#endorse)
+      World.instance.citizens.get(id).endorsedBy.delete(this.#id);
   }
 
   toJson(){
