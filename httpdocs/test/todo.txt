@@ -1,7 +1,6 @@
 tests:
   - two networks begin at the same time
 samples worlds
-Remove id from endorsedBy when deleting node/citizen
 generator:
   - add to existing, or create new
 

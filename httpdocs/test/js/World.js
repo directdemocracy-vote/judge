@@ -402,14 +402,14 @@ export default class World {
             this.#ctx.fillStyle = 'red';
           else
             this.#ctx.fillStyle = 'black';
-          endorsement.rebuildArrowHead(endorsement.arrowHead1);
+          endorsement.rebuildArrowHead(1);
         }
         if (typeof endorsement.arrowHead2 !== 'undefined') {
           if (endorsement.arrowHead2.id === this.#selectedArrow)
             this.#ctx.fillStyle = 'red';
           else
             this.#ctx.fillStyle = 'black';
-          endorsement.rebuildArrowHead(endorsement.arrowHead2);
+          endorsement.rebuildArrowHead(2);
         }
       } else if (availablePixels > -2 * arrowSize)
         endorsement.buildLine(this.#displayDistance, true);
