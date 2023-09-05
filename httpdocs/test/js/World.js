@@ -584,9 +584,9 @@ export default class World {
 
   #isOnPoint(x, y) {
     for (const entry of this.#endorsements.entries()) {
-      if (typeof entry[1].arrowHead1 !== 'undefined' && this.#ctx.isPointInPath(entry[1].arrowHead1.path, x, y))
+      if (typeof entry[1].arrowHead1 !== 'undefined' && typeof entry[1].arrowHead1.path !== 'undefined' && this.#ctx.isPointInPath(entry[1].arrowHead1.path, x, y))
         return entry[1].arrowHead1.id;
-      if (typeof entry[1].arrowHead2 !== 'undefined' && this.#ctx.isPointInPath(entry[1].arrowHead2.path, x, y))
+      if (typeof entry[1].arrowHead2 !== 'undefined' && typeof entry[1].arrowHead2.path !== 'undefined' && this.#ctx.isPointInPath(entry[1].arrowHead2.path, x, y))
         return entry[1].arrowHead2.id;
     }
 
