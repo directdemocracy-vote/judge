@@ -16,7 +16,7 @@ export default class World {
   #endorsements;
   #idGenerator;
   #idPlaceholder;
-  #maximumReputation
+  #maximumReputation;
   #maxZoomLevel;
   #minimumReputation;
   #mouseDown;
@@ -50,9 +50,9 @@ export default class World {
     this.#startDragOffset = {};
     this.#mouseDown = false;
     this.#translatePosition = {
-        x: -256,
-        y: 0
-      };
+      x: -256,
+      y: 0
+    };
     this.#zoomLevel = 20;
     this.#maxZoomLevel = 20;
     this.#pixelToMeterRatio = 0.075;
@@ -62,13 +62,14 @@ export default class World {
     this.#maximumReputation = 0;
 
     this.#borders = [];
-    this.#borders.push([0,0], [0, Math.pow(2.0, this.#maxZoomLevel) * 256 -1], [Math.pow(2, this.#maxZoomLevel) * 256 -1, Math.pow(2, this.#maxZoomLevel)  * 256 -1], [Math.pow(2, this.#maxZoomLevel)  * 256 -1, 0]);
+    this.#borders.push([0, 0], [0, Math.pow(2.0, this.#maxZoomLevel) * 256 - 1], [Math.pow(2, this.#maxZoomLevel) * 256 - 1,
+      Math.pow(2, this.#maxZoomLevel) * 256 - 1], [Math.pow(2, this.#maxZoomLevel) * 256 - 1, 0]);
     this.#idPlaceholder = document.getElementById('idPlaceholder');
     this.#reputationButton = document.getElementById('reputation');
     this.#reputationButton.onclick = () => {
       this.#computeReputation();
-      this.draw()
-    }
+      this.draw();
+    };
 
     // Initialize buttons
     this.#ageButton = document.getElementById('age');
@@ -89,11 +90,9 @@ export default class World {
         this.#getCursorPosition(event);
       else if (event.buttons === 2)
         this.#initializeTranslationOfViewpoint(event);
-
     });
 
     this.#canvas.addEventListener('mousemove', event => this.#translateViewpoint(event));
-
 
     const saveButton = document.getElementById('save-world');
     saveButton.onclick = () => this.#saveWorld();
@@ -108,19 +107,21 @@ export default class World {
     loadButton.onclick = () => this.loadWorld();
 
     const generateButton = document.getElementById('generate-world');
-    generateButton.onclick = () => document.getElementById('generator').style.display = 'block';
+    generateButton.onclick = () => {
+      document.getElementById('generator').style.display = 'block';
+    };
 
     const cancelDelete = document.getElementById('cancel-delete');
     cancelDelete.onclick = () => {
       this.#selectedWorld = undefined;
       document.getElementById('password-menu').style.display = 'none';
-    }
+    };
 
     const sendDelete = document.getElementById('send-delete');
     sendDelete.onclick = () => this.#sendDelete();
 
     // prevent context menu to open
-    this.#canvas.oncontextmenu = () => {return false;}
+    this.#canvas.oncontextmenu = () => { return false; };
 
     this.#canvas.addEventListener('wheel', event => {
       if (event.deltaY < 0) {
@@ -130,7 +131,7 @@ export default class World {
           this.#translatePosition.y = this.#translatePosition.y * 2 - 256;
         }
       } else {
-        this.#zoomLevel -=1;
+        this.#zoomLevel -= 1;
         if (this.#zoomLevel >= 1) {
           const centralCoordinateX = 256 - this.#translatePosition.x;
           const centralCoordinateY = 256 - this.#translatePosition.y;
@@ -147,12 +148,12 @@ export default class World {
       this.draw();
     });
 
-    this.#canvas.addEventListener('mouseup', () => this.#mouseDown = false);
-    this.#canvas.addEventListener('mouseover', () => this.#mouseDown = false);
-    this.#canvas.addEventListener('mouseout', () => this.#mouseDown = false);
+    this.#canvas.addEventListener('mouseup', () => { this.#mouseDown = false; });
+    this.#canvas.addEventListener('mouseover', () => { this.#mouseDown = false; });
+    this.#canvas.addEventListener('mouseout', () => { this.#mouseDown = false; });
 
     this.#drawScaleIndicator();
-    new Generator();
+    this.generator = new Generator();
   }
 
   get ctx() {
@@ -203,19 +204,19 @@ export default class World {
     return this.#zoomLevel;
   }
 
-  static init(){
+  static init() {
     World.instance = new World();
   }
 
   #arrowSize() {
     const r = Math.ceil(World.instance.zoomLevel / 2);
     let angle = 0;
-    const x1 = r*Math.cos(angle);
-    const y1 = r*Math.sin(angle);
+    const x1 = r * Math.cos(angle);
+    const y1 = r * Math.sin(angle);
 
-    angle += (1/3)*(2*Math.PI)
-    const x2 = r*Math.cos(angle);
-    const y2 = r*Math.sin(angle);
+    angle += (1 / 3) * (2 * Math.PI);
+    const x2 = r * Math.cos(angle);
+    const y2 = r * Math.sin(angle);
 
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
   }
@@ -334,12 +335,13 @@ export default class World {
     if (nbrEndorsements > 0) {
       const nbrDoubleEndorsementsDiv = document.createElement('div');
       const percent = doubleEndorsements / this.#endorsements.size * 100;
-      nbrDoubleEndorsementsDiv.textContent = 'Number of mutual endorsements: ' + doubleEndorsements + ' (' + percent.toFixed(2) + '%)';
+      nbrDoubleEndorsementsDiv.textContent = 'Number of mutual endorsements: ' + doubleEndorsements +
+        ' (' + percent.toFixed(2) + '%)';
       statisticsPlaceholder.appendChild(nbrDoubleEndorsementsDiv);
 
       if (typeof this.#threshold !== 'undefined') {
         const thresholdDiv = document.createElement('div');
-        thresholdDiv.textContent = "Threshold: " + this.#threshold;
+        thresholdDiv.textContent = 'Threshold: ' + this.#threshold;
         statisticsPlaceholder.appendChild(thresholdDiv);
       }
 
@@ -350,9 +352,11 @@ export default class World {
 
       const medianDistanceDiv = document.createElement('div');
       distanceList.sort(this.#sort);
-      const medianDistance = distanceList.length % 2 === 0 ? ((distanceList[distanceList.length / 2 - 1] + distanceList[distanceList.length / 2]) / 2) : distanceList[(distanceList.length + 1) / 2 - 1];
+      const medianDistance = distanceList.length % 2 === 0
+        ? ((distanceList[distanceList.length / 2 - 1] + distanceList[distanceList.length / 2]) / 2)
+        : distanceList[(distanceList.length + 1) / 2 - 1];
       medianDistanceDiv.textContent = 'Median distance of endorsements: ' + medianDistance + 'km';
-      statisticsPlaceholder.appendChild(medianDistanceDiv);90
+      statisticsPlaceholder.appendChild(medianDistanceDiv);
     }
   }
 
@@ -392,7 +396,8 @@ export default class World {
       this.#ctx.fillStyle = 'black';
       let arrowSize = this.#arrowSize();
       // Number of pixels between the two points
-      let availablePixels = endorsement.distance / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) / this.#pixelToMeterRatio * 1000;
+      let availablePixels = endorsement.distance / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) /
+        this.#pixelToMeterRatio * 1000;
       availablePixels -= Math.ceil(World.instance.zoomLevel / 2) + 2 * arrowSize; // substract the radius and the arrows
 
       if (availablePixels > 0) {
@@ -416,10 +421,14 @@ export default class World {
     }
 
     this.#ctx.beginPath();
-    this.#ctx.moveTo(this.#borders[0][0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) - 5, this.#borders[0][1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) - 5);
-    this.#ctx.lineTo(this.#borders[1][0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) - 5, this.#borders[1][1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) + 5);
-    this.#ctx.lineTo(this.#borders[2][0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) + 5, this.#borders[2][1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) + 5);
-    this.#ctx.lineTo(this.#borders[3][0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) + 5, this.#borders[3][1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) - 5);
+    this.#ctx.moveTo(this.#borders[0][0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) - 5, this.#borders[0][1] /
+      Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) - 5);
+    this.#ctx.lineTo(this.#borders[1][0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) - 5, this.#borders[1][1] /
+      Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) + 5);
+    this.#ctx.lineTo(this.#borders[2][0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) + 5, this.#borders[2][1] /
+      Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) + 5);
+    this.#ctx.lineTo(this.#borders[3][0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) + 5, this.#borders[3][1] /
+      Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) - 5);
     this.#ctx.closePath();
     this.#ctx.lineWidth = 10;
     this.#ctx.stroke();
@@ -433,13 +442,14 @@ export default class World {
 
   #drawEndorsement(id1, id2) {
     for (const endorsement of this.#endorsements.values()) {
-      if ((id1 === endorsement.idPoint1 || id1 === endorsement.idPoint2) && (id2 === endorsement.idPoint1 || id2 === endorsement.idPoint2)) {
-
+      if ((id1 === endorsement.idPoint1 || id1 === endorsement.idPoint2) && (id2 === endorsement.idPoint1 ||
+          id2 === endorsement.idPoint2)) {
         // The endorsement already exists
-        if ((typeof endorsement.arrowHead1 !== 'undefined' && endorsement.arrowHead1.source === id1 && endorsement.arrowHead1.destination === id2) ||
-            (typeof endorsement.arrowHead2 !== 'undefined' && endorsement.arrowHead2.source === id1 && endorsement.arrowHead2.destination === id2)) {
-            this.#resetSelection();
-            return;
+        if ((typeof endorsement.arrowHead1 !== 'undefined' && endorsement.arrowHead1.source === id1 &&
+          endorsement.arrowHead1.destination === id2) || (typeof endorsement.arrowHead2 !== 'undefined' &&
+          endorsement.arrowHead2.source === id1 && endorsement.arrowHead2.destination === id2)) {
+          this.#resetSelection();
+          return;
         }
 
         // Reverse endorsement already exists
@@ -480,23 +490,22 @@ export default class World {
   }
 
   #drawPoint(x, y) {
-    const point = new Path2D();
     const coordX = (x - this.#translatePosition.x) * Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
     const coordY = (y - this.#translatePosition.y) * Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
     for (const neighbour of this.#citizens.values()) {
       const coords = neighbour.coords;
-      const distance = computeDistance(coordX, coordY, coords[0], coords[1])
+      const distance = computeDistance(coordX, coordY, coords[0], coords[1]);
       if (distance < 0.005)
         return;
     }
-    const id = this.#idGenerator++
+    const id = this.#idGenerator++;
     const citizen = new Citizen(id, undefined, [coordX, coordY]);
     this.#citizens.set(id, citizen);
     this.draw();
   }
 
   #getCursorPosition(event) {
-    const rect = this.#canvas.getBoundingClientRect()
+    const rect = this.#canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     const xTranslated = x - this.#translatePosition.x;
@@ -505,17 +514,17 @@ export default class World {
     const id = this.#isOnPoint(xTranslated, yTranslated);
     if (typeof id === 'undefined') {
       this.#selectedArrow = undefined;
-      if (typeof this.#selection !== 'undefined') {
-        this.#resetSelection()
-      } else
+      if (typeof this.#selection !== 'undefined')
+        this.#resetSelection();
+      else
         this.#drawPoint(x, y);
     } else {
       if (this.#citizens.has(id)) {
         if (typeof this.#selection === 'undefined' || this.#selection === id) {
           this.#selection = id;
-          this.#selectedArrow = undefined
+          this.#selectedArrow = undefined;
           this.draw();
-          const citizen = this.#citizens.get(id)
+          const citizen = this.#citizens.get(id);
           this.#idPlaceholder.innerHTML = '';
           const idDiv = document.createElement('div');
           idDiv.textContent = 'ID: ' + id;
@@ -524,36 +533,35 @@ export default class World {
           reputationDiv.textContent = 'Reputation: ' + citizen.reputation;
           this.#idPlaceholder.appendChild(reputationDiv);
           const coordsDiv = document.createElement('div');
-          coordsDiv.textContent = "Coordinates: " + citizen.coords[0] + ", " + citizen.coords[1];
+          coordsDiv.textContent = 'Coordinates: ' + citizen.coords[0] + ', ' + citizen.coords[1];
           this.#idPlaceholder.appendChild(coordsDiv);
           const endorseDiv = document.createElement('div');
-          let string = "";
-          citizen.endorse.forEach(value => string += value + " ");
-          endorseDiv.textContent = "endorse: " + string;
+          let string = '';
+          citizen.endorse.forEach(value => { string += value + ' '; });
+          endorseDiv.textContent = 'endorse: ' + string;
           this.#idPlaceholder.appendChild(endorseDiv);
           const endorsedByDiv = document.createElement('div');
-          string = "";
-          citizen.endorsedBy.forEach(value => string += value + " ");
-          endorsedByDiv.textContent = "endorsedBy: " + string;
+          string = '';
+          citizen.endorsedBy.forEach(value => { string += value + ' '; });
+          endorsedByDiv.textContent = 'endorsedBy: ' + string;
           this.#idPlaceholder.appendChild(endorsedByDiv);
           const endorsementToGetDiv = document.createElement('div');
-          endorsementToGetDiv.textContent = "Endorsement to get: " + citizen.endorsementToGet;
+          endorsementToGetDiv.textContent = 'Endorsement to get: ' + citizen.endorsementToGet;
           this.#idPlaceholder.appendChild(endorsementToGetDiv);
           this.#revokeButton(id);
-        } else {
-          this.#drawEndorsement(this.#selection, id)
-        }
+        } else
+          this.#drawEndorsement(this.#selection, id);
       } else {
         let line;
         let head;
         for (const endorsement of this.#endorsements.values()) {
           if (endorsement.arrowHead1 && endorsement.arrowHead1.id === id) {
-            line =  endorsement;
-            head = 1
+            line = endorsement;
+            head = 1;
             break;
-          } else if(endorsement.arrowHead2 && endorsement.arrowHead2.id === id) {
-            line =  endorsement;
-            head = 2
+          } else if (endorsement.arrowHead2 && endorsement.arrowHead2.id === id) {
+            line = endorsement;
+            head = 2;
             break;
           }
         }
@@ -584,9 +592,11 @@ export default class World {
 
   #isOnPoint(x, y) {
     for (const entry of this.#endorsements.entries()) {
-      if (typeof entry[1].arrowHead1 !== 'undefined' && typeof entry[1].arrowHead1.path !== 'undefined' && this.#ctx.isPointInPath(entry[1].arrowHead1.path, x, y))
+      if (typeof entry[1].arrowHead1 !== 'undefined' && typeof entry[1].arrowHead1.path !== 'undefined' &&
+        this.#ctx.isPointInPath(entry[1].arrowHead1.path, x, y))
         return entry[1].arrowHead1.id;
-      if (typeof entry[1].arrowHead2 !== 'undefined' && typeof entry[1].arrowHead2.path !== 'undefined' && this.#ctx.isPointInPath(entry[1].arrowHead2.path, x, y))
+      if (typeof entry[1].arrowHead2 !== 'undefined' && typeof entry[1].arrowHead2.path !== 'undefined' &&
+        this.#ctx.isPointInPath(entry[1].arrowHead2.path, x, y))
         return entry[1].arrowHead2.id;
     }
 
@@ -624,21 +634,22 @@ export default class World {
 
           let newEndorsement = new Arrow(endorsement.id, endorsement.idPoint1, endorsement.idPoint2, true);
 
-          if (typeof endorsement.arrowHead1 !== 'undefined'){
-            if (endorsement.arrowHead1.destination === 13)
+          if (typeof endorsement.arrowHead1 !== 'undefined') {
             if (endorsement.arrowHead1.id >= this.#idGenerator)
               this.#idGenerator = endorsement.arrowHead1.id + 1;
             if (endorsement.arrowHead1.age >= this.#year)
               this.#year = endorsement.arrowHead1.age;
-            newEndorsement.arrowHead1 = new ArrowHead(endorsement.arrowHead1.id, endorsement.arrowHead1.source, endorsement.arrowHead1.destination, endorsement.arrowHead1.age)
+            newEndorsement.arrowHead1 = new ArrowHead(endorsement.arrowHead1.id, endorsement.arrowHead1.source,
+              endorsement.arrowHead1.destination, endorsement.arrowHead1.age);
           }
 
-          if (typeof endorsement.arrowHead2 !== 'undefined'){
+          if (typeof endorsement.arrowHead2 !== 'undefined') {
             if (endorsement.arrowHead2.id >= this.#idGenerator)
               this.#idGenerator = endorsement.arrowHead2.id + 1;
             if (endorsement.arrowHead2.age >= this.#year)
               this.#year = endorsement.arrowHead2.age;
-            newEndorsement.arrowHead2 = new ArrowHead(endorsement.arrowHead2.id, endorsement.arrowHead2.source, endorsement.arrowHead2.destination, endorsement.arrowHead2.age)
+            newEndorsement.arrowHead2 = new ArrowHead(endorsement.arrowHead2.id, endorsement.arrowHead2.source,
+              endorsement.arrowHead2.destination, endorsement.arrowHead2.age);
           }
 
           this.#endorsements.set(newEndorsement.id, newEndorsement);
@@ -649,7 +660,7 @@ export default class World {
   }
 
   #openWorldsPanel() {
-    document.getElementById('load-menu').style.display = 'block'
+    document.getElementById('load-menu').style.display = 'block';
     const menu = document.getElementById('world-menu');
     menu.innerHTML = '';
     fetch('/test/ajax/list.php')
@@ -669,13 +680,13 @@ export default class World {
                 world.parentNode.style.background = 'transparent';
 
               div.parentNode.style.background = 'dodgerblue';
-            }
+            };
             const deleteButton = document.createElement('button');
             deleteButton.className = 'trash';
             deleteButton.onclick = () => {
               this.#selectedWorld = name;
               this.#askPassword();
-            }
+            };
             const container = document.createElement('div');
             container.className = 'container';
             container.appendChild(div);
@@ -703,16 +714,16 @@ export default class World {
     this.#startDragOffset = {};
     this.#mouseDown = false;
     this.#translatePosition = {
-        x: 0,
-        y: 0
-      };
+      x: 0,
+      y: 0
+    };
     this.#zoomLevel = 20;
     this.#maxZoomLevel = 20;
     this.#pixelToMeterRatio = 0.075;
   }
 
   #revokeButton(id) {
-    const button = document.createElement('button')
+    const button = document.createElement('button');
     button.textContent = 'Revoke';
     button.onclick = () => {
       if (this.#citizens.has(id)) {
@@ -730,7 +741,7 @@ export default class World {
               endorsement.arrowHead1 = undefined;
             else
               this.#endorsements.delete(endorsement.id);
-          } else if(typeof endorsement.arrowHead2 !== 'undefined' && endorsement.arrowHead2.id === id) {
+          } else if (typeof endorsement.arrowHead2 !== 'undefined' && endorsement.arrowHead2.id === id) {
             endorsement.arrowHead2.prepareDelete();
             if (typeof endorsement.arrowHead1 !== 'undefined')
               endorsement.arrowHead2 = undefined;
@@ -742,24 +753,24 @@ export default class World {
       this.#selection = undefined;
       this.#selectedArrow = undefined;
       this.draw();
-    }
+    };
     this.#idPlaceholder.appendChild(button);
   }
 
   runTest(url) {
-    this.#computeReputation()
-    this.draw()
+    this.#computeReputation();
+    this.draw();
     fetch('https://judge.directdemocracy.vote/test/tests/' + url)
       .then(response => response.json())
       .then(response => {
         for (const assermentedID of response.assermented) {
           if (!this.#citizens.get(assermentedID).endorsed)
-            console.log(assermentedID + " should be assermented but is not.")
+            console.log(assermentedID + ' should be assermented but is not.');
         }
 
         for (const assermentedID of response.nonAssermented) {
           if (this.#citizens.get(assermentedID).endorsed)
-            console.log(assermentedID + " should not be assermented but is.")
+            console.log(assermentedID + ' should not be assermented but is.');
         }
       });
   }
@@ -774,16 +785,18 @@ export default class World {
     for (const endorsement of this.#endorsements.values())
       endorsements.push(endorsement.toJson());
 
-    fetch('/test/ajax/save.php', { method: 'post', body: JSON.stringify({ name: name, citizens: citizens, endorsements: endorsements})})
+    fetch('/test/ajax/save.php', { method: 'post',
+      body: JSON.stringify({ name: name, citizens: citizens, endorsements: endorsements})})
       .then(response => response.text())
       .then(response => {
         if (response !== '')
-          console.error(response)
+          console.error(response);
       });
   }
 
   #sendDelete() {
-    fetch('/test/ajax/delete.php', { method: 'post', body: JSON.stringify({ name: this.#selectedWorld, password: document.getElementById('password').value})});
+    fetch('/test/ajax/delete.php', { method: 'post',
+      body: JSON.stringify({ name: this.#selectedWorld, password: document.getElementById('password').value})});
 
     this.#selectedWorld = undefined;
     document.getElementById('password-menu').style.display = 'none';
@@ -796,7 +809,7 @@ export default class World {
       this.#showDistanceButton.textContent = 'Hide distance (km)';
 
     this.#displayDistance = !this.#displayDistance;
-    this.draw()
+    this.draw();
   }
 
   #showId() {
@@ -806,8 +819,7 @@ export default class World {
       this.#showIdButton.textContent = 'Hide id';
 
     this.#displayId = !this.#displayId;
-    this.draw()
-    console.log(this)
+    this.draw();
   }
 
   #showReputation() {
@@ -817,15 +829,15 @@ export default class World {
       this.#showReputationButton.textContent = 'Hide reputation';
 
     this.#displayReputation = !this.#displayReputation;
-    this.draw()
+    this.draw();
   }
 
   #sort(a, b) {
     if (a > b)
       return 1;
-    else if (a == b)
+    else if (a === b)
       return 0;
-    return -1
+    return -1;
   }
 
   #translateViewpoint(event) {

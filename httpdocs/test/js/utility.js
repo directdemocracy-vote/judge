@@ -6,4 +6,4 @@ function computeDistance(x1, y1, x2, y2) {
   return parseFloat(distance.toFixed(3));
 }
 
-export {computeDistance}
+export {computeDistance};

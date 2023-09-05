@@ -6,8 +6,8 @@ export default class Citizen {
   #endorsedBy;
   #endorse;
   #id;
-  #path
-  #reputation
+  #path;
+  #reputation;
   constructor(id, path, coords) {
     this.#id = id;
     this.#path = path;
@@ -69,7 +69,7 @@ export default class Citizen {
       World.instance.citizens.get(id).endorsedBy.delete(this.#id);
   }
 
-  toJson(){
+  toJson() {
     return { id: this.#id, coords: this.#coords};
   }
 }

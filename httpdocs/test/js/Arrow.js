@@ -6,7 +6,7 @@ export default class Arrow {
   #arrowHead1;
   #arrowHead2;
   #distance;
-  #id
+  #id;
   #idPoint1;
   #idPoint2;
   #line;
@@ -61,9 +61,11 @@ export default class Arrow {
   buildLine(showDistance, arrow) {
     this.#line = new Path2D();
     let coords1 = World.instance.citizens.get(this.#idPoint1).coords;
-    coords1 = [coords1[0] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel), coords1[1] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel)];
+    coords1 = [coords1[0] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel), coords1[1] /
+      Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel)];
     let coords2 = World.instance.citizens.get(this.#idPoint2).coords;
-    coords2 = [coords2[0] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel), coords2[1] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel)];
+    coords2 = [coords2[0] / Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel), coords2[1] /
+      Math.pow(2, World.instance.maxZoomLevel - World.instance.zoomLevel)];
 
     const [x1, y1] = this.#intersection(coords1, coords2, arrow);
     const [x2, y2] = this.#intersection(coords2, coords1, arrow);
@@ -81,61 +83,64 @@ export default class Arrow {
     const centerY = (this.#y1 + this.#y2) / 2;
 
     if (showDistance) {
-      World.instance.ctx.font = "12px serif";
+      World.instance.ctx.font = '12px serif';
       World.instance.ctx.fillText(this.#distance, centerX, centerY);
     }
   }
 
   buildArrow(source, destination) {
-    const path = source === this.idPoint1 ? this.#pathArrow(this.#x1, this.#y1, this.#x2, this.#y2) : this.#pathArrow(this.#x2, this.#y2, this.#x1, this.#y1);
+    const path = source === this.idPoint1 ? this.#pathArrow(this.#x1, this.#y1, this.#x2, this.#y2)
+      : this.#pathArrow(this.#x2, this.#y2, this.#x1, this.#y1);
+
     if (typeof this.#arrowHead1 === 'undefined')
       this.#arrowHead1 = new ArrowHead(World.instance.idGenerator++, source, destination, World.instance.year, path);
     else
       this.#arrowHead2 = new ArrowHead(World.instance.idGenerator++, source, destination, World.instance.year, path);
 
-    World.instance.ctx.fillStyle = "black";
+    World.instance.ctx.fillStyle = 'black';
     World.instance.ctx.fill(path);
   }
 
   rebuildArrowHead(number) {
     const arrowHead = number === 1 ? this.#arrowHead1 : this.arrowHead2;
-    const path = arrowHead.source === this.idPoint1 ? this.#pathArrow(this.#x1, this.#y1, this.#x2, this.#y2) : this.#pathArrow(this.#x2, this.#y2, this.#x1, this.#y1);
+    const path = arrowHead.source === this.idPoint1 ? this.#pathArrow(this.#x1, this.#y1, this.#x2, this.#y2)
+      : this.#pathArrow(this.#x2, this.#y2, this.#x1, this.#y1);
     if (number === 1)
       this.#arrowHead1.path = path;
     else
       this.#arrowHead2.path = path;
 
-    World.instance.ctx.fill(path)
+    World.instance.ctx.fill(path);
   }
 
-  #pathArrow(fromx, fromy, tox, toy){
-    const r = Math.ceil(World.instance.zoomLevel / 2)
+  #pathArrow(fromx, fromy, tox, toy) {
+    const r = Math.ceil(World.instance.zoomLevel / 2);
     const path = new Path2D();
 
-    let angle = Math.atan2(toy-fromy,tox-fromx)
-    let x = r*Math.cos(angle) + tox;
-    let y = r*Math.sin(angle) + toy;
+    let angle = Math.atan2(toy - fromy, tox - fromx);
+    let x = r * Math.cos(angle) + tox;
+    let y = r * Math.sin(angle) + toy;
 
     path.moveTo(x, y);
 
-    angle += (1/3)*(2*Math.PI)
-    x = r*Math.cos(angle) + tox;
-    y = r*Math.sin(angle) + toy;
+    angle += (1 / 3) * (2 * Math.PI);
+    x = r * Math.cos(angle) + tox;
+    y = r * Math.sin(angle) + toy;
 
     path.lineTo(x, y);
 
-    angle += (1/3)*(2*Math.PI)
-    x = r*Math.cos(angle) + tox;
-    y = r*Math.sin(angle) + toy;
+    angle += (1 / 3) * (2 * Math.PI);
+    x = r * Math.cos(angle) + tox;
+    y = r * Math.sin(angle) + toy;
 
     path.lineTo(x, y);
 
     path.closePath();
 
-    return path
+    return path;
   }
 
-  #intersection(coords1, coords2, arrow){
+  #intersection(coords1, coords2, arrow) {
     const x1 = coords1[0];
     const y1 = coords1[1];
     const x2 = coords2[0];
@@ -145,13 +150,14 @@ export default class Arrow {
     const a = (y2 - y1) / (x2 - x1);
     const b = y1 - a * x1;
 
-    const A = Math.pow(a,2) + 1;
-    const B = 2*((a*b) - (a*y1) -  x1);
-    let base = !arrow ? Math.ceil(World.instance.zoomLevel / 2) + Math.ceil(World.instance.zoomLevel / 2) :  Math.ceil(World.instance.zoomLevel / 2)
-    const C = Math.pow(y1,2) - Math.pow(base,2) + Math.pow(x1,2) - (2*b*y1) + Math.pow(b,2);
-    const y3 = a * ((-B + Math.sqrt(Math.pow(B,2) - 4 * A*C)) / (2 * A)) + b;
+    const A = Math.pow(a, 2) + 1;
+    const B = 2 * ((a * b) - (a * y1) - x1);
+    let base = !arrow ? Math.ceil(World.instance.zoomLevel / 2) + Math.ceil(World.instance.zoomLevel / 2)
+      : Math.ceil(World.instance.zoomLevel / 2);
+    const C = Math.pow(y1, 2) - Math.pow(base, 2) + Math.pow(x1, 2) - (2 * b * y1) + Math.pow(b, 2);
+    const y3 = a * ((-B + Math.sqrt(Math.pow(B, 2) - 4 * A * C)) / (2 * A)) + b;
     const x3 = (y3 - b) / a;
-    const y4 = a * ((-B - Math.sqrt(Math.pow(B,2) - 4 * A*C)) / (2 * A)) + b;
+    const y4 = a * ((-B - Math.sqrt(Math.pow(B, 2) - 4 * A * C)) / (2 * A)) + b;
     const x4 = (y4 - b) / a;
 
     const norm1 = Math.sqrt(Math.pow(x2 - x3, 2) + Math.pow(y2 - y3, 2));
@@ -161,6 +167,10 @@ export default class Arrow {
   }
 
   toJson() {
-    return {id: this.#id, idPoint1: this.#idPoint1, idPoint2: this.#idPoint2, arrowHead1: this.#arrowHead1?.toJson(), arrowHead2: this.#arrowHead2?.toJson()};
+    return {id: this.#id,
+      idPoint1: this.#idPoint1,
+      idPoint2: this.#idPoint2,
+      arrowHead1: this.#arrowHead1?.toJson(),
+      arrowHead2: this.#arrowHead2?.toJson()};
   }
 }
