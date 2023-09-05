@@ -1,10 +1,6 @@
 tests:
   - two networks begin at the same time
 samples worlds
-generator:
-  - add to existing, or create new
-
-judge auto revoke when link value reach zero
 
 distance:
   - 100: 0
