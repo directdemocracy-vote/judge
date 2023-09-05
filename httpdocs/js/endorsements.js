@@ -29,7 +29,7 @@ window.onload = function() {
         tbody.appendChild(tr);
         let endorsement = answer.endorsements[i];
         let td = document.createElement('td');
-        td.innerHTML = new Date(endorsement.published).toISOString().slice(0, 19).replace('T', ' ');
+        td.innerHTML = new Date(endorsement.published).toLocaleString();
         tr.appendChild(td);
         td = document.createElement('td');
         if (endorsement.revoke) {
