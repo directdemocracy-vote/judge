@@ -17,14 +17,14 @@ window.onload = function() {
       thead.appendChild(tr);
       let th = document.createElement('th');
       tr.appendChild(th);
-      th.innerHTML = 'Date';
+      th.innerHTML = 'Status';
       tr.appendChild(th);
       th = document.createElement('th');
       tr.appendChild(th);
       th.innerHTML = 'Name';
       th = document.createElement('th');
       tr.appendChild(th);
-      th.innerHTML = 'Status';
+      th.innerHTML = 'Date';
       let tbody = document.createElement('tbody');
       table.appendChild(tbody);
       for (i = 0; i < answer.endorsements.length; i++) {
@@ -32,7 +32,13 @@ window.onload = function() {
         tbody.appendChild(tr);
         let endorsement = answer.endorsements[i];
         let td = document.createElement('td');
-        td.innerHTML = new Date(endorsement.published).toLocaleString();
+        if (endorsement.latest) {
+          td.setAttribute('align', 'center');
+          const title = endorsement.revoke ? 'revoked' : 'endorsed';
+          const color = endorsement.revoke ? 'red' : 'green';
+          const icon = endorsement.revoke ? 'xmark_seal_fill' : 'checkmark_seal_fill';
+          td.innerHTML = `<i title="${title}" class="icon f7-icons" style="color:${color};font-size:110%">${icon}</i>`;
+        }
         tr.appendChild(td);
         td = document.createElement('td');
         if (endorsement.revoke) {
@@ -46,13 +52,7 @@ window.onload = function() {
         a.innerHTML = endorsement.givenNames + ' ' + endorsement.familyName;
         tr.appendChild(td);
         td = document.createElement('td');
-        if (endorsement.latest) {
-          td.setAttribute('align', 'center');
-          const title = endorsement.revoke ? 'revoked' : 'endorsed';
-          const color = endorsement.revoke ? 'red' : 'green';
-          const icon = endorsement.revoke ? 'xmark_seal_fill' : 'checkmark_seal_fill';
-          td.innerHTML = `<i title="${title}" class="icon f7-icons" style="color:${color};font-size:110%">${icon}</i>`;
-        }
+        td.innerHTML = new Date(endorsement.published).toLocaleString();
         tr.appendChild(td);
       }
       content.appendChild(table);
