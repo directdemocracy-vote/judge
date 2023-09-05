@@ -2,7 +2,9 @@ window.onload = function() {
   const judge = window.location.protocol + '//' + window.location.host;
   const notary = judge.replace('judge', 'notary');
   let content = document.getElementById('content');
-  fetch(`${notary}/api/judge.php`, {method: 'POST', headers:{'Content-Type': 'application/x-www-form-urlencoded'}, body: `judge=${encodeURIComponent(judge)}`})
+  fetch(`${notary}/api/judge.php`, {method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: `judge=${encodeURIComponent(judge)}`})
     .then((response) => response.json())
     .then((answer) => {
       if (answer.error) {
@@ -27,7 +29,7 @@ window.onload = function() {
       th.innerHTML = 'Date';
       let tbody = document.createElement('tbody');
       table.appendChild(tbody);
-      for (i = 0; i < answer.endorsements.length; i++) {
+      for (let i = 0; i < answer.endorsements.length; i++) {
         let tr = document.createElement('tr');
         tbody.appendChild(tr);
         let endorsement = answer.endorsements[i];
@@ -57,4 +59,4 @@ window.onload = function() {
       }
       content.appendChild(table);
     });
-}
+};
