@@ -39,7 +39,7 @@ window.onload = function() {
           td.title = 'endorsed';
         let a = document.createElement('a');
         td.appendChild(a);
-        a.href = '/citizen.html?fingerprint=' + endorsement.fingerprint;
+        a.href = `${notary}/citizen.html?fingerprint=${endorsement.fingerprint}`;
         a.innerHTML = endorsement.givenNames + ' ' + endorsement.familyName;
         tr.appendChild(td);
       }
