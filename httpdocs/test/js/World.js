@@ -807,6 +807,7 @@ export default class World {
 
     this.#displayId = !this.#displayId;
     this.draw()
+    console.log(this)
   }
 
   #showReputation() {
