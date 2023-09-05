@@ -1,7 +1,7 @@
 <?php
 require_once '../../php/database.php';
 
-$reputation_factor = 2.35;
+$reputation_factor = 2.37;
 $version = '0.0.2';
 $notary = 'https://notary.directdemocracy.vote';
 
