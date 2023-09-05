@@ -45,7 +45,7 @@ window.onload = function() {
         a.href = `${notary}/citizen.html?fingerprint=${endorsement.fingerprint}`;
         a.innerHTML = endorsement.givenNames + ' ' + endorsement.familyName;
         tr.appendChild(td);
-        let td = document.createElement('td');
+        td = document.createElement('td');
         if (endorsement.latest) {
           const title = endorsement.revoke ? 'revoked' : 'endorsed';
           const color = endorsement.revoke ? 'red' : 'green';
