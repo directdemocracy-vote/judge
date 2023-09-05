@@ -22,6 +22,9 @@ window.onload = function() {
       th = document.createElement('th');
       tr.appendChild(th);
       th.innerHTML = 'Name';
+      th = document.createElement('th');
+      tr.appendChild(th);
+      th.innerHTML = 'Status';
       let tbody = document.createElement('tbody');
       table.appendChild(tbody);
       for (i = 0; i < answer.endorsements.length; i++) {
@@ -41,6 +44,14 @@ window.onload = function() {
         td.appendChild(a);
         a.href = `${notary}/citizen.html?fingerprint=${endorsement.fingerprint}`;
         a.innerHTML = endorsement.givenNames + ' ' + endorsement.familyName;
+        tr.appendChild(td);
+        let td = document.createElement('td');
+        if (endorsement.latest) {
+          const title = endorsement.revoke ? 'revoked' : 'endorsed';
+          const color = endorsement.revoke ? 'red' : 'green';
+          const icon = endorsement.revoke ? 'xmark_seal_fill' : 'checkmark_seal_fill';
+          td.innerHTML = `<i title="${title}" class="icon f7-icons" style="color:${color};font-size:110%">${icon}</i>`;
+        }
         tr.appendChild(td);
       }
       content.appendChild(table);
