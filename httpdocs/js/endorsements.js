@@ -4,7 +4,7 @@ window.onload = function() {
   console.log(judge);
   let content = document.getElementById('content');
   let xhttp = new XMLHttpRequest();
-  xhttp.open('POST', `{notary}/api/judge.php`, true);
+  xhttp.open('POST', `${notary}/api/judge.php`, true);
   xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhttp.send('judge=' + encodeURIComponent(judge));
   let title = document.createElement('div');
