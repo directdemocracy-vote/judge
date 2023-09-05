@@ -101,10 +101,14 @@ export default class Arrow {
     World.instance.ctx.fill(path);
   }
 
-  rebuildArrowHead(arrowHead) {
+  rebuildArrowHead(number) {
+    const arrowHead = number === 1 ? this.#arrowHead1 : this.arrowHead2;
     const path = arrowHead.source === this.idPoint1 ? this.#pathArrow(this.#x1, this.#y1, this.#x2, this.#y2)
       : this.#pathArrow(this.#x2, this.#y2, this.#x1, this.#y1);
-    arrowHead.path = path;
+    if (number === 1)
+      this.#arrowHead1.path = path;
+    else
+      this.#arrowHead2.path = path;
 
     World.instance.ctx.fill(path);
   }
