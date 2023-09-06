@@ -29,13 +29,25 @@ export default class Generator {
     const createButton = document.createElement('button');
     createButton.id = 'generator-create';
     createButton.textContent = 'Create';
-    createButton.onclick = () => this.#generateWorld(true);
+    createButton.onclick = () => {
+      const nbrCitizens = parseInt(document.getElementById('generator-citizens').value);
+      const maxRadius = parseFloat(document.getElementById('generator-radius').value);
+      const centerX = parseFloat(document.getElementById('generator-x').value);
+      const centerY = parseFloat(document.getElementById('generator-y').value);
+      this.generateWorld(true, nbrCitizens, maxRadius, centerX, centerY);
+    };
     this.#generator.appendChild(createButton);
 
     const addButton = document.createElement('button');
     addButton.id = 'generator-add';
     addButton.textContent = 'Add to world';
-    addButton.onclick = () => this.#generateWorld(false);
+    addButton.onclick = () => {
+      const nbrCitizens = parseInt(document.getElementById('generator-citizens').value);
+      const maxRadius = parseFloat(document.getElementById('generator-radius').value);
+      const centerX = parseFloat(document.getElementById('generator-x').value);
+      const centerY = parseFloat(document.getElementById('generator-y').value);
+      this.generateWorld(false, nbrCitizens, maxRadius, centerX, centerY);
+    }
     this.#generator.appendChild(addButton);
   }
 
@@ -59,11 +71,7 @@ export default class Generator {
     this.#generator.appendChild(container);
   }
 
-  #generateWorld(reset) {
-    const nbrCitizens = parseInt(document.getElementById('generator-citizens').value);
-    const maxRadius = parseFloat(document.getElementById('generator-radius').value);
-    const centerX = parseFloat(document.getElementById('generator-x').value);
-    const centerY = parseFloat(document.getElementById('generator-y').value);
+  generateWorld(reset, nbrCitizens, maxRadius, centerX, centerY) {
     if (reset)
       World.instance.resetWorld();
 

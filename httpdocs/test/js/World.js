@@ -235,10 +235,11 @@ export default class World {
     this.#selectedWorld = undefined;
   }
 
-  #computeReputation() {
+  #computeReputation(numberOfIteration) {
     this.#threshold = 0.5;
-
-    for (let i = 0; i < 1; i++) {
+    if (typeof numberOfIteration === 'undefined')
+      numberOfIteration = 15;
+    for (let i = 0; i < numberOfIteration; i++) {
       this.#nbrCitizensEndorsed = 0;
       this.#totalReputation = 0;
       for (const citizen of this.#citizens.values()) {
@@ -771,6 +772,37 @@ export default class World {
           if (this.#citizens.get(assermentedID).endorsed)
             console.log(assermentedID + ' should not be assermented but is.');
         }
+        const oldReputation = [];
+        for (const citizen of this.#citizens.values()) {
+          oldReputation.push(citizen.reputation);
+          if (citizen.endorsed && citizen.endorsedBy.size < 3)
+            console.log(citizen.id + ' is assermented but less than three citizen endorsed him.')
+          else if (!citizen.endorsed && citizen.endorsedBy.size > 5) {
+            let endorserEndorsed = 0;
+            for (const endorserId of citizen.endorsedBy) {
+              if (this.#citizens.get(endorserId).endorsed)
+                endorserEndorsed++;
+            }
+            if (endorserEndorsed > 4)
+              console.log(citizen.id + ' is not assermented but at least 5 assermented citizens endorsed him.')
+          }
+        }
+
+        this.#computeReputation(1);
+        for (let i = 0; i > this.#citizens.size; i++) {
+          if (this.#citizens.values()[i].reputation !== oldReputation[i])
+            console.log('Reputation of ' + this.#citizens.values()[i] + ' has changed: ' + this.#citizens.values()[i].reputation + ' not egal to ' + oldReputation[i]);
+        }
+
+        this.#computeReputation(10);
+        for (let i = 0; i > this.#citizens.size; i++) {
+          if (this.#citizens.values()[i].reputation !== oldReputation[i])
+            console.log('Reputation of ' + this.#citizens.values()[i] + ' has changed: ' + this.#citizens.values()[i].reputation + ' not egal to ' + oldReputation[i]);
+        }
+
+        this.generator.generateWorld(false, 1, response.radius, response.center[0], response.center[1]);
+
+        console.log("Test finished")
       });
   }
 
