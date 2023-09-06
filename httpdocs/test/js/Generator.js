@@ -132,7 +132,7 @@ export default class Generator {
         const p = Math.random() * 1 / Math.sqrt(distance);
         ranking.push([p, citizen2.id]);
       }
-      console.log(ranking)
+
       ranking.sort(this.#sortByProba);
       let i = -1;
       while (citizen.endorsedBy.size < citizen.endorsementToGet) {

@@ -283,7 +283,8 @@ export default class World {
           const source = headNumber === 1 ? link.arrowHead1.source : link.arrowHead2.source;
           const age = headNumber === 1 ? this.#year - link.arrowHead1.age : this.#year - link.arrowHead2.age;
           const reputation = this.#citizens.get(source).reputation;
-          sum += reputation;
+          const distanceFactor = this.#distanceFunction(link.distance);
+          sum += reputation * distanceFactor;
         }
 
         citizen.reputation = this.#reputationFunction(2 / (1 + Math.sqrt(this.#totalReputation)) + sum);
@@ -302,6 +303,13 @@ export default class World {
       return Math.pow(x, 2) / 18;
     else
       return 1 - (0.75 / (x - 1.5));
+  }
+
+  #distanceFunction(x) {
+    if (x < 10)
+      return 1 - (1 / (1 + Math.exp((10 - x) / 2)));
+    else
+      return (0.5 / 0.9) * (1 - 0.001 * x);
   }
 
   #computeStatistics() {
