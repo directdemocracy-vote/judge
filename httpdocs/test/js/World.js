@@ -840,19 +840,18 @@ export default class World {
         if (!bug)
           this.testResultDiv.innerHTML += '<p class=result-ok>OK</p>';
 
-        bug = false;
 
-        this.testResultDiv.innerHTML += '<p>Testing that reputation is still stable after adding 10 random citizens:</p>'
         this.generator.generateWorld(false, 10, response.radius, response.center[0], response.center[1]);
         this.#computeReputation(15);
 
         oldReputation = this.#commonTest();
-
+        bug = false;
+        this.testResultDiv.innerHTML += '<p>Testing that reputation is still stable after adding 10 random citizens:</p>'
         this.#computeReputation(1);
         for (let i = 0; i > this.#citizens.size; i++) {
           if (this.#citizens.values()[i].reputation !== oldReputation[i]) {
             bug = true;
-            this.testResultDiv.innerHTML += '<p class=result-wrong> Reputation of ' + this.#citizens.values()[i] + ' has changed: ' + this.#citizens.values()[i].reputation + ' not egal to ' + oldReputation[i] + '</p>';
+            this.testResultDiv.innerHTML += '<p class=result-wrong>Reputation of ' + this.#citizens.values()[i] + ' has changed: ' + this.#citizens.values()[i].reputation + ' not egal to ' + oldReputation[i] + '</p>';
           }
         }
         if (!bug)
@@ -866,20 +865,31 @@ export default class World {
 
   #commonTest() {
     const oldReputation = [];
+    let bug = false;
+    this.testResultDiv.innerHTML += '<p>Testing that no node is assermented but has less than three endorsements and</p>';
+    this.testResultDiv.innerHTML += '<p>that no node is not assermented but has at least five assermented citizens endorsing him</p>';
+
     for (const citizen of this.#citizens.values()) {
       oldReputation.push(citizen.reputation);
-      if (citizen.endorsed && citizen.endorsedBy.size < 3)
-        console.log(citizen.id + ' is assermented but less than three citizen endorsed him.')
+      if (citizen.endorsed && citizen.endorsedBy.size < 3) {
+        bug = true;
+        this.testResultDiv.innerHTML += '<p class=result-wrong>' + citizen.id + ' is assermented but less than three citizen endorsed him.</p>';
+      }
       else if (!citizen.endorsed && citizen.endorsedBy.size > 5) {
         let endorserEndorsed = 0;
         for (const endorserId of citizen.endorsedBy) {
           if (this.#citizens.get(endorserId).endorsed)
             endorserEndorsed++;
         }
-        if (endorserEndorsed > 4)
-          console.log(citizen.id + ' is not assermented but at least 5 assermented citizens endorsed him.')
+        if (endorserEndorsed > 4) {
+          bug = true;
+          this.testResultDiv.innerHTML += '<p class=result-wrong>' + citizen.id + ' is not assermented but at least 5 assermented citizens endorsed him.</p>';
+        }
       }
     }
+
+    if (!bug)
+      this.testResultDiv.innerHTML += '<p class=result-ok>OK</p>';
 
     return oldReputation;
   }
