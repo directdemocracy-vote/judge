@@ -307,7 +307,7 @@ export default class World {
 
   #distanceFunction(x) {
     if (x < 10)
-      return 1 - (1 / (1 + Math.exp((10 - x) / 2)));
+      return 1 - (1 / (1 + Math.exp((10 - x) / 3)));
     else
       return (0.5 / 0.9) * (1 - 0.001 * x);
   }
