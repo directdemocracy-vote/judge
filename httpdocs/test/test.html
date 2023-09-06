@@ -26,6 +26,10 @@
       <button id="load-world">Load</button>
       <button id="generate-world">Generate</button>
     </div>
+    <div>
+      <button id=prev-button>Previous test</button>
+      <button id=next-button>Next test</button>
+      <div id=test-result></div>
     <div id="load-menu" class="load-menu">
       <div class="world-menu" id="world-menu">
       </div>
@@ -42,8 +46,12 @@
     import World from './js/World.js';
 
     World.init();
-    World.instance.selectedWorld = '20Citizen1km.json'
-    World.instance.loadWorld(true)
-      .then(() => World.instance.runTest('20Citizen1km_soluce.json'));
+    World.instance.loadTestWorld();
+
+    const nextButton = document.getElementById('next-button');
+    nextButton.onclick = () => {
+      World.instance.testIndex++;
+      World.instance.loadTestWorld();
+    }
   </script>
 </html>

@@ -30,6 +30,9 @@ export default class World {
   #showIdButton;
   #showReputationButton;
   #startDragOffset;
+  #testIndex;
+  #testList;
+  #testListSoluce;
   #threshold;
   #totalReputation;
   #translatePosition;
@@ -154,6 +157,19 @@ export default class World {
 
     this.#drawScaleIndicator();
     this.generator = new Generator();
+
+    this.#testList = [
+      '20Citizen1km.json',
+      '100Citizen2km.json',
+      '1000Citizen2km.json',
+    ]
+
+    this.#testListSoluce = [
+      '20Citizen1km_soluce.json',
+      '100Citizen2km_soluce.json',
+      '1000Citizen2km_soluce.json',
+    ]
+    this.#testIndex = 0;
   }
 
   get ctx() {
@@ -190,6 +206,14 @@ export default class World {
 
   set selectedWorld(newSelectedWorld) {
     this.#selectedWorld = newSelectedWorld;
+  }
+
+  get testIndex() {
+    return this.#testIndex;
+  }
+
+  set testIndex(newIndex) {
+    this.#testIndex = newIndex;
   }
 
   get year() {
@@ -757,12 +781,20 @@ export default class World {
     this.#idPlaceholder.appendChild(button);
   }
 
-  runTest(url) {
+  loadTestWorld() {
+    this.#selectedWorld = this.#testList[this.#testIndex];
+    this.loadWorld(true)
+      .then(() => this.#runTest())
+  }
+
+  #runTest() {
     this.#computeReputation();
     this.draw();
-    fetch('https://judge.directdemocracy.vote/test/tests/' + url)
+    fetch('https://judge.directdemocracy.vote/test/tests/' + this.#testListSoluce[this.#testIndex])
       .then(response => response.json())
       .then(response => {
+        console.log(response.assermented)
+        console.log(this.#citizens)
         for (const assermentedID of response.assermented) {
           if (!this.#citizens.get(assermentedID).endorsed)
             console.log(assermentedID + ' should be assermented but is not.');
