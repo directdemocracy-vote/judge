@@ -800,7 +800,7 @@ export default class World {
             console.log('Reputation of ' + this.#citizens.values()[i] + ' has changed: ' + this.#citizens.values()[i].reputation + ' not egal to ' + oldReputation[i]);
         }
 
-        this.generator.generateWorld(false, 10, response.radius, response.center[0], response.center[1]);
+        this.generator.generateWorld(false, 2, response.radius, response.center[0], response.center[1]);
 
         console.log("Test finished")
       });
