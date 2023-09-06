@@ -114,26 +114,25 @@ export default class Generator {
       this.#generator.style.display = 'none';
       World.instance.draw();
     }
-    console.log(distribution);
 
-    for (const citizen of World.instance.citizens.values()) {
+    for (const id of ids) {
+      const citizen = World.instance.citizens.get(id);
       let ranking = [];
 
       if (citizen.endorsedBy.length >= citizen.endorsementToGet)
         break;
 
-      for (const id of ids) {
-        if (id === citizen.id)
+      for (const citizen2 of World.instance.citizens.values()) {
+        if (citizen2.id === citizen.id)
           continue;
 
-        const citizen2 = World.instance.citizens.get(id);
         let distance = computeDistance(citizen.coords[0], citizen.coords[1], citizen2.coords[0], citizen2.coords[1]);
         if (distance < 1)
           distance = 1;
         const p = Math.random() * 1 / Math.sqrt(distance);
-        ranking.push([p, id]);
+        ranking.push([p, citizen2.id]);
       }
-
+      console.log(ranking)
       ranking.sort(this.#sortByProba);
       let i = -1;
       while (citizen.endorsedBy.size < citizen.endorsementToGet) {

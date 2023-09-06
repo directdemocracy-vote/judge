@@ -50,7 +50,13 @@
 
     const nextButton = document.getElementById('next-button');
     nextButton.onclick = () => {
-      World.instance.testIndex++;
+      World.instance.nextIndex();
+      World.instance.loadTestWorld();
+    }
+
+    const prevButton = document.getElementById('prev-button');
+    prevButton.onclick = () => {
+      World.instance.prevIndex();
       World.instance.loadTestWorld();
     }
   </script>

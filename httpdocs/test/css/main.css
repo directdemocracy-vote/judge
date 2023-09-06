@@ -79,3 +79,13 @@
   background-color: lightgrey;
   display: none;
 }
+
+/* Test */
+
+.result-ok {
+  color: blue;
+}
+
+.result--wrong {
+  color:red;
+}

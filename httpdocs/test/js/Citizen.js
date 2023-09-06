@@ -15,7 +15,6 @@ export default class Citizen {
     this.#reputation = 0;
     this.#endorsedBy = new Set();
     this.#endorse = new Set();
-    this.endorsementToGet = 6;
   }
 
   get id() {
