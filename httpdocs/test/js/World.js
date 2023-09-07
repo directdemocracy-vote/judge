@@ -308,8 +308,14 @@ export default class World {
   #distanceFunction(x) {
     if (x < 10)
       return 1 - (1 / (1 + Math.exp((10 - x) / 3)));
-    else
+    else if (x < 100)
       return (0.5 / 0.9) * (1 - 0.001 * x);
+    else
+      return 0;
+  }
+
+  #timeFunction(x) {
+    return 1 - (1 / (1 + Math.exp(4 * ( 2 - x))));
   }
 
   #computeStatistics() {
