@@ -40,4 +40,53 @@ distanceFactor = 0
 ```
 
 ![distance](https://github.com/directdemocracy-vote/judge/assets/25938827/7a636356-f53a-48b2-b4bf-3768f2c39d37)
-The red line is followed until 10km, and then we take the blue line into account.
+*The red line is followed until 10km, and then we take the blue line into account.*
+
+### timeFactor
+Goal: reduce the weight of endorsement links between two citizens as it ages.
+
+Milestones taken into account when the functions were designed:
+ - The age should have little or no impact if the link is less than a year old.
+ - The link weight should be halved after 2 years.
+ - The link weight should be 0 after 3 years. 
+
+Function:
+```math
+timeFactor = 1 -  {1 \over 1 + e^{4(2 - x)}}
+```
+
+![time](https://github.com/directdemocracy-vote/judge/assets/25938827/6fdd6625-ffaa-4b73-96ec-8b9de1dbfeeb)
+
+**Note:**Here, the time is expressed in years to simplify the reading. However, in the application the time is recorded in milliseconds.
+
+### growthFactor
+Goal: attribute a initial reputation to the nodes.
+
+It should decrease when the global reputation increase because there is less need for an initial reputation and we want to favor links with other citizens.
+
+The parameters of this function have been empirically defined.
+Function:
+```math
+growthFactor = {2 \over 1 + \sqrt{totalReputation}}
+```
+Where totalReputation is the sum of the reputation of all citizens
+
+### reputationFunction
+
+Goal: attribute a reputation to citizen.
+
+The reputation should be bound between [0,1].
+A citizen shoud need at least three strong endorsements to be endorsed.
+
+Function:
+if x < 3
+```math
+reputation  = {x^2 \over 18}
+```
+else
+```math
+reputation = 1 - {0.75 \over x -1.5}
+```
+![reputation](https://github.com/directdemocracy-vote/judge/assets/25938827/7308ea10-e0a1-4958-ac19-faa38109160d)
+*The red line is followed until 3, and then we take the blue line into account.*
+
