@@ -285,8 +285,6 @@ export default class World {
           const reputation = this.#citizens.get(source).reputation;
           const distanceFactor = this.#distanceFunction(link.distance);
           const timeFactor = this.#timeFunction(age);
-          console.log(distanceFactor);
-          console.log(timeFactor);
           sum += reputation * distanceFactor * timeFactor;
         }
 
