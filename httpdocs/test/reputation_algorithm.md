@@ -20,18 +20,18 @@ Goal: reduce the weight of endorsement links between two citizens in proportion 
 Milestones taken into account when the functions were designed:
  - The distance should have little or no impact in the first few kilometers.
  - The link weight should be halved at 10 km.
- - The link weight should be 0 when two citizens are more than 100 km apart. 
+ - The link weight should be 0 when two citizens are more than 100 km apart.
 
 Function:
 if distance < 10km:
 
 ```math
-distanceFactor = 1 -  {1 \over 1 + e^{10 - x \over 3}}
+distanceFactor = 1 -  {1 \over 1 + e^{10 - x \over 2}}
 ```
 else if distance < 100km:
 
 ```math
-distanceFactor = {0.5 \over 0.9} (1 - 0.001x)
+distanceFactor = {0.5 \over 0.9} (1 - 0.01x)
 ```
 
 else
@@ -48,7 +48,7 @@ Goal: reduce the weight of endorsement links between two citizens as it ages.
 Milestones taken into account when the functions were designed:
  - The age should have little or no impact if the link is less than a year old.
  - The link weight should be halved after 2 years.
- - The link weight should be 0 after 3 years. 
+ - The link weight should be 0 after 3 years.
 
 Function:
 ```math
@@ -89,4 +89,3 @@ reputation = 1 - {0.75 \over x -1.5}
 ```
 ![reputation](https://github.com/directdemocracy-vote/judge/assets/25938827/7308ea10-e0a1-4958-ac19-faa38109160d)
 *The red line is followed until 3, and then we take the blue line into account.*
-
