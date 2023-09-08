@@ -47,7 +47,7 @@ export default class Generator {
       const centerX = parseFloat(document.getElementById('generator-x').value);
       const centerY = parseFloat(document.getElementById('generator-y').value);
       this.generateWorld(false, nbrCitizens, maxRadius, centerX, centerY);
-    }
+    };
     this.#generator.appendChild(addButton);
   }
 

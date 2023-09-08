@@ -5,7 +5,7 @@ import Generator from './Generator.js';
 import {computeDistance} from './utility.js';
 
 export default class World {
-  #ageButton;
+  #yearButton;
   #borders;
   #canvas;
   #ctx;
@@ -36,7 +36,7 @@ export default class World {
   #threshold;
   #totalReputation;
   #translatePosition;
-  #year;
+  #date;
   #zoomLevel;
   constructor() {
     this.#canvas = document.getElementById('worldMap');
@@ -46,7 +46,7 @@ export default class World {
     this.#endorsements = new Map();
 
     this.#idGenerator = 1;
-    this.#year = 2023;
+    this.#date = 1704063600000; // 2024/01/01 00:00,  0 = 1970-01-01 00:00:00.000
 
     this.#nbrCitizensEndorsed = 0;
 
@@ -75,8 +75,8 @@ export default class World {
     };
 
     // Initialize buttons
-    this.#ageButton = document.getElementById('age');
-    this.#ageButton.onclick = () => this.#year++;
+    this.#yearButton = document.getElementById('year');
+    this.#yearButton.onclick = () => { this.#date += 31536000000; };
 
     this.#showReputationButton = document.getElementById('show-reputation');
     this.#showReputationButton.onclick = () => this.#showReputation();
@@ -161,14 +161,14 @@ export default class World {
     this.#testList = [
       '20Citizen1km.json',
       '100Citizen2km.json',
-      '1000Citizen2km.json',
-    ]
+      '1000Citizen2km.json'
+    ];
 
     this.#testListSoluce = [
       '20Citizen1km_soluce.json',
       '100Citizen2km_soluce.json',
-      '1000Citizen2km_soluce.json',
-    ]
+      '1000Citizen2km_soluce.json'
+    ];
     this.#testIndex = 0;
   }
 
@@ -208,12 +208,12 @@ export default class World {
     this.#selectedWorld = newSelectedWorld;
   }
 
-  get year() {
-    return this.#year;
+  get date() {
+    return this.#date;
   }
 
-  set year(newYear) {
-    this.#year = newYear;
+  set date(newDate) {
+    this.#date = newDate;
   }
 
   get zoomLevel() {
@@ -281,10 +281,13 @@ export default class World {
           let headNumber = linkedEndorsement[j][1];
 
           const source = headNumber === 1 ? link.arrowHead1.source : link.arrowHead2.source;
-          const age = headNumber === 1 ? this.#year - link.arrowHead1.age : this.#year - link.arrowHead2.age;
+          const age = headNumber === 1 ? this.#date - link.arrowHead1.age : this.#date - link.arrowHead2.age;
           const reputation = this.#citizens.get(source).reputation;
           const distanceFactor = this.#distanceFunction(link.distance);
-          sum += reputation * distanceFactor;
+          const timeFactor = this.#timeFunction(age);
+          console.log(distanceFactor);
+          console.log(timeFactor);
+          sum += reputation * distanceFactor * timeFactor;
         }
 
         citizen.reputation = this.#reputationFunction(2 / (1 + Math.sqrt(this.#totalReputation)) + sum);
@@ -306,16 +309,19 @@ export default class World {
   }
 
   #distanceFunction(x) {
+    if (x < 1)
+      x = 1;
     if (x < 10)
-      return 1 - (1 / (1 + Math.exp((10 - x) / 3)));
+      return 1 - (1 / (1 + Math.exp((10 - x) / 2)));
     else if (x < 100)
-      return (0.5 / 0.9) * (1 - 0.001 * x);
+      return (0.5 / 0.9) * (1 - 0.01 * x);
     else
       return 0;
   }
 
   #timeFunction(x) {
-    return 1 - (1 / (1 + Math.exp(4 * ( 2 - x))));
+    // 1 year = 31536000000
+    return 1 - (1 / (1 + Math.exp((63072000000 - x) / 8000000000)));
   }
 
   #computeStatistics() {
@@ -606,7 +612,7 @@ export default class World {
         this.#idPlaceholder.appendChild(distanceDiv);
         const ageDiv = document.createElement('div');
         const age = head === 1 ? line.arrowHead1.age : line.arrowHead2.age;
-        ageDiv.textContent = 'Year: ' + age;
+        ageDiv.textContent = 'Date: ' + age;
         this.#idPlaceholder.appendChild(ageDiv);
         this.#revokeButton(id);
         this.draw();
@@ -667,8 +673,8 @@ export default class World {
           if (typeof endorsement.arrowHead1 !== 'undefined') {
             if (endorsement.arrowHead1.id >= this.#idGenerator)
               this.#idGenerator = endorsement.arrowHead1.id + 1;
-            if (endorsement.arrowHead1.age >= this.#year)
-              this.#year = endorsement.arrowHead1.age;
+            if (endorsement.arrowHead1.age >= this.#date)
+              this.#date = endorsement.arrowHead1.age;
             newEndorsement.arrowHead1 = new ArrowHead(endorsement.arrowHead1.id, endorsement.arrowHead1.source,
               endorsement.arrowHead1.destination, endorsement.arrowHead1.age);
           }
@@ -676,8 +682,8 @@ export default class World {
           if (typeof endorsement.arrowHead2 !== 'undefined') {
             if (endorsement.arrowHead2.id >= this.#idGenerator)
               this.#idGenerator = endorsement.arrowHead2.id + 1;
-            if (endorsement.arrowHead2.age >= this.#year)
-              this.#year = endorsement.arrowHead2.age;
+            if (endorsement.arrowHead2.age >= this.#date)
+              this.#date = endorsement.arrowHead2.age;
             newEndorsement.arrowHead2 = new ArrowHead(endorsement.arrowHead2.id, endorsement.arrowHead2.source,
               endorsement.arrowHead2.destination, endorsement.arrowHead2.age);
           }
@@ -739,7 +745,7 @@ export default class World {
     this.#endorsements = new Map();
 
     this.#idGenerator = 1;
-    this.#year = 2023;
+    this.#date = 1704063600000; // 2024/01/01 00:00,  0 = 1970-01-01 00:00:00.000
 
     this.#startDragOffset = {};
     this.#mouseDown = false;
@@ -788,8 +794,6 @@ export default class World {
   }
 
   nextIndex() {
-    console.log(this.#testIndex)
-    console.log(this.#testList.length)
     if (this.#testIndex < this.#testList.length)
       this.#testIndex++;
   }
@@ -804,7 +808,7 @@ export default class World {
     this.testResultDiv.innerHTML = '';
     this.#selectedWorld = this.#testList[this.#testIndex];
     this.loadWorld(true)
-      .then(() => this.#runTest())
+      .then(() => this.#runTest());
   }
 
   #runTest() {
@@ -815,10 +819,10 @@ export default class World {
       .then(response => {
         let bug = false;
 
-        this.testResultDiv.innerHTML += '<p>Testing given assermented citizens:</p>'
+        this.testResultDiv.innerHTML += '<p>Testing given assermented citizens:</p>';
         for (const assermentedID of response.assermented) {
           if (!this.#citizens.get(assermentedID).endorsed) {
-            bug = true
+            bug = true;
             this.testResultDiv.innerHTML += '<p class=result-wrong>' + assermentedID + ' should be assermented but is not.</p>';
           }
         }
@@ -827,7 +831,7 @@ export default class World {
           this.testResultDiv.innerHTML += '<p class=result-ok>OK</p>';
 
         bug = false;
-        this.testResultDiv.innerHTML += '<p>Testing given non-assermented citizens:</p>'
+        this.testResultDiv.innerHTML += '<p>Testing given non-assermented citizens:</p>';
         for (const assermentedID of response.nonAssermented) {
           if (this.#citizens.get(assermentedID).endorsed) {
             bug = true;
@@ -841,7 +845,7 @@ export default class World {
         let oldReputation = this.#commonTest();
 
         bug = false;
-        this.testResultDiv.innerHTML += '<p>Testing that reputation has converged:</p>'
+        this.testResultDiv.innerHTML += '<p>Testing that reputation has converged:</p>';
 
         this.#computeReputation(1);
         for (let i = 0; i > this.#citizens.size; i++) {
@@ -854,13 +858,12 @@ export default class World {
         if (!bug)
           this.testResultDiv.innerHTML += '<p class=result-ok>OK</p>';
 
-
         this.generator.generateWorld(false, 10, response.radius, response.center[0], response.center[1]);
         this.#computeReputation(15);
 
         oldReputation = this.#commonTest();
         bug = false;
-        this.testResultDiv.innerHTML += '<p>Testing that reputation is still stable after adding 10 random citizens:</p>'
+        this.testResultDiv.innerHTML += '<p>Testing that reputation is still stable after adding 10 random citizens:</p>';
         this.#computeReputation(1);
         for (let i = 0; i > this.#citizens.size; i++) {
           if (this.#citizens.values()[i].reputation !== oldReputation[i]) {
@@ -873,7 +876,7 @@ export default class World {
 
         bug = false;
 
-        console.log("Test finished")
+        console.log('Test finished');
       });
   }
 
@@ -888,8 +891,7 @@ export default class World {
       if (citizen.endorsed && citizen.endorsedBy.size < 3) {
         bug = true;
         this.testResultDiv.innerHTML += '<p class=result-wrong>' + citizen.id + ' is assermented but less than three citizen endorsed him.</p>';
-      }
-      else if (!citizen.endorsed && citizen.endorsedBy.size > 5) {
+      } else if (!citizen.endorsed && citizen.endorsedBy.size > 5) {
         let endorserEndorsed = 0;
         for (const endorserId of citizen.endorsedBy) {
           if (this.#citizens.get(endorserId).endorsed)
