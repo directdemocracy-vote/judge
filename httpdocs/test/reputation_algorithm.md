@@ -38,8 +38,7 @@ else
 ```math
 distanceFactor = 0
 ```
-
-![distance](https://github.com/directdemocracy-vote/judge/assets/25938827/7a636356-f53a-48b2-b4bf-3768f2c39d37)
+![distance](https://github.com/directdemocracy-vote/judge/assets/25938827/312023dc-4bc0-4fb7-831c-227e3822023a)
 *The red line is followed until 10km, and then we take the blue line into account.*
 
 ### timeFactor
