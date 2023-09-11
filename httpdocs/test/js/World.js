@@ -5,7 +5,6 @@ import Generator from './Generator.js';
 import {computeDistance} from './utility.js';
 
 export default class World {
-  #yearButton;
   #borders;
   #canvas;
   #ctx;
@@ -75,8 +74,11 @@ export default class World {
     };
 
     // Initialize buttons
-    this.#yearButton = document.getElementById('year');
-    this.#yearButton.onclick = () => { this.#date += 31536000000; };
+    const yearButton = document.getElementById('year');
+    yearButton.onclick = () => { this.#date += 31536000000; };
+
+    const monthButton = document.getElementById('month');
+    monthButton.onclick = () => { this.#date += 2628000000; };
 
     this.#showReputationButton = document.getElementById('show-reputation');
     this.#showReputationButton.onclick = () => this.#showReputation();

@@ -1,0 +1,8 @@
+geotiff
+
+apparition de points:
+  - random
+  - * densité de population
+  - * distance avec des points existants
+
+- Plus explication écrite de pourquoi tel algo et pour propagation
