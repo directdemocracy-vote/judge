@@ -22,6 +22,7 @@ export default class World {
   #minimumReputation;
   #mouseDown;
   #nbrCitizensEndorsed;
+  #privateSpace;
   #pixelToMeterRatio;
   #reputationButton;
   #selection;
@@ -57,9 +58,10 @@ export default class World {
       x: -256,
       y: 0
     };
-    this.#zoomLevel = 20;
-    this.#maxZoomLevel = 20;
-    this.#pixelToMeterRatio = 0.075;
+    this.#zoomLevel = 21;
+    this.#maxZoomLevel = 21;
+    this.#privateSpace = 0.0021; // to be able to see the arrows
+    this.#pixelToMeterRatio = 0.0325;
 
     this.#totalReputation = 0;
     this.#minimumReputation = 0;
@@ -207,6 +209,10 @@ export default class World {
     return this.#pixelToMeterRatio;
   }
 
+  get privateSpace() {
+    return this.#privateSpace;
+  }
+
   get selectedWorld() {
     return this.#selectedWorld;
   }
@@ -241,7 +247,13 @@ export default class World {
     const x2 = r * Math.cos(angle);
     const y2 = r * Math.sin(angle);
 
-    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    angle += (1 / 3) * (2 * Math.PI);
+    const x3 = r * Math.cos(angle);
+    const y3 = r * Math.sin(angle);
+
+    const x4 = (x1 + x2) / 2;
+    const y4 = (y1 + y2) / 2;
+    return Math.sqrt(Math.pow(x3 - x4, 2) + Math.pow(y3 - y4, 2));
   }
 
   #askPassword(name) {
@@ -406,6 +418,37 @@ export default class World {
     this.#clear();
     this.#ctx.save();
     this.#ctx.translate(this.#translatePosition.x, this.#translatePosition.y);
+
+    // Represent the density map
+    if (typeof this.#incrementalGenerator !== 'undefined') {
+      let d = 0;
+      for (const tile of this.#incrementalGenerator.densityTiles) {
+        const coordX = tile[0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
+        const coordY = tile[1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
+        const size = (100 / this.#pixelToMeterRatio) / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
+        const density = tile[2];
+        if (density > d)
+          d = density;
+        this.#ctx.beginPath();
+        if (density > 120)
+          this.#ctx.fillStyle = '#bd0026';
+        else if (density > 40)
+          this.#ctx.fillStyle = '#f03b20';
+        else if (density > 15)
+          this.#ctx.fillStyle = '#fd8d3c';
+        else if (density > 6)
+          this.#ctx.fillStyle = '#feb243';
+        else if (density > 3)
+          this.#ctx.fillStyle = '#fdd976';
+        else
+          this.#ctx.fillStyle = '#ffffb2';
+
+        this.#ctx.rect(coordX, coordY, size, size);
+        this.#ctx.fill();
+        this.#ctx.closePath();
+      }
+    }
+
     for (const citizen of this.#citizens.values()) {
       const path = new Path2D();
       const coordX = citizen.coords[0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
@@ -440,7 +483,7 @@ export default class World {
       // Number of pixels between the two points
       let availablePixels = endorsement.distance / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) /
         this.#pixelToMeterRatio * 1000;
-      availablePixels -= Math.ceil(World.instance.zoomLevel / 2) + 2 * arrowSize; // substract the radius and the arrows
+      availablePixels -= 2 * Math.ceil(World.instance.zoomLevel / 2) + 2 * arrowSize; // substract the radius and the arrows
 
       if (availablePixels > 0) {
         endorsement.buildLine(this.#displayDistance);
@@ -460,17 +503,6 @@ export default class World {
         }
       } else if (availablePixels > -2 * arrowSize)
         endorsement.buildLine(this.#displayDistance, true);
-    }
-
-    // Represent the density map
-    if (typeof this.#incrementalGenerator !== 'undefined') {
-      for (const tile of this.#incrementalGenerator.densityTiles) {
-        const coordX = tile[0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
-        const coordY = tile[1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
-        const size = (100 / this.#pixelToMeterRatio) / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
-        this.#ctx.rect(coordX, coordY, size, size);
-        this.#ctx.fill();
-      }
     }
 
     this.#ctx.beginPath();
@@ -548,7 +580,7 @@ export default class World {
     for (const neighbour of this.#citizens.values()) {
       const coords = neighbour.coords;
       const distance = computeDistance(coordX, coordY, coords[0], coords[1]);
-      if (distance < 0.005)
+      if (distance < this.#privateSpace)
         return;
     }
     const id = this.#idGenerator++;

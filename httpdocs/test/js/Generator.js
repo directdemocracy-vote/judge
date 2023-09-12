@@ -97,7 +97,7 @@ export default class Generator {
       for (const neighbour of World.instance.citizens.values()) {
         const coords = neighbour.coords;
         const distance = computeDistance(x, y, coords[0], coords[1]);
-        if (distance < 0.005) {
+        if (distance < World.instance.privateSpace) {
           tooClose = true;
           break;
         }
