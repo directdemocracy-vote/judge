@@ -2,6 +2,7 @@ import Arrow from './Arrow.js';
 import ArrowHead from './ArrowHead.js';
 import Citizen from './Citizen.js';
 import Generator from './Generator.js';
+import IncrementalGenerator from './IncrementalGenerator.js';
 import {computeDistance} from './utility.js';
 
 export default class World {
@@ -15,6 +16,7 @@ export default class World {
   #endorsements;
   #idGenerator;
   #idPlaceholder;
+  #incrementalGenerator;
   #maximumReputation;
   #maxZoomLevel;
   #minimumReputation;
@@ -172,6 +174,9 @@ export default class World {
       '1000Citizen2km_soluce.json'
     ];
     this.#testIndex = 0;
+
+    if (true)
+      this.#incrementalGenerator = new IncrementalGenerator();
   }
 
   get ctx() {
@@ -455,6 +460,17 @@ export default class World {
         }
       } else if (availablePixels > -2 * arrowSize)
         endorsement.buildLine(this.#displayDistance, true);
+    }
+
+    // Represent the density map
+    if (typeof this.#incrementalGenerator !== 'undefined') {
+      for (const tile of this.#incrementalGenerator.densityTiles) {
+        const coordX = tile[0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
+        const coordY = tile[1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
+        const size = (100 / this.#pixelToMeterRatio) / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
+        this.#ctx.rect(coordX, coordY, size, size);
+        this.#ctx.fill();
+      }
     }
 
     this.#ctx.beginPath();
