@@ -420,34 +420,34 @@ export default class World {
     this.#ctx.translate(this.#translatePosition.x, this.#translatePosition.y);
 
     // Represent the density map
-    if (typeof this.#incrementalGenerator !== 'undefined') {
-      let d = 0;
-      for (const tile of this.#incrementalGenerator.densityTiles) {
-        const coordX = tile[0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
-        const coordY = tile[1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
-        const size = (100 / this.#pixelToMeterRatio) / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
-        const density = tile[2];
-        if (density > d)
-          d = density;
-        this.#ctx.beginPath();
-        if (density > 120)
-          this.#ctx.fillStyle = '#bd0026';
-        else if (density > 40)
-          this.#ctx.fillStyle = '#f03b20';
-        else if (density > 15)
-          this.#ctx.fillStyle = '#fd8d3c';
-        else if (density > 6)
-          this.#ctx.fillStyle = '#feb243';
-        else if (density > 3)
-          this.#ctx.fillStyle = '#fdd976';
-        else
-          this.#ctx.fillStyle = '#ffffb2';
-
-        this.#ctx.rect(coordX, coordY, size, size);
-        this.#ctx.fill();
-        this.#ctx.closePath();
-      }
-    }
+    // if (typeof this.#incrementalGenerator !== 'undefined') {
+    //   let d = 0;
+    //   for (const tile of this.#incrementalGenerator.densityTiles) {
+    //     const coordX = tile[0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
+    //     const coordY = tile[1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
+    //     const size = (100 / this.#pixelToMeterRatio) / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
+    //     const density = tile[2];
+    //     if (density > d)
+    //       d = density;
+    //     this.#ctx.beginPath();
+    //     if (density > 120)
+    //       this.#ctx.fillStyle = '#bd0026';
+    //     else if (density > 40)
+    //       this.#ctx.fillStyle = '#f03b20';
+    //     else if (density > 15)
+    //       this.#ctx.fillStyle = '#fd8d3c';
+    //     else if (density > 6)
+    //       this.#ctx.fillStyle = '#feb243';
+    //     else if (density > 3)
+    //       this.#ctx.fillStyle = '#fdd976';
+    //     else
+    //       this.#ctx.fillStyle = '#ffffb2';
+    //
+    //     this.#ctx.rect(coordX, coordY, size, size);
+    //     this.#ctx.fill();
+    //     this.#ctx.closePath();
+    //   }
+    // }
 
     for (const citizen of this.#citizens.values()) {
       const path = new Path2D();
@@ -459,7 +459,9 @@ export default class World {
         path.arc(coordX, coordY, Math.ceil(this.#zoomLevel / 2), 0, 2 * Math.PI);
       citizen.path = path;
 
-      if (citizen.endorsed)
+      if (!citizen.hasApp)
+        this.#ctx.fillStyle = 'grey';
+      else if (citizen.endorsed)
         this.#ctx.fillStyle = 'green';
       else
         this.#ctx.fillStyle = 'red';

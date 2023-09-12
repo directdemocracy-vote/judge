@@ -5,16 +5,18 @@ export default class Citizen {
   #endorsed;
   #endorsedBy;
   #endorse;
+  #hasApp;
   #id;
   #path;
   #reputation;
-  constructor(id, path, coords) {
+  constructor(id, path, coords, hasApp) {
     this.#id = id;
     this.#path = path;
     this.#coords = coords;
     this.#reputation = 0;
     this.#endorsedBy = new Set();
     this.#endorse = new Set();
+    this.#hasApp = hasApp;
   }
 
   get id() {
@@ -35,6 +37,14 @@ export default class Citizen {
 
   get endorsedBy() {
     return this.#endorsedBy;
+  }
+
+  get hasApp() {
+    return this.#hasApp;
+  }
+
+  set hasApp(newHasApp) {
+    this.#hasApp = newHasApp
   }
 
   get path() {

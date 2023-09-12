@@ -58,14 +58,16 @@ export default class IncrementalGenerator {
           const yTile = (height - (parseInt(row[1]) - this.#bottom)) / World.instance.pixelToMeterRatio;
           const density = parseInt(row[2]);
           this.#densityTiles.push([xTile, yTile, density]);
-          console.log("Tile")
+
           let generatedCitizen = 0;
+          const localCitizens = [];
           while (generatedCitizen < density) { // Can never end if the density is too big (~> 2500)
-            const x = xTile + this.#getRandomNonZeroInt(100 / World.instance.pixelToMeterRatio);
-            const y = yTile + this.#getRandomNonZeroInt(100 / World.instance.pixelToMeterRatio);
+            const privatePixels = (World.instance.privateSpace / 2 * 1000) / World.instance.pixelToMeterRatio
+            const x = xTile + privatePixels + (World.instance.privateSpace / 2) + this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
+            const y = yTile + privatePixels + this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
 
             let tooClose = false;
-            for (const neighbour of World.instance.citizens.values()) {
+            for (const neighbour of localCitizens) {
               const coords = neighbour.coords;
               const distance = computeDistance(x, y, coords[0], coords[1]);
               if (distance < World.instance.privateSpace) {
@@ -78,10 +80,12 @@ export default class IncrementalGenerator {
 
             const id = World.instance.idGenerator++;
             const citizen = new Citizen(id, undefined, [x, y]);
+            localCitizens.push(citizen);
             World.instance.citizens.set(id, citizen);
             generatedCitizen++;
           }
         }
+
         this.#densityTiles.pop(); // Remove last empty line
       });
   }
