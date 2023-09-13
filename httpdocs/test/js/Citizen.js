@@ -2,21 +2,21 @@ import World from './World.js';
 
 export default class Citizen {
   #coords;
+  #downloadDate;
   #endorsed;
   #endorsedBy;
   #endorse;
-  #hasApp;
   #id;
   #path;
   #reputation;
-  constructor(id, path, coords, hasApp) {
+  constructor(id, path, coords, downloadDate) {
     this.#id = id;
     this.#path = path;
     this.#coords = coords;
     this.#reputation = 0;
     this.#endorsedBy = new Set();
     this.#endorse = new Set();
-    this.#hasApp = hasApp;
+    this.#downloadDate = downloadDate;
   }
 
   get id() {
@@ -39,12 +39,8 @@ export default class Citizen {
     return this.#endorsedBy;
   }
 
-  get hasApp() {
-    return this.#hasApp;
-  }
-
-  set hasApp(newHasApp) {
-    this.#hasApp = newHasApp
+  get downloadDate() {
+    return this.#downloadDate;
   }
 
   get path() {

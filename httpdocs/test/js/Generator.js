@@ -2,7 +2,7 @@ import World from './World.js';
 import Arrow from './Arrow.js';
 import ArrowHead from './ArrowHead.js';
 import Citizen from './Citizen.js';
-import {computeDistance} from './utility.js';
+import {computeDistance, randomNormal} from './utility.js';
 
 export default class Generator {
   #generator;
@@ -159,7 +159,7 @@ export default class Generator {
   }
 
   #setNumberEndorsement() {
-    let n = parseInt(this.#randomNormal(-10, 20, 1));
+    let n = parseInt(randomNormal(-10, 20, 1));
 
     // Artificially increase the number of 0 and 1 citizens
     if (n < 0) {
@@ -180,27 +180,5 @@ export default class Generator {
     else if (a[0] === b[0])
       return 0;
     return 1;
-  }
-
-  // https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve
-  #randomNormal(min, max, skew) {
-    let u = 0;
-    let v = 0;
-    while (u === 0)
-      u = Math.random(); // Converting [0,1) to (0,1)
-    while (v === 0)
-      v = Math.random();
-
-    let number = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-
-    number = number / 10.0 + 0.5; // Translate to 0 -> 1
-    if (number > 1 || number < 0)
-      number = this.#randomNormal(min, max, skew); // resample between 0 and 1 if out of range
-    else {
-      number = Math.pow(number, skew); // Skew
-      number *= max - min; // Stretch to fill range
-      number += min; // offset to min
-    }
-    return number;
   }
 }

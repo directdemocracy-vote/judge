@@ -10,6 +10,7 @@ export default class World {
   #canvas;
   #ctx;
   #citizens;
+  #date;
   #displayDistance;
   #displayId;
   #displayReputation;
@@ -38,7 +39,6 @@ export default class World {
   #threshold;
   #totalReputation;
   #translatePosition;
-  #date;
   #zoomLevel;
   constructor() {
     // Seed the random generator: https://github.com/davidbau/seedrandom
@@ -461,9 +461,7 @@ export default class World {
         path.arc(coordX, coordY, Math.ceil(this.#zoomLevel / 2), 0, 2 * Math.PI);
       citizen.path = path;
 
-      if (!citizen.hasApp)
-        this.#ctx.fillStyle = 'grey';
-      else if (citizen.endorsed)
+      if (citizen.endorsed)
         this.#ctx.fillStyle = 'green';
       else
         this.#ctx.fillStyle = 'red';
