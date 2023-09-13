@@ -1,0 +1,5 @@
+- Plus explication écrite de pourquoi tel algo et pour propagation
+  - explication extractor
+  - pourquoi
+  - comment
+  - choix

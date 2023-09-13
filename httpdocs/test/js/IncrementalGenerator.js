@@ -62,9 +62,11 @@ export default class IncrementalGenerator {
           let generatedCitizen = 0;
           const localCitizens = [];
           while (generatedCitizen < density) { // Can never end if the density is too big (~> 2500)
-            const privatePixels = (World.instance.privateSpace / 2 * 1000) / World.instance.pixelToMeterRatio
-            const x = xTile + privatePixels + (World.instance.privateSpace / 2) + this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
-            const y = yTile + privatePixels + this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
+            const privatePixels = (World.instance.privateSpace / 2 * 1000) / World.instance.pixelToMeterRatio;
+            const x = xTile + privatePixels + (World.instance.privateSpace / 2) +
+              this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
+            const y = yTile + privatePixels + this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) -
+              privatePixels);
 
             let tooClose = false;
             for (const neighbour of localCitizens) {
