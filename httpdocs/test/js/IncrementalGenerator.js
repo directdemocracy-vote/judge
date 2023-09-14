@@ -1,5 +1,7 @@
 import World from './World.js';
 import Tile from './Tile.js';
+import Arrow from './Arrow.js';
+import ArrowHead from './ArrowHead.js';
 
 export default class IncrementalGenerator {
   #csvUrl;
@@ -78,11 +80,46 @@ export default class IncrementalGenerator {
         for (let i = 0; i < this.#totalPopulation; i++)
           this.#availableCitizenNumbers.push(i);
 
+        for (const tile of this.#densityTiles)
+          tile.createThreeKmTileList(this.#densityTiles);
+
         this.#simulateOneDay();
       });
   }
 
   #simulateOneDay() {
+    // Citizens create links with other
+    for (const citizen of this.#uncompleteCitizens) {
+      if ((citizen.linksToGet[0] + citizen.linksToGet[1] + citizen.linksToGet[2]) <= 0)
+        this.#uncompleteCitizens.delete(citizen);
+      else {
+        let totalCreated = 0;
+        const days = (World.instance.date - citizen.downloadDate) / 86400000;
+        let tile = this.#getTile(citizen.number);;
+        for (let i = 0; i < citizen.linksToGet[0]; i++) {
+          if (this.#shouldCreateANewLink(days)) {
+            this.#createLink(citizen, tile, 0);
+            totalCreated++;
+          }
+        }
+        citizen.linksToGet[0] -= totalCreated;
+        totalCreated = 0;
+        for (let i = 0; i < citizen.linksToGet[1]; i++) {
+          if (this.#shouldCreateANewLink(days)) {
+            const neighbourTile = this.#densityTiles[tile.threeKmList[this.#getRandomInt(tile.threeKmList.length - 1)]];
+            totalCreated++;
+            if (typeof neighbourTile === 'undefined') {
+              console.log("Isolated tile");
+              continue;
+            }
+            this.#createLink(citizen, neighbourTile, 1)
+          }
+        }
+        citizen.linksToGet[1] -= totalCreated;
+        totalCreated = 0;
+      }
+    }
+
     // Citizens discovers the app by themself
     let numberOfNewCitizens = this.#getRandomInt(Math.floor(Math.pow(World.instance.citizens.size, 2) * (1 / 10000) + 1));
     // Only 80% of the population will eventually adopt the application
@@ -92,45 +129,17 @@ export default class IncrementalGenerator {
     }
 
     for (let i = 0; i < numberOfNewCitizens; i++) {
-      const citizenNumber = this.#getValidCitizenNumber();
+      const citizenNumber = this.#getValidNewCitizenNumber();
       this.#spawnCitizen(citizenNumber);
-    }
-
-    // Citizens create links with other
-    for (const citizen of this.#uncompleteCitizens) {
-      if ((citizen.linksToGet[0] + citizen.linksToGet[1] + citizen.linksToGet[2]) !== 0)
-        this.#uncompleteCitizens.delete(citizen);
-      else {
-        let totalCreated = 0;
-        const days = (World.instance.date - citizen.downloadDate) / 86400000;
-        let tile;
-        for (let i = 0; i < citizen.linksToGet[0]; i++) {
-          if (this.#shouldCreateANewLink(days)) {
-            totalCreated++;
-            if (typeof tile === 'undefined')
-              tile = this.#getTile(citizen.number);
-
-            let targetNumber = this.#getRandomInt(tile.density);
-            let target;
-            for (const tileCitizen of tile) {
-              if (tileCitizen.number === targetNumber) {
-                target = tileCitizen;
-                break;
-              }
-            }
-            if (typeof target === 'undefined')
-              target = this.#createTarget(number);
-          }
-        }
-        citizen.linksToGet[0] -= totalCreated;
-      }
     }
 
     World.instance.date += 86400000; // add one day
     this.#daysElapsed++;
     World.instance.draw();
-    if (this.#daysElapsed < 731)
+    if (this.#daysElapsed < 720) {
+      console.log(this.#daysElapsed)
       window.requestAnimationFrame(() => this.#simulateOneDay());
+    }
   }
 
   #getRandomNonZeroInt(max) {
@@ -141,9 +150,8 @@ export default class IncrementalGenerator {
     return Math.floor(Math.random() * (max + 1)); // +1 to include the max
   }
 
-  #getValidCitizenNumber() {
+  #getValidNewCitizenNumber() {
     let index = this.#getRandomInt(this.#availableCitizenNumbers.length - 1);
-    // console.log(index)
     return this.#availableCitizenNumbers.splice(index, 1)[0];
   }
 
@@ -180,13 +188,56 @@ export default class IncrementalGenerator {
 
   #removeNumberFromList(number) {
     for (let i = 0; i < this.#availableCitizenNumbers.length; i++) {
-      if (this.#availableCitizenNumbers[i] === i)
+      if (this.#availableCitizenNumbers[i] === number) {
         this.#availableCitizenNumbers.splice(i, 1);
+        break;
+      }
     }
   }
 
   #createTarget(number) {
-    this.#removeNumberFromList();
+    this.#removeNumberFromList(number);
     return this.#spawnCitizen(number);
+  }
+
+  #citizenToCreateArrow(citizen, tile, area, counter){
+    if (typeof counter === 'undefined')
+      counter = 0;
+    else if (counter === 10 || tile.density === 1)// Prevent infinite recursion
+      return;
+
+    let targetNumber = this.#getRandomInt(tile.density - 1) + tile.firstNumber;
+    if (targetNumber === citizen.number)
+      return this.#citizenToCreateArrow(citizen, tile, area, ++counter)
+
+    let target;
+    for (const tileCitizen of tile.citizens) {
+      if (tileCitizen.number === targetNumber) {
+        target = tileCitizen;
+        break;
+      }
+    }
+    if (typeof target === 'undefined')
+      target = this.#createTarget(targetNumber);
+
+    if (target.linksToGet[area] <= 0 || citizen.endorsedBy.has(target.id) || citizen.endorse.has(target.id))
+      return this.#citizenToCreateArrow(citizen, tile, area, ++counter)
+
+    return target;
+  }
+
+  #createLink(citizen, tile, area) {
+    const target = this.#citizenToCreateArrow(citizen, tile, area);
+    if (typeof target === 'undefined')
+      return;
+    const arrow = new Arrow(World.instance.idGenerator++, citizen.id, target.id);
+
+    const random = Math.random();
+    if (random < 0.9) {
+      arrow.arrowHead2 = new ArrowHead(World.instance.idGenerator++, target.id, citizen.id, World.instance.date);
+      target.linksToGet[0]--;
+    }
+
+    World.instance.endorsements.set(arrow.id, arrow);
   }
 }

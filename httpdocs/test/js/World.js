@@ -425,10 +425,10 @@ export default class World {
     if (typeof this.#incrementalGenerator !== 'undefined') {
       let d = 0;
       for (const tile of this.#incrementalGenerator.densityTiles) {
-        const coordX = tile[0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
-        const coordY = tile[1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
+        const coordX = tile.xPixel / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
+        const coordY = tile.yPixel / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
         const size = (100 / this.#pixelToMeterRatio) / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
-        const density = tile[2];
+        const density = tile.density;
         if (density > d)
           d = density;
         this.#ctx.beginPath();
