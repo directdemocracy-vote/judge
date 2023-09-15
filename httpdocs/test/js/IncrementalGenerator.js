@@ -16,13 +16,19 @@ export default class IncrementalGenerator {
   #availableCitizenNumbers;
   #uncompleteCitizens;
   #threshold;
+  #pause;
+  #pauseButton;
+  #animation;
+  #daysToSimulate;
   constructor() {
     this.#csvUrl = './utils/density.csv';
     this.#top = 1000000;
     this.#left = 2850000;
     this.#right = 2480000;
     this.#bottom = 1300000;
-    this.#threshold = 0.88;
+    this.#threshold = 0.89;
+
+    this.#daysToSimulate = 720;
 
     this.#totalPopulation = 0;
     this.#daysElapsed = 0;
@@ -30,6 +36,8 @@ export default class IncrementalGenerator {
     this.#citizensAllSpawned = false;
     this.#availableCitizenNumbers = [];
     this.#uncompleteCitizens = new Set();
+
+    this.#pause = true;
 
     this.#load();
   }
@@ -81,10 +89,31 @@ export default class IncrementalGenerator {
           this.#availableCitizenNumbers.push(i);
 
         for (const tile of this.#densityTiles)
-          tile.createThreeKmTileList(this.#densityTiles);
+          tile.createKmTileList(this.#densityTiles);
 
-        this.#simulateOneDay();
+        this.#pauseButton = document.createElement('button');
+        this.#pauseButton.textContent = 'Play';
+        this.#pauseButton.onclick = () => this.#run();
+        document.body.appendChild(this.#pauseButton);
+
+        const stepButton = document.createElement('button');
+        stepButton.textContent = 'Step';
+        stepButton.onclick = () => this.#step();
+        document.body.appendChild(stepButton);
       });
+  }
+
+  #run() {
+    this.#pause = !this.#pause;
+    if (!this.#pause) {
+      this.#simulateOneDay();
+      this.#pauseButton.textContent = 'Pause';
+    } else
+      this.#pauseButton.textContent = 'Play';
+  }
+
+  #step() {
+    this.#simulateOneDay();
   }
 
   #simulateOneDay() {
@@ -95,36 +124,47 @@ export default class IncrementalGenerator {
       else {
         let totalCreated = 0;
         const days = (World.instance.date - citizen.downloadDate) / 86400000;
-        let tile = this.#getTile(citizen.number);;
-        for (let i = 0; i < citizen.linksToGet[0]; i++) {
-          if (this.#shouldCreateANewLink(days)) {
-            this.#createLink(citizen, tile, 0);
-            totalCreated++;
-          }
-        }
-        citizen.linksToGet[0] -= totalCreated;
+        let tile = this.#getTile(citizen.number);
+        // for (let i = 0; i < citizen.linksToGet[0]; i++) {
+        //   if (this.#shouldCreateANewLink(days)) {
+        //     this.#createLink(citizen, tile, 0);
+        //     totalCreated++;
+        //   }
+        // }
+        // citizen.linksToGet[0] -= totalCreated;
+        // totalCreated = 0;
+        // for (let i = 0; i < citizen.linksToGet[1]; i++) {
+        //   if (this.#shouldCreateANewLink(days)) {
+        //     const neighbourTile = this.#densityTiles[tile.threeKmList[this.#getRandomInt(tile.threeKmList.length - 1)]];
+        //     totalCreated++;
+        //     if (typeof neighbourTile === 'undefined') {
+        //       console.log('Isolated tile');
+        //       continue;
+        //     }
+        //     this.#createLink(citizen, neighbourTile, 1);
+        //   }
+        // }
+        // citizen.linksToGet[1] -= totalCreated;
         totalCreated = 0;
-        for (let i = 0; i < citizen.linksToGet[1]; i++) {
+        for (let i = 0; i < citizen.linksToGet[2]; i++) {
           if (this.#shouldCreateANewLink(days)) {
-            const neighbourTile = this.#densityTiles[tile.threeKmList[this.#getRandomInt(tile.threeKmList.length - 1)]];
+            const neighbourTile = this.#densityTiles[tile.tenKmList[this.#getRandomInt(tile.tenKmList.length - 1)]];
             totalCreated++;
             if (typeof neighbourTile === 'undefined') {
-              console.log("Isolated tile");
+              console.log('Isolated tile');
               continue;
             }
-            this.#createLink(citizen, neighbourTile, 1)
+            this.#createLink(citizen, neighbourTile, 2);
           }
         }
-        citizen.linksToGet[1] -= totalCreated;
-        totalCreated = 0;
+        citizen.linksToGet[2] -= totalCreated;
       }
     }
 
     // Citizens discovers the app by themself
     let numberOfNewCitizens = this.#getRandomInt(Math.floor(Math.pow(World.instance.citizens.size, 2) * (1 / 10000) + 1));
-    // Only 80% of the population will eventually adopt the application
-    if (World.instance.citizens.size + numberOfNewCitizens > Math.floor(this.#totalPopulation * 0.8)) {
-      numberOfNewCitizens = Math.floor(this.#totalPopulation * 0.8) - World.instance.citizens.size;
+    if (World.instance.citizens.size + numberOfNewCitizens > this.#totalPopulation) {
+      numberOfNewCitizens = this.#totalPopulation - World.instance.citizens.size;
       this.#citizensAllSpawned = true;
     }
 
@@ -135,10 +175,11 @@ export default class IncrementalGenerator {
 
     World.instance.date += 86400000; // add one day
     this.#daysElapsed++;
+    World.instance.computeReputation();
     World.instance.draw();
-    if (this.#daysElapsed < 720) {
-      console.log(this.#daysElapsed)
-      window.requestAnimationFrame(() => this.#simulateOneDay());
+    if (this.#daysElapsed < this.#daysToSimulate && !this.#pause) {
+      console.log(this.#daysElapsed);
+      return window.requestAnimationFrame(() => this.#simulateOneDay());
     }
   }
 
@@ -175,7 +216,7 @@ export default class IncrementalGenerator {
   }
 
   #shouldCreateANewLink(days) {
-    const p = Math.random() * (1 - (0.1 / (1 + Math.exp((25 - days) / 4))));
+    const p = Math.random() * (1 - (0.1 / (1 + Math.exp((10 - days) / 4))));
     return p > this.#threshold;
   }
 
@@ -200,7 +241,7 @@ export default class IncrementalGenerator {
     return this.#spawnCitizen(number);
   }
 
-  #citizenToCreateArrow(citizen, tile, area, counter){
+  #citizenToCreateArrow(citizen, tile, area, counter) {
     if (typeof counter === 'undefined')
       counter = 0;
     else if (counter === 10 || tile.density === 1)// Prevent infinite recursion
@@ -208,7 +249,7 @@ export default class IncrementalGenerator {
 
     let targetNumber = this.#getRandomInt(tile.density - 1) + tile.firstNumber;
     if (targetNumber === citizen.number)
-      return this.#citizenToCreateArrow(citizen, tile, area, ++counter)
+      return this.#citizenToCreateArrow(citizen, tile, area, ++counter);
 
     let target;
     for (const tileCitizen of tile.citizens) {
@@ -221,7 +262,7 @@ export default class IncrementalGenerator {
       target = this.#createTarget(targetNumber);
 
     if (target.linksToGet[area] <= 0 || citizen.endorsedBy.has(target.id) || citizen.endorse.has(target.id))
-      return this.#citizenToCreateArrow(citizen, tile, area, ++counter)
+      return this.#citizenToCreateArrow(citizen, tile, area, ++counter);
 
     return target;
   }
@@ -234,7 +275,7 @@ export default class IncrementalGenerator {
 
     const random = Math.random();
     if (random < 0.9) {
-      arrow.arrowHead2 = new ArrowHead(World.instance.idGenerator++, target.id, citizen.id, World.instance.date);
+      arrow.arrowHead2 = new ArrowHead(World.instance.idGenerator++, target.id, citizen.id, World.instance.date, arrow);
       target.linksToGet[0]--;
     }
 

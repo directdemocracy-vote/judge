@@ -93,9 +93,9 @@ export default class Arrow {
       : this.#pathArrow(this.#x2, this.#y2, this.#x1, this.#y1);
 
     if (typeof this.#arrowHead1 === 'undefined')
-      this.#arrowHead1 = new ArrowHead(World.instance.idGenerator++, source, destination, World.instance.date, path);
+      this.#arrowHead1 = new ArrowHead(World.instance.idGenerator++, source, destination, World.instance.date, this, path);
     else
-      this.#arrowHead2 = new ArrowHead(World.instance.idGenerator++, source, destination, World.instance.date, path);
+      this.#arrowHead2 = new ArrowHead(World.instance.idGenerator++, source, destination, World.instance.date, this, path);
 
     World.instance.ctx.fillStyle = 'black';
     World.instance.ctx.fill(path);

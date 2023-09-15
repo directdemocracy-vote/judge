@@ -5,6 +5,7 @@ import {computeDistance, randomNormal} from './utility.js';
 // A Tile represent an hectare
 export default class Tile {
   #threeKmList;
+  #tenKmList;
   #density;
   #citizens;
   #xPixel;
@@ -20,7 +21,8 @@ export default class Tile {
     this.#density = density;
     this.#citizens = [];
     this.#firstNumber = firstNumber;
-    this.#threeKmList = []
+    this.#threeKmList = [];
+    this.#tenKmList = [];
   }
 
   get xKm() {
@@ -55,6 +57,10 @@ export default class Tile {
     return this.#threeKmList;
   }
 
+  get tenKmList() {
+    return this.#tenKmList;
+  }
+
   hasNumber(number) {
     return number >= this.#firstNumber && number < this.#firstNumber + this.#density;
   }
@@ -76,19 +82,26 @@ export default class Tile {
     return citizen;
   }
 
-  createThreeKmTileList(tilesList) {
+  createKmTileList(tilesList) {
     const topLimit = this.yKm - 3;
-    const bottomLimit = this.yKm +3;
+    const bottomLimit = this.yKm + 3;
     const leftLimit = this.xKm - 3;
     const rightLimit = this.xKm + 3;
-    console.log("Top " + topLimit)
-    console.log("Bottom " + bottomLimit)
-    console.log("Left " + leftLimit)
-    console.log("Right " + rightLimit)
+
+    const topTenLimit = this.yKm - 10;
+    const bottomTenLimit = this.yKm + 10;
+    const leftTenLimit = this.xKm - 10;
+    const rightTenLimit = this.xKm + 10;
+
     for (let i = 0; i < tilesList.length; i++) {
       if (tilesList[i].xKm > leftLimit && tilesList[i].xKm < rightLimit && tilesList[i].yKm < bottomLimit &&
           tilesList[i].yKm > topLimit && tilesList[i].firstNumber !== this.#firstNumber)
-          this.#threeKmList.push(i);
+        this.#threeKmList.push(i);
+
+      if (tilesList[i].xKm > leftTenLimit && tilesList[i].xKm < rightTenLimit && tilesList[i].yKm < bottomTenLimit &&
+          tilesList[i].yKm > topTenLimit && tilesList[i].firstNumber !== this.#firstNumber && (tilesList[i].xKm <= leftLimit ||
+          tilesList[i].xKm >= rightLimit || tilesList[i].yKm >= bottomLimit || tilesList[i].yKm <= topLimit))
+        this.#tenKmList.push(i);
     }
   }
 }

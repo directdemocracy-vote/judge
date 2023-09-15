@@ -11,6 +11,7 @@ export default class World {
   #ctx;
   #citizens;
   #date;
+  #displayArrow;
   #displayDistance;
   #displayId;
   #displayReputation;
@@ -29,6 +30,7 @@ export default class World {
   #selection;
   #selectedArrow;
   #selectedWorld;
+  #showArrowButton;
   #showDistanceButton;
   #showIdButton;
   #showReputationButton;
@@ -42,7 +44,7 @@ export default class World {
   #zoomLevel;
   constructor() {
     // Seed the random generator: https://github.com/davidbau/seedrandom
-    Math.seedrandom('test');
+    Math.seedrandom('test0');
     this.#canvas = document.getElementById('worldMap');
     this.#ctx = this.#canvas.getContext('2d');
 
@@ -75,7 +77,7 @@ export default class World {
     this.#idPlaceholder = document.getElementById('idPlaceholder');
     this.#reputationButton = document.getElementById('reputation');
     this.#reputationButton.onclick = () => {
-      this.#computeReputation();
+      this.computeReputation();
       this.draw();
     };
 
@@ -94,6 +96,10 @@ export default class World {
 
     this.#showIdButton = document.getElementById('show-id');
     this.#showIdButton.onclick = () => this.#showId();
+
+    this.#showArrowButton = document.getElementById('show-arrow');
+    this.#showArrowButton.onclick = () => this.#showArrow();
+    this.#displayArrow = true;
 
     // Initialize mouse listener
     this.#canvas.addEventListener('mousedown', event => {
@@ -272,7 +278,7 @@ export default class World {
     this.#selectedWorld = undefined;
   }
 
-  #computeReputation(numberOfIteration) {
+  computeReputation(numberOfIteration) {
     this.#threshold = 0.5;
     if (typeof numberOfIteration === 'undefined')
       numberOfIteration = 15;
@@ -289,27 +295,16 @@ export default class World {
 
       for (const citizen of this.#citizens.values()) {
         let sum = 0;
-        const linkedEndorsement = [];
-        for (const endorsement of this.#endorsements.values()) {
-          if (typeof endorsement.arrowHead1 !== 'undefined' && endorsement.arrowHead1.destination === citizen.id)
-            linkedEndorsement.push([endorsement, 1]);
-          else if (typeof endorsement.arrowHead2 !== 'undefined' && endorsement.arrowHead2.destination === citizen.id)
-            linkedEndorsement.push([endorsement, 2]);
-        }
-
-        for (let j = 0; j < linkedEndorsement.length; j++) {
-          let link = linkedEndorsement[j][0];
-          let headNumber = linkedEndorsement[j][1];
-
-          const source = headNumber === 1 ? link.arrowHead1.source : link.arrowHead2.source;
-          const age = headNumber === 1 ? this.#date - link.arrowHead1.age : this.#date - link.arrowHead2.age;
+        for (const link of citizen.endorsementsLinks) {
+          const source = link.source;
+          const age = this.#date - link.age;
           const reputation = this.#citizens.get(source).reputation;
-          const distanceFactor = this.#distanceFunction(link.distance);
+          const distanceFactor = this.#distanceFunction(link.distance());
           const timeFactor = this.#timeFunction(age);
           sum += reputation * distanceFactor * timeFactor;
         }
 
-        citizen.reputation = this.#reputationFunction(2 / (1 + Math.sqrt(this.#totalReputation)) + sum);
+        citizen.reputation = this.#reputationFunction(2 / (1 + Math.sqrt(this.#totalReputation / this.citizens.size )) + sum);
         if (citizen.reputation < this.#minimumReputation)
           this.#minimumReputation = citizen.reputation;
         if (citizen.reputation > this.#maximumReputation)
@@ -479,32 +474,34 @@ export default class World {
       }
     }
 
-    for (const endorsement of this.#endorsements.values()) {
-      this.#ctx.fillStyle = 'black';
-      let arrowSize = this.#arrowSize();
-      // Number of pixels between the two points
-      let availablePixels = endorsement.distance / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) /
-        this.#pixelToMeterRatio * 1000;
-      availablePixels -= 2 * Math.ceil(World.instance.zoomLevel / 2) + 2 * arrowSize; // substract the radius and the arrows
+    if (this.#displayArrow) {
+      for (const endorsement of this.#endorsements.values()) {
+        this.#ctx.fillStyle = 'black';
+        let arrowSize = this.#arrowSize();
+        // Number of pixels between the two points
+        let availablePixels = endorsement.distance / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) /
+          this.#pixelToMeterRatio * 1000;
+        availablePixels -= 2 * Math.ceil(World.instance.zoomLevel / 2) + 2 * arrowSize; // substract the radius and the arrows
 
-      if (availablePixels > 0) {
-        endorsement.buildLine(this.#displayDistance);
-        if (typeof endorsement.arrowHead1 !== 'undefined') {
-          if (endorsement.arrowHead1.id === this.#selectedArrow)
-            this.#ctx.fillStyle = 'red';
-          else
-            this.#ctx.fillStyle = 'black';
-          endorsement.rebuildArrowHead(endorsement.arrowHead1);
-        }
-        if (typeof endorsement.arrowHead2 !== 'undefined') {
-          if (endorsement.arrowHead2.id === this.#selectedArrow)
-            this.#ctx.fillStyle = 'red';
-          else
-            this.#ctx.fillStyle = 'black';
-          endorsement.rebuildArrowHead(endorsement.arrowHead2);
-        }
-      } else if (availablePixels > -2 * arrowSize)
-        endorsement.buildLine(this.#displayDistance, true);
+        if (availablePixels > 0) {
+          endorsement.buildLine(this.#displayDistance);
+          if (typeof endorsement.arrowHead1 !== 'undefined') {
+            if (endorsement.arrowHead1.id === this.#selectedArrow)
+              this.#ctx.fillStyle = 'red';
+            else
+              this.#ctx.fillStyle = 'black';
+            endorsement.rebuildArrowHead(endorsement.arrowHead1);
+          }
+          if (typeof endorsement.arrowHead2 !== 'undefined') {
+            if (endorsement.arrowHead2.id === this.#selectedArrow)
+              this.#ctx.fillStyle = 'red';
+            else
+              this.#ctx.fillStyle = 'black';
+            endorsement.rebuildArrowHead(endorsement.arrowHead2);
+          }
+        } else if (availablePixels > -2 * arrowSize)
+          endorsement.buildLine(this.#displayDistance, true);
+      }
     }
 
     this.#ctx.beginPath();
@@ -726,7 +723,7 @@ export default class World {
             if (endorsement.arrowHead1.age >= this.#date)
               this.#date = endorsement.arrowHead1.age;
             newEndorsement.arrowHead1 = new ArrowHead(endorsement.arrowHead1.id, endorsement.arrowHead1.source,
-              endorsement.arrowHead1.destination, endorsement.arrowHead1.age);
+              endorsement.arrowHead1.destination, endorsement.arrowHead1.age, newEndorsement);
           }
 
           if (typeof endorsement.arrowHead2 !== 'undefined') {
@@ -735,7 +732,7 @@ export default class World {
             if (endorsement.arrowHead2.age >= this.#date)
               this.#date = endorsement.arrowHead2.age;
             newEndorsement.arrowHead2 = new ArrowHead(endorsement.arrowHead2.id, endorsement.arrowHead2.source,
-              endorsement.arrowHead2.destination, endorsement.arrowHead2.age);
+              endorsement.arrowHead2.destination, endorsement.arrowHead2.age, newEndorsement);
           }
 
           this.#endorsements.set(newEndorsement.id, newEndorsement);
@@ -862,7 +859,7 @@ export default class World {
   }
 
   #runTest() {
-    this.#computeReputation();
+    this.computeReputation();
     this.draw();
     fetch('https://judge.directdemocracy.vote/test/tests/' + this.#testListSoluce[this.#testIndex])
       .then(response => response.json())
@@ -897,7 +894,7 @@ export default class World {
         bug = false;
         this.testResultDiv.innerHTML += '<p>Testing that reputation has converged:</p>';
 
-        this.#computeReputation(1);
+        this.computeReputation(1);
         for (let i = 0; i > this.#citizens.size; i++) {
           if (this.#citizens.values()[i].reputation !== oldReputation[i]) {
             bug = true;
@@ -909,12 +906,12 @@ export default class World {
           this.testResultDiv.innerHTML += '<p class=result-ok>OK</p>';
 
         this.generator.generateWorld(false, 10, response.radius, response.center[0], response.center[1]);
-        this.#computeReputation(15);
+        this.computeReputation(15);
 
         oldReputation = this.#commonTest();
         bug = false;
         this.testResultDiv.innerHTML += '<p>Testing that reputation is still stable after adding 10 random citizens:</p>';
-        this.#computeReputation(1);
+        this.computeReputation(1);
         for (let i = 0; i > this.#citizens.size; i++) {
           if (this.#citizens.values()[i].reputation !== oldReputation[i]) {
             bug = true;
@@ -994,6 +991,16 @@ export default class World {
       this.#showDistanceButton.textContent = 'Hide distance (km)';
 
     this.#displayDistance = !this.#displayDistance;
+    this.draw();
+  }
+
+  #showArrow() {
+    if (this.#displayArrow)
+      this.#showArrowButton.textContent = 'Show arrows';
+    else
+      this.#showArrowButton.textContent = 'Hide arrows';
+
+    this.#displayArrow = !this.#displayArrow;
     this.draw();
   }
 

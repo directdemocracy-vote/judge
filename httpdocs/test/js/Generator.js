@@ -150,7 +150,7 @@ export default class Generator {
         const random = Math.random();
 
         if (random < 0.9)
-          arrow.arrowHead2 = new ArrowHead(World.instance.idGenerator++, citizen.id, endorser.id, World.instance.date);
+          arrow.arrowHead2 = new ArrowHead(World.instance.idGenerator++, citizen.id, endorser.id, World.instance.date, arrow);
 
         World.instance.endorsements.set(arrow.id, arrow);
       }

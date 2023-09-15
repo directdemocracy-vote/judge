@@ -6,6 +6,7 @@ export default class Citizen {
   #endorsed;
   #endorsedBy;
   #endorse;
+  #endorsementsLinks;
   #id;
   #path;
   #reputation;
@@ -17,6 +18,7 @@ export default class Citizen {
     this.#endorsedBy = new Set();
     this.#endorse = new Set();
     this.#downloadDate = downloadDate;
+    this.#endorsementsLinks = []; // link whose destination is this citizen
   }
 
   get id() {
@@ -37,6 +39,10 @@ export default class Citizen {
 
   get endorsedBy() {
     return this.#endorsedBy;
+  }
+
+  get endorsementsLinks() {
+    return this.#endorsementsLinks;
   }
 
   get downloadDate() {

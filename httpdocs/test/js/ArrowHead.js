@@ -5,15 +5,19 @@ export default class ArrowHead {
   #destination;
   #id;
   #path;
+  #parent;
   #source;
-  constructor(id, source, destination, age, path) {
+  constructor(id, source, destination, age, parent, path) {
     this.#id = id;
     this.#age = age;
     this.#source = source;
     this.#destination = destination;
     this.#path = path;
+    this.#parent = parent;
     World.instance.citizens.get(source).endorse.add(destination);
-    World.instance.citizens.get(destination).endorsedBy.add(source);
+    const dest = World.instance.citizens.get(destination);
+    dest.endorsedBy.add(source);
+    dest.endorsementsLinks.push(this);
   }
 
   get age() {
@@ -40,9 +44,20 @@ export default class ArrowHead {
     return this.#source;
   }
 
+  distance() {
+    return this.#parent.distance;
+  }
+
   prepareDelete() {
     World.instance.citizens.get(this.#source).endorse.delete(this.#destination);
-    World.instance.citizens.get(this.#destination).endorsedBy.delete(this.#source);
+    const dest = World.instance.citizens.get(this.#destination);
+    dest.endorsedBy.delete(this.#source);
+    for (let i = 0; i < dest.endorsementsLinks; i++) {
+      if (dest.endorsementsLinks[i].id === this.#id) {
+        dest.endorsementsLinks.splice(i, 1);
+        break;
+      }
+    }
   }
 
   toJson() {
