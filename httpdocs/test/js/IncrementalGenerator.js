@@ -125,26 +125,26 @@ export default class IncrementalGenerator {
         let totalCreated = 0;
         const days = (World.instance.date - citizen.downloadDate) / 86400000;
         let tile = this.#getTile(citizen.number);
-        // for (let i = 0; i < citizen.linksToGet[0]; i++) {
-        //   if (this.#shouldCreateANewLink(days)) {
-        //     this.#createLink(citizen, tile, 0);
-        //     totalCreated++;
-        //   }
-        // }
-        // citizen.linksToGet[0] -= totalCreated;
-        // totalCreated = 0;
-        // for (let i = 0; i < citizen.linksToGet[1]; i++) {
-        //   if (this.#shouldCreateANewLink(days)) {
-        //     const neighbourTile = this.#densityTiles[tile.threeKmList[this.#getRandomInt(tile.threeKmList.length - 1)]];
-        //     totalCreated++;
-        //     if (typeof neighbourTile === 'undefined') {
-        //       console.log('Isolated tile');
-        //       continue;
-        //     }
-        //     this.#createLink(citizen, neighbourTile, 1);
-        //   }
-        // }
-        // citizen.linksToGet[1] -= totalCreated;
+        for (let i = 0; i < citizen.linksToGet[0]; i++) {
+          if (this.#shouldCreateANewLink(days)) {
+            this.#createLink(citizen, tile, 0);
+            totalCreated++;
+          }
+        }
+        citizen.linksToGet[0] -= totalCreated;
+        totalCreated = 0;
+        for (let i = 0; i < citizen.linksToGet[1]; i++) {
+          if (this.#shouldCreateANewLink(days)) {
+            const neighbourTile = this.#densityTiles[tile.threeKmList[this.#getRandomInt(tile.threeKmList.length - 1)]];
+            totalCreated++;
+            if (typeof neighbourTile === 'undefined') {
+              console.log('Isolated tile');
+              continue;
+            }
+            this.#createLink(citizen, neighbourTile, 1);
+          }
+        }
+        citizen.linksToGet[1] -= totalCreated;
         totalCreated = 0;
         for (let i = 0; i < citizen.linksToGet[2]; i++) {
           if (this.#shouldCreateANewLink(days)) {
@@ -276,7 +276,7 @@ export default class IncrementalGenerator {
     const random = Math.random();
     if (random < 0.9) {
       arrow.arrowHead2 = new ArrowHead(World.instance.idGenerator++, target.id, citizen.id, World.instance.date, arrow);
-      target.linksToGet[0]--;
+      target.linksToGet[area]--;
     }
 
     World.instance.endorsements.set(arrow.id, arrow);

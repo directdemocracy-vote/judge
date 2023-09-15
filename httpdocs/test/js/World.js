@@ -44,7 +44,7 @@ export default class World {
   #zoomLevel;
   constructor() {
     // Seed the random generator: https://github.com/davidbau/seedrandom
-    Math.seedrandom('test0');
+    Math.seedrandom('test2');
     this.#canvas = document.getElementById('worldMap');
     this.#ctx = this.#canvas.getContext('2d');
 
