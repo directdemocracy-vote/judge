@@ -75,7 +75,8 @@ export default class Tile {
 
     const id = World.instance.idGenerator++;
     const citizen = new Citizen(id, undefined, [x, y], World.instance.date);
-    citizen.linksToGet = [parseInt(randomNormal(0, 8, 1)), parseInt(randomNormal(0, 4, 1)), parseInt(randomNormal(0, 2, 1))];
+    citizen.linksToGet = [Math.round(parseFloat(randomNormal(0, 8, 1))), Math.round(parseFloat(randomNormal(0, 4, 1))),
+      Math.round(parseFloat(randomNormal(0, 2, 1)))];
     citizen.number = number;
     this.#citizens.push(citizen);
     World.instance.citizens.set(id, citizen);

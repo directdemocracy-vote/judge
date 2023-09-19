@@ -28,7 +28,7 @@ export default class IncrementalGenerator {
     this.#bottom = 1300000;
     this.#threshold = 0.97;
 
-    this.#daysToSimulate = 720;
+    this.#daysToSimulate = 1095;
 
     this.#totalPopulation = 0;
     this.#daysElapsed = 0;
@@ -290,5 +290,6 @@ export default class IncrementalGenerator {
     }
 
     World.instance.endorsements.set(arrow.id, arrow);
+    return true;
   }
 }
