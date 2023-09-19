@@ -26,7 +26,7 @@ export default class IncrementalGenerator {
     this.#left = 2850000;
     this.#right = 2480000;
     this.#bottom = 1300000;
-    this.#threshold = 0.89;
+    this.#threshold = 0.97;
 
     this.#daysToSimulate = 720;
 
@@ -127,8 +127,8 @@ export default class IncrementalGenerator {
         let tile = this.#getTile(citizen.number);
         for (let i = 0; i < citizen.linksToGet[0]; i++) {
           if (this.#shouldCreateANewLink(days)) {
-            this.#createLink(citizen, tile, 0);
-            totalCreated++;
+            if (this.#createLink(citizen, tile, 0))
+              totalCreated++;
           }
         }
         citizen.linksToGet[0] -= totalCreated;
@@ -136,12 +136,13 @@ export default class IncrementalGenerator {
         for (let i = 0; i < citizen.linksToGet[1]; i++) {
           if (this.#shouldCreateANewLink(days)) {
             const neighbourTile = this.#densityTiles[tile.threeKmList[this.#getRandomInt(tile.threeKmList.length - 1)]];
-            totalCreated++;
             if (typeof neighbourTile === 'undefined') {
               console.log('Isolated tile');
+              totalCreated++;
               continue;
             }
-            this.#createLink(citizen, neighbourTile, 1);
+            if (this.#createLink(citizen, neighbourTile, 1))
+              totalCreated++;
           }
         }
         citizen.linksToGet[1] -= totalCreated;
@@ -149,12 +150,13 @@ export default class IncrementalGenerator {
         for (let i = 0; i < citizen.linksToGet[2]; i++) {
           if (this.#shouldCreateANewLink(days)) {
             const neighbourTile = this.#densityTiles[tile.tenKmList[this.#getRandomInt(tile.tenKmList.length - 1)]];
-            totalCreated++;
             if (typeof neighbourTile === 'undefined') {
               console.log('Isolated tile');
+              totalCreated++;
               continue;
             }
-            this.#createLink(citizen, neighbourTile, 2);
+            if (this.#createLink(citizen, neighbourTile, 2))
+              totalCreated++;
           }
         }
         citizen.linksToGet[2] -= totalCreated;
@@ -162,11 +164,16 @@ export default class IncrementalGenerator {
     }
 
     // Citizens discovers the app by themself
-    let numberOfNewCitizens = this.#getRandomInt(Math.floor(Math.pow(World.instance.citizens.size, 2) * (1 / 10000) + 1));
+    let numberOfNewCitizens = this.#getRandomInt(Math.floor(Math.sqrt((World.instance.citizens.size + 1) *
+        (1 - (World.instance.citizens.size / this.#totalPopulation))))) * this.#getRandomInt(1);
+
     if (World.instance.citizens.size + numberOfNewCitizens > this.#totalPopulation) {
       numberOfNewCitizens = this.#totalPopulation - World.instance.citizens.size;
       this.#citizensAllSpawned = true;
     }
+
+    // if (World.instance.citizens.size > 10)
+    //   numberOfNewCitizens = 0;
 
     for (let i = 0; i < numberOfNewCitizens; i++) {
       const citizenNumber = this.#getValidNewCitizenNumber();
@@ -177,10 +184,9 @@ export default class IncrementalGenerator {
     this.#daysElapsed++;
     World.instance.computeReputation();
     World.instance.draw();
-    if (this.#daysElapsed < this.#daysToSimulate && !this.#pause) {
-      console.log(this.#daysElapsed);
+    console.log(this.#daysElapsed);
+    if (this.#daysElapsed < this.#daysToSimulate && !this.#pause)
       return window.requestAnimationFrame(() => this.#simulateOneDay());
-    }
   }
 
   #getRandomNonZeroInt(max) {
@@ -216,7 +222,7 @@ export default class IncrementalGenerator {
   }
 
   #shouldCreateANewLink(days) {
-    const p = Math.random() * (1 - (0.1 / (1 + Math.exp((10 - days) / 4))));
+    const p = Math.random() * (1 - (0.02 / (1 + Math.exp((10 - days) / 4))));
     return p > this.#threshold;
   }
 
@@ -258,8 +264,12 @@ export default class IncrementalGenerator {
         break;
       }
     }
-    if (typeof target === 'undefined')
+
+    if (typeof target === 'undefined') {
+      if (Math.random() < 0.5)
+        return;
       target = this.#createTarget(targetNumber);
+    }
 
     if (target.linksToGet[area] <= 0 || citizen.endorsedBy.has(target.id) || citizen.endorse.has(target.id))
       return this.#citizenToCreateArrow(citizen, tile, area, ++counter);

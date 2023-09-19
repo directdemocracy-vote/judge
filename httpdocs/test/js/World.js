@@ -304,7 +304,7 @@ export default class World {
           sum += reputation * distanceFactor * timeFactor;
         }
 
-        citizen.reputation = this.#reputationFunction(2 / (1 + Math.sqrt(this.#totalReputation / this.citizens.size )) + sum);
+        citizen.reputation = this.#reputationFunction(2 / (1 + Math.sqrt(this.#totalReputation / this.citizens.size)) + sum);
         if (citizen.reputation < this.#minimumReputation)
           this.#minimumReputation = citizen.reputation;
         if (citizen.reputation > this.#maximumReputation)
