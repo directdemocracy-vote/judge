@@ -185,8 +185,7 @@ export default class World {
     ];
     this.#testIndex = 0;
 
-    if (true)
-      this.#incrementalGenerator = new IncrementalGenerator();
+    this.#incrementalGenerator = new IncrementalGenerator();
   }
 
   get ctx() {
@@ -451,9 +450,9 @@ export default class World {
       const coordX = citizen.coords[0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
       const coordY = citizen.coords[1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
       if (this.#selection === citizen.id)
-        path.arc(coordX, coordY, Math.ceil(this.#zoomLevel / 2) + 2, 0, 2 * Math.PI);
+        path.arc(coordX, coordY, Math.ceil(Math.pow(this.#zoomLevel, 2) / 6) + 2, 0, 2 * Math.PI);
       else
-        path.arc(coordX, coordY, Math.ceil(this.#zoomLevel / 2), 0, 2 * Math.PI);
+        path.arc(coordX, coordY, Math.ceil(25 - (24 / (1 + Math.exp(0.9 * (this.#zoomLevel - 20))))), 0, 2 * Math.PI);
       citizen.path = path;
 
       if (citizen.endorsed)
