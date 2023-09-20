@@ -5,6 +5,7 @@ import ArrowHead from './ArrowHead.js';
 
 export default class IncrementalGenerator {
   #csvUrl;
+  #jsonUrl;
   #bottom;
   #densityTiles;
   #left;
@@ -22,6 +23,7 @@ export default class IncrementalGenerator {
   #daysToSimulate;
   constructor() {
     this.#csvUrl = './utils/density.csv';
+    this.#jsonUrl = './utils/municipality.json';
     this.#top = 1000000;
     this.#left = 2850000;
     this.#right = 2480000;
@@ -67,39 +69,65 @@ export default class IncrementalGenerator {
             this.#bottom = longitude;
         }
 
-        for (let row of csv) {
-          if (row === '')
-            continue; // empty line
-          row = row.split(',');
-          if (row[0] === 'E_KOORD') // skip first row
-            continue;
+        fetch(this.#jsonUrl)
+          .then(response => response.json())
+          .then(json => {
+            for (let row of csv) {
+              if (row === '')
+                continue; // empty line
+              row = row.split(',');
+              if (row[0] === 'E_KOORD') // skip first row
+                continue;
 
-          if (parseInt(row[2]) === 3)
-            row[2] = this.#getRandomNonZeroInt(3);
+              if (parseInt(row[2]) === 3)
+                row[2] = this.#getRandomNonZeroInt(3);
 
-          const height = this.#top - this.#bottom;
-          const x = parseInt(row[0]) - this.#left;
-          const y = height - (parseInt(row[1]) - this.#bottom);
-          const density = parseInt(row[2]);
-          this.#densityTiles.push(new Tile(x, y, density, this.#totalPopulation));
-          this.#totalPopulation += density;
-        }
+              const height = this.#top - this.#bottom;
+              const rawX = parseInt(row[0]);
+              const x = rawX - this.#left;
+              const rawY = parseInt(row[1]);
+              const y = height - (rawY - this.#bottom);
+              const density = parseInt(row[2]);
+              const tile = new Tile(x, y, density, this.#totalPopulation);
+              let index;
+              for (let i = 0; i < json.tile_to_boost.length; i++) {
+                const boostedTile = json.tile_to_boost[i];
+                if (rawX === boostedTile.x && rawY === boostedTile.y) {
+                  tile.boost = true;
+                  index = i;
+                  break;
+                }
+              }
 
-        for (let i = 0; i < this.#totalPopulation; i++)
-          this.#availableCitizenNumbers.push(i);
+              if (typeof index !== 'undefined')
+                json.tile_to_boost.splice(index, 1);
 
-        for (const tile of this.#densityTiles)
-          tile.createKmTileList(this.#densityTiles);
+              this.#densityTiles.push(tile);
+              this.#totalPopulation += density;
+            }
 
-        this.#pauseButton = document.createElement('button');
-        this.#pauseButton.textContent = 'Play';
-        this.#pauseButton.onclick = () => this.#run();
-        document.body.appendChild(this.#pauseButton);
+            for (let i = 0; i < this.#totalPopulation; i++)
+              this.#availableCitizenNumbers.push(i);
 
-        const stepButton = document.createElement('button');
-        stepButton.textContent = 'Step';
-        stepButton.onclick = () => this.#step();
-        document.body.appendChild(stepButton);
+            // Create citizen present in the json file
+            for (const citizen of json.citizens) {
+              const number = this.#getNumberFromCoord(citizen.x, citizen.y);
+              this.#spawnCitizen(number, citizen.x, citizen.y);
+            }
+
+            for (const tile of this.#densityTiles)
+              tile.createKmTileList(this.#densityTiles);
+
+            this.#pauseButton = document.createElement('button');
+            this.#pauseButton.textContent = 'Play';
+            this.#pauseButton.onclick = () => this.#run();
+            document.body.appendChild(this.#pauseButton);
+
+            const stepButton = document.createElement('button');
+            stepButton.textContent = 'Step';
+            stepButton.onclick = () => this.#step();
+            document.body.appendChild(stepButton);
+          });
       });
   }
 
@@ -199,22 +227,25 @@ export default class IncrementalGenerator {
     return this.#availableCitizenNumbers.splice(index, 1)[0];
   }
 
-  #spawnCitizen(number) {
+  #spawnCitizen(number, x, y) {
     const hectare = this.#getTile(number);
 
     let citizen = false;
     while (!citizen) { // Can never end if the density is too big (~> 2500)
-      const privatePixels = (World.instance.privateSpace / 2 * 1000) / World.instance.pixelToMeterRatio;
-      const x = hectare.xPixel + privatePixels +
-        this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
-      const y = hectare.yPixel + privatePixels +
-        this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
-
+      if (typeof x === 'undefined' && typeof y === 'undefined') {
+        const privatePixels = Math.ceil((World.instance.privateSpace / 2 * 1000) / World.instance.pixelToMeterRatio);
+        x = hectare.xPixel + privatePixels +
+          this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
+        y = hectare.yPixel + privatePixels +
+          this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
+      }
       citizen = hectare.insert(x, y, number);
       if (citizen) {
         this.#uncompleteCitizens.add(citizen);
         return citizen;
       }
+      x = undefined;
+      y = undefined;
     }
   }
 
@@ -247,7 +278,7 @@ export default class IncrementalGenerator {
   #citizenToCreateArrow(citizen, tile, area, counter) {
     if (typeof counter === 'undefined')
       counter = 0;
-    else if (counter === 10 || tile.density === 1)// Prevent infinite recursion
+    else if (counter === 10 || tile.density === 1) // Prevent infinite recursion
       return;
 
     let targetNumber = this.#getRandomInt(tile.density - 1) + tile.firstNumber;
@@ -263,7 +294,10 @@ export default class IncrementalGenerator {
     }
 
     if (typeof target === 'undefined') {
-      if (Math.random() < 0.5)
+      const rand = Math.random();
+      if (tile.boost && rand < 0.2)
+        return;
+      else if (rand < 0.7)
         return;
       target = this.#createTarget(targetNumber);
     }
@@ -288,5 +322,22 @@ export default class IncrementalGenerator {
 
     World.instance.endorsements.set(arrow.id, arrow);
     return true;
+  }
+
+  #getNumberFromCoord(x, y) {
+    for (const tile of this.#densityTiles) {
+      if (x > tile.xPixel && x < tile.xPixel + 100 / World.instance.pixelToMeterRatio &&
+        y > tile.yPixel && y < tile.yPixel + 100 / World.instance.pixelToMeterRatio) {
+        for (let i = 0; i < tile.density; i++) {
+          const number = tile.firstNumber + i;
+          for (let j = 0; j < this.#availableCitizenNumbers.length; j++) {
+            if (this.#availableCitizenNumbers[j] === number) {
+              this.#availableCitizenNumbers.splice(j, 1);
+              return number;
+            }
+          }
+        }
+      }
+    }
   }
 }
