@@ -282,15 +282,10 @@ export default class World {
     if (typeof numberOfIteration === 'undefined')
       numberOfIteration = 15;
     for (let i = 0; i < numberOfIteration; i++) {
-      this.#nbrCitizensEndorsed = 0;
-      this.#totalReputation = 0;
-      for (const citizen of this.#citizens.values()) {
-        if (citizen.endorsed)
-          this.#nbrCitizensEndorsed++;
-        this.#totalReputation += citizen.reputation;
-      }
+      let newTotalReputation = 0;
       this.#maximumReputation = 0;
       this.#minimumReputation = 1;
+      this.#nbrCitizensEndorsed = 0;
 
       for (const citizen of this.#citizens.values()) {
         let sum = 0;
@@ -310,7 +305,13 @@ export default class World {
           this.#maximumReputation = citizen.reputation;
 
         citizen.endorsed = citizen.reputation > this.#threshold;
+        if (citizen.endorsed)
+          this.#nbrCitizensEndorsed++;
+
+        newTotalReputation += citizen.reputation;
       }
+
+      this.#totalReputation = newTotalReputation;
     }
   }
 
