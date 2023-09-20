@@ -172,9 +172,6 @@ export default class IncrementalGenerator {
       this.#citizensAllSpawned = true;
     }
 
-    // if (World.instance.citizens.size > 10)
-    //   numberOfNewCitizens = 0;
-
     for (let i = 0; i < numberOfNewCitizens; i++) {
       const citizenNumber = this.#getValidNewCitizenNumber();
       this.#spawnCitizen(citizenNumber);

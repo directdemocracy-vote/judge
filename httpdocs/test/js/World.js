@@ -474,8 +474,8 @@ export default class World {
       }
     }
 
-    if ((this.#displayArrow && this.#zoomLevel > 17) || typeof this.#selection !== 'undefined') {
-      const showOnlySelectedCitizenArrow = !(this.#displayArrow && this.#zoomLevel > 17);
+    if ((this.#displayArrow && this.#zoomLevel > 18) || typeof this.#selection !== 'undefined') {
+      const showOnlySelectedCitizenArrow = !(this.#displayArrow && this.#zoomLevel > 18);
 
       for (const endorsement of this.#endorsements.values()) {
         if (showOnlySelectedCitizenArrow &&
@@ -668,6 +668,14 @@ export default class World {
         const age = head === 1 ? line.arrowHead1.age : line.arrowHead2.age;
         ageDiv.textContent = 'Date: ' + age;
         this.#idPlaceholder.appendChild(ageDiv);
+
+        const weightDiv = document.createElement('div');
+        const duration = this.#date - age;
+        const distanceFactor = this.#distanceFunction(line.distance);
+        const timeFactor = this.#timeFunction(duration);
+
+        weightDiv.textContent = 'Weight (distance * age): ' + (distanceFactor * timeFactor);
+        this.#idPlaceholder.appendChild(weightDiv);
         this.#revokeButton(id);
         this.draw();
       }
