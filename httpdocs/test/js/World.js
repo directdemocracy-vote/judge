@@ -450,7 +450,7 @@ export default class World {
       const coordX = citizen.coords[0] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
       const coordY = citizen.coords[1] / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
       if (this.#selection === citizen.id)
-        path.arc(coordX, coordY, Math.ceil(Math.pow(this.#zoomLevel, 2) / 6) + 2, 0, 2 * Math.PI);
+        path.arc(coordX, coordY, Math.ceil(25 - (24 / (1 + Math.exp(0.9 * (this.#zoomLevel - 20))))) + 2, 0, 2 * Math.PI);
       else
         path.arc(coordX, coordY, Math.ceil(25 - (24 / (1 + Math.exp(0.9 * (this.#zoomLevel - 20))))), 0, 2 * Math.PI);
       citizen.path = path;
@@ -458,7 +458,7 @@ export default class World {
       if (citizen.endorsed)
         this.#ctx.fillStyle = 'green';
       else
-        this.#ctx.fillStyle = 'red';
+        this.#ctx.fillStyle = 'grey';
 
       this.#ctx.fill(path);
 
@@ -473,14 +473,21 @@ export default class World {
       }
     }
 
-    if (this.#displayArrow) {
+    if ((this.#displayArrow && this.#zoomLevel > 17) || typeof this.#selection !== 'undefined') {
+      const showOnlySelectedCitizenArrow = !(this.#displayArrow && this.#zoomLevel > 17);
+
       for (const endorsement of this.#endorsements.values()) {
+        if (showOnlySelectedCitizenArrow &&
+          !(endorsement.idPoint1 === this.#selection || endorsement.idPoint2 === this.#selection))
+          continue;
+
         this.#ctx.fillStyle = 'black';
         let arrowSize = this.#arrowSize();
         // Number of pixels between the two points
         let availablePixels = endorsement.distance / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) /
           this.#pixelToMeterRatio * 1000;
-        availablePixels -= 2 * Math.ceil(World.instance.zoomLevel / 2) + 2 * arrowSize; // substract the radius and the arrows
+        // substract the radius and the arrows
+        availablePixels -= 2 * Math.ceil(25 - (24 / (1 + Math.exp(0.9 * (this.#zoomLevel - 20)))) + 2) + 2 * arrowSize;
 
         if (availablePixels > 0) {
           endorsement.buildLine(this.#displayDistance);

@@ -149,8 +149,8 @@ export default class Arrow {
 
     const A = Math.pow(a, 2) + 1;
     const B = 2 * ((a * b) - (a * y1) - x1);
-    let base = !arrow ? Math.ceil(World.instance.zoomLevel / 2) + Math.ceil(World.instance.zoomLevel / 2)
-      : Math.ceil(World.instance.zoomLevel / 2);
+    let base = !arrow ? Math.ceil(25 - (24 / (1 + Math.exp(0.9 * (World.instance.zoomLevel - 20)))) + 2) +
+      Math.ceil(World.instance.zoomLevel / 2) : Math.ceil(World.instance.zoomLevel / 2);
     const C = Math.pow(y1, 2) - Math.pow(base, 2) + Math.pow(x1, 2) - (2 * b * y1) + Math.pow(b, 2);
     const y3 = a * ((-B + Math.sqrt(Math.pow(B, 2) - 4 * A * C)) / (2 * A)) + b;
     const x3 = (y3 - b) / a;
