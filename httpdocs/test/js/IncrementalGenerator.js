@@ -17,18 +17,21 @@ export default class IncrementalGenerator {
   #availableCitizenNumbers;
   #uncompleteCitizens;
   #threshold;
+  #thresholdBoosted;
   #pause;
   #pauseButton;
   #animation;
   #daysToSimulate;
-  constructor() {
-    this.#csvUrl = './utils/density.csv';
-    this.#jsonUrl = './utils/municipality.json';
+  #totalBoostedCitizens;
+  constructor(csvLink, jsonLink) {
+    this.#csvUrl = csvLink;
+    this.#jsonUrl = jsonLink;
     this.#top = 1000000;
     this.#left = 2850000;
     this.#right = 2480000;
     this.#bottom = 1300000;
     this.#threshold = 0.97;
+    this.#thresholdBoosted = 0.5;
 
     this.#daysToSimulate = 1095;
 
@@ -38,6 +41,7 @@ export default class IncrementalGenerator {
     this.#citizensAllSpawned = false;
     this.#availableCitizenNumbers = [];
     this.#uncompleteCitizens = new Set();
+    this.#totalBoostedCitizens = 0;
 
     this.#pause = true;
 
@@ -69,66 +73,78 @@ export default class IncrementalGenerator {
             this.#bottom = longitude;
         }
 
-        fetch(this.#jsonUrl)
-          .then(response => response.json())
-          .then(json => {
-            for (let row of csv) {
-              if (row === '')
-                continue; // empty line
-              row = row.split(',');
-              if (row[0] === 'E_KOORD') // skip first row
-                continue;
-
-              if (parseInt(row[2]) === 3)
-                row[2] = this.#getRandomNonZeroInt(3);
-
-              const height = this.#top - this.#bottom;
-              const rawX = parseInt(row[0]);
-              const x = rawX - this.#left;
-              const rawY = parseInt(row[1]);
-              const y = height - (rawY - this.#bottom);
-              const density = parseInt(row[2]);
-              const tile = new Tile(x, y, density, this.#totalPopulation);
-              let index;
-              for (let i = 0; i < json.tile_to_boost.length; i++) {
-                const boostedTile = json.tile_to_boost[i];
-                if (rawX === boostedTile.x && rawY === boostedTile.y) {
-                  tile.boost = true;
-                  index = i;
-                  break;
-                }
-              }
-
-              if (typeof index !== 'undefined')
-                json.tile_to_boost.splice(index, 1);
-
-              this.#densityTiles.push(tile);
-              this.#totalPopulation += density;
-            }
-
-            for (let i = 0; i < this.#totalPopulation; i++)
-              this.#availableCitizenNumbers.push(i);
-
-            // Create citizen present in the json file
-            for (const citizen of json.citizens) {
-              const number = this.#getNumberFromCoord(citizen.x, citizen.y);
-              this.#spawnCitizen(number, citizen.x, citizen.y);
-            }
-
-            for (const tile of this.#densityTiles)
-              tile.createKmTileList(this.#densityTiles);
-
-            this.#pauseButton = document.createElement('button');
-            this.#pauseButton.textContent = 'Play';
-            this.#pauseButton.onclick = () => this.#run();
-            document.body.appendChild(this.#pauseButton);
-
-            const stepButton = document.createElement('button');
-            stepButton.textContent = 'Step';
-            stepButton.onclick = () => this.#step();
-            document.body.appendChild(stepButton);
-          });
+        if (typeof this.#jsonUrl !== 'undefined') {
+          fetch(this.#jsonUrl)
+            .then(response => response.json())
+            .then(json => {
+                this.#initialize(csv, json);
+            });
+        } else
+          this.#initialize(csv);
       });
+  }
+
+  #initialize(csv, json) {
+    for (let row of csv) {
+      if (row === '')
+        continue; // empty line
+      row = row.split(',');
+      if (row[0] === 'E_KOORD') // skip first row
+        continue;
+
+      if (parseInt(row[2]) === 3)
+        row[2] = this.#getRandomNonZeroInt(3);
+
+      const height = this.#top - this.#bottom;
+      const rawX = parseInt(row[0]);
+      const x = rawX - this.#left;
+      const rawY = parseInt(row[1]);
+      const y = height - (rawY - this.#bottom);
+      const density = parseInt(row[2]);
+      const tile = new Tile(x, y, density, this.#totalPopulation);
+      if (typeof json !== 'undefined') {
+        let index;
+        for (let i = 0; i < json.tile_to_boost.length; i++) {
+          const boostedTile = json.tile_to_boost[i];
+          if (rawX === boostedTile.x && rawY === boostedTile.y) {
+            tile.boost = true;
+            this.#totalBoostedCitizens += tile.density;
+            index = i;
+            break;
+          }
+        }
+
+        if (typeof index !== 'undefined')
+          json.tile_to_boost.splice(index, 1);
+      }
+
+      this.#densityTiles.push(tile);
+      this.#totalPopulation += density;
+    }
+
+    for (let i = 0; i < this.#totalPopulation; i++)
+      this.#availableCitizenNumbers.push(i);
+
+    if (typeof json !== 'undefined') {
+      // Create citizen present in the json file
+      for (const citizen of json.citizens) {
+        const number = this.#getNumberFromCoord(citizen.x, citizen.y);
+        this.#spawnCitizen(number, citizen.x, citizen.y);
+      }
+    }
+
+    for (const tile of this.#densityTiles)
+      tile.createKmTileList(this.#densityTiles);
+
+    this.#pauseButton = document.createElement('button');
+    this.#pauseButton.textContent = 'Play';
+    this.#pauseButton.onclick = () => this.#run();
+    document.body.appendChild(this.#pauseButton);
+
+    const stepButton = document.createElement('button');
+    stepButton.textContent = 'Step';
+    stepButton.onclick = () => this.#step();
+    document.body.appendChild(stepButton);
   }
 
   #run() {
@@ -153,8 +169,9 @@ export default class IncrementalGenerator {
         let totalCreated = 0;
         const days = (World.instance.date - citizen.downloadDate) / 86400000;
         let tile = this.#getTile(citizen.number);
+        const boost = tile.boost
         for (let i = 0; i < citizen.linksToGet[0]; i++) {
-          if (this.#shouldCreateANewLink(days)) {
+          if (this.#shouldCreateANewLink(days, boost)) {
             if (this.#createLink(citizen, tile, 0))
               totalCreated++;
           }
@@ -162,7 +179,7 @@ export default class IncrementalGenerator {
         citizen.linksToGet[0] -= totalCreated;
         totalCreated = 0;
         for (let i = 0; i < citizen.linksToGet[1]; i++) {
-          if (this.#shouldCreateANewLink(days)) {
+          if (this.#shouldCreateANewLink(days, boost)) {
             const neighbourTile = this.#densityTiles[tile.threeKmList[this.#getRandomInt(tile.threeKmList.length - 1)]];
             if (typeof neighbourTile === 'undefined') {
               console.log('Isolated tile');
@@ -210,6 +227,25 @@ export default class IncrementalGenerator {
     World.instance.computeReputation();
     World.instance.draw();
     console.log(this.#daysElapsed);
+
+    // Compute stat for boosted area
+    if (typeof this.#jsonUrl !== 'undefined') {
+      console.log('Total citizens: ' + this.#totalBoostedCitizens);
+      let totalCitizens = 0;
+      let totalEndorsed = 0;
+      for (const tile of this.#densityTiles) {
+        if (tile.boost) {
+          totalCitizens += tile.citizens.length;
+          for (const citizen of tile.citizens) {
+            if (citizen.endorsed)
+              totalEndorsed++;
+          }
+        }
+      }
+      console.log('Total citizens with the app: ' + totalCitizens);
+      console.log('Total citizens endorsed: ' + totalEndorsed);
+    }
+
     if (this.#daysElapsed < this.#daysToSimulate && !this.#pause)
       return window.requestAnimationFrame(() => this.#simulateOneDay());
   }
@@ -223,7 +259,14 @@ export default class IncrementalGenerator {
   }
 
   #getValidNewCitizenNumber() {
-    let index = this.#getRandomInt(this.#availableCitizenNumbers.length - 1);
+    let index;
+    let counter = typeof this.#jsonUrl === 'undefined' ? 2 : 0;
+    do {
+        index = this.#getRandomInt(this.#availableCitizenNumbers.length - 1);
+        counter++;
+        if (this.#getTile(index).boost)
+          counter === 2;
+    } while (counter < 2)
     return this.#availableCitizenNumbers.splice(index, 1)[0];
   }
 
@@ -249,9 +292,9 @@ export default class IncrementalGenerator {
     }
   }
 
-  #shouldCreateANewLink(days) {
+  #shouldCreateANewLink(days, boost) {
     const p = Math.random() * (1 - (0.02 / (1 + Math.exp((10 - days) / 4))));
-    return p > this.#threshold;
+    return typeof boost !== 'undefined' ? p > this.#thresholdBoosted : p > this.#threshold;
   }
 
   #getTile(number) {

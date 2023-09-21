@@ -3,15 +3,34 @@
 # Use this script to extract the information (population total, by age) for a given rectangle
 
 import csv
-import os
 
 # Define rectangle
-top = 1164600
-bottom = 1155100
-left = 2523400
-right = 2532900
 
-with open(os.environ['HOME'] + '/Downloads/ag-b-00.03-vz2022statpop/STATPOP2022.csv', mode='r') as csv_file:
+# Around Gollion (10km X 10 km)
+# top = 1164600
+# bottom = 1155100
+# left = 2523400
+# right = 2532900
+
+# Lausanne - Cully - Tolochenaz - Romanel
+# top = 1158300
+# bottom = 1148600
+# left = 2525600
+# right = 2545200
+
+# Herens valley
+# top = 1118900
+# bottom = 1096800
+# left = 2594500
+# right = 2606400
+
+# Gollion village (need some manual cleaning)
+top = 1161100
+bottom = 1159000
+left = 2528000
+right = 2530300
+
+with open('./STATPOP2022.csv', mode='r') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=';')
     line_count = 0
     with open('density.csv', mode='w') as result_file:

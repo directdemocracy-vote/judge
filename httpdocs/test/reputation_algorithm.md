@@ -51,12 +51,12 @@ Milestones taken into account when the functions were designed:
 
 Function:
 ```math
-timeFactor = 1 -  {1 \over 1 + e^{4(2 - x)}}
+timeFactor = 1 -  {1 \over 1 + e^{{(63072000000 - x) \over 8000000000}}}
 ```
 
 ![time](https://github.com/directdemocracy-vote/judge/assets/25938827/6fdd6625-ffaa-4b73-96ec-8b9de1dbfeeb)
 
-**Note:**Here, the time is expressed in years to simplify the reading. However, in the application the time is recorded in milliseconds.
+**Note:**The time is expressed in milliseconds from the first January 1970.
 
 ### growthFactor
 Goal: attribute a initial reputation to the nodes.
@@ -66,7 +66,7 @@ It should decrease when the global reputation increase because there is less nee
 The parameters of this function have been empirically defined.
 Function:
 ```math
-growthFactor = {2 \over 1 + \sqrt{totalReputation}}
+growthFactor = {2 \over 1 + \sqrt{{totalReputation \over numberOfCitizens}}}
 ```
 Where totalReputation is the sum of the reputation of all citizens
 

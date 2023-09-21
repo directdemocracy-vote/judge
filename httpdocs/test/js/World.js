@@ -185,7 +185,7 @@ export default class World {
     ];
     this.#testIndex = 0;
 
-    this.#incrementalGenerator = new IncrementalGenerator();
+    this.#incrementalGenerator = new IncrementalGenerator('./utils/gollion_region.csv', './utils/gollion_region.json');
   }
 
   get ctx() {
