@@ -1,5 +1,5 @@
 <?php
-$version = "0.0.2";
+$version = "2";
 $notary = 'https://notary.directdemocracy.vote';
 
 function error($message) {
