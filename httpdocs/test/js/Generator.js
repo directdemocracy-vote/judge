@@ -86,8 +86,8 @@ export default class Generator {
       let x, y;
       trials++;
       do {
-        const angle = (Math.random() * 2 - 1) * Math.PI;
-        const radius = Math.sqrt(Math.random()) * maxRadius;
+        const angle = (World.instance.rng() * 2 - 1) * Math.PI;
+        const radius = Math.sqrt(World.instance.rng()) * maxRadius;
         x = (centerX + radius * Math.cos(angle)) * 1000 / World.instance.pixelToMeterRatio;
         y = (centerY + radius * Math.sin(angle)) * 1000 / World.instance.pixelToMeterRatio;
       } while (x < 0 || y < 0 || x > 512 * Math.pow(2, World.instance.maxZoomLevel) ||
@@ -129,7 +129,7 @@ export default class Generator {
         let distance = computeDistance(citizen.coords[0], citizen.coords[1], citizen2.coords[0], citizen2.coords[1]);
         if (distance < 1)
           distance = 1;
-        const p = Math.random() * 1 / Math.sqrt(distance);
+        const p = World.instance.rng() * 1 / Math.sqrt(distance);
         ranking.push([p, citizen2.id]);
       }
 
@@ -147,7 +147,7 @@ export default class Generator {
 
         const arrow = new Arrow(World.instance.idGenerator++, endorser.id, citizen.id);
 
-        const random = Math.random();
+        const random = World.instance.rng();
 
         if (random < 0.9)
           arrow.arrowHead2 = new ArrowHead(World.instance.idGenerator++, citizen.id, endorser.id, World.instance.date, arrow);

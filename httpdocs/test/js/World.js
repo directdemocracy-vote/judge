@@ -12,6 +12,7 @@ export default class World {
   #citizens;
   #date;
   #displayArrow;
+  #displayDensity;
   #displayDistance;
   #displayId;
   #displayReputation;
@@ -32,6 +33,7 @@ export default class World {
   #selectedArrow;
   #selectedWorld;
   #showArrowButton;
+  #showDensityButton;
   #showDistanceButton;
   #showIdButton;
   #showReputationButton;
@@ -46,7 +48,7 @@ export default class World {
   #zoomLevel;
   constructor() {
     // Seed the random generator: https://github.com/davidbau/seedrandom
-    Math.seedrandom('test2');
+    this.rng = new Math.seedrandom('seed');
     this.#canvas = document.getElementById('worldMap');
     this.#width = document.body.clientWidth;
     this.#height = document.body.clientHeight;
@@ -90,11 +92,29 @@ export default class World {
     if (document.getElementById('statsButton'))
       document.getElementById('statsButton').onclick = () => this.#toggleStatsTab();
 
+    if (document.getElementById('buttonsButton'))
+      document.getElementById('buttonsButton').onclick = () => this.#toggleButtonsTab();
+
     const yearButton = document.getElementById('year');
-    yearButton.onclick = () => { this.#date += 31536000000; };
+    yearButton.onclick = () => {
+      this.#date += 31536000000;
+      this.computeReputation();
+      this.draw();
+    };
 
     const monthButton = document.getElementById('month');
-    monthButton.onclick = () => { this.#date += 2628000000; };
+    monthButton.onclick = () => {
+      this.#date += 2628000000;
+      this.computeReputation();
+      this.draw();
+    };
+
+    const dayButton = document.getElementById('day');
+    dayButton.onclick = () => {
+      this.#date += 86400000;
+      this.computeReputation();
+      this.draw();
+    };
 
     this.#showReputationButton = document.getElementById('show-reputation');
     this.#showReputationButton.onclick = () => this.#showReputation();
@@ -104,6 +124,10 @@ export default class World {
 
     this.#showIdButton = document.getElementById('show-id');
     this.#showIdButton.onclick = () => this.#showId();
+
+    this.#showDensityButton = document.getElementById('show-density');
+    this.#showDensityButton.onclick = () => this.#showDensity();
+    this.#displayDensity = true;
 
     this.#showArrowButton = document.getElementById('show-arrow');
     this.#showArrowButton.onclick = () => this.#showArrow();
@@ -176,6 +200,9 @@ export default class World {
     this.#canvas.addEventListener('mouseup', () => { this.#mouseDown = false; });
     this.#canvas.addEventListener('mouseover', () => { this.#mouseDown = false; });
     this.#canvas.addEventListener('mouseout', () => { this.#mouseDown = false; });
+    document.getElementById('seedInput').onchange = () => {
+      this.rng = new Math.seedrandom(document.getElementById('seedInput').value);
+    };
 
     this.#drawScaleIndicator();
     this.generator = new Generator();
@@ -350,6 +377,10 @@ export default class World {
     const statisticsPlaceholder = document.getElementById('statisticsPlaceholder');
     statisticsPlaceholder.innerHTML = '';
 
+    const dateDiv = document.createElement('div');
+    dateDiv.textContent = 'Date: ' + new Date(this.#date).toLocaleString();
+    statisticsPlaceholder.appendChild(dateDiv);
+
     const nbrCitizensDiv = document.createElement('div');
     nbrCitizensDiv.textContent = 'Number of citizens: ' + this.#citizens.size;
     statisticsPlaceholder.appendChild(nbrCitizensDiv);
@@ -425,7 +456,7 @@ export default class World {
     this.#ctx.translate(this.#translatePosition.x, this.#translatePosition.y);
 
     // Represent the density map
-    if (typeof this.#incrementalGenerator !== 'undefined') {
+    if (typeof this.#incrementalGenerator !== 'undefined' && this.#displayDensity) {
       let d = 0;
       for (const tile of this.#incrementalGenerator.densityTiles) {
         const coordX = tile.xPixel / Math.pow(2, this.#maxZoomLevel - this.#zoomLevel);
@@ -482,8 +513,8 @@ export default class World {
       }
     }
 
-    if ((this.#displayArrow && this.#zoomLevel > 18) || typeof this.#selection !== 'undefined') {
-      const showOnlySelectedCitizenArrow = !(this.#displayArrow && this.#zoomLevel > 18);
+    if ((this.#displayArrow && this.#zoomLevel > 16) || typeof this.#selection !== 'undefined') {
+      const showOnlySelectedCitizenArrow = !(this.#displayArrow && this.#zoomLevel > 16);
 
       for (const endorsement of this.#endorsements.values()) {
         if (showOnlySelectedCitizenArrow &&
@@ -1040,6 +1071,16 @@ export default class World {
     this.draw();
   }
 
+  #showDensity() {
+    if (this.#displayDensity)
+      this.#showDensityButton.textContent = 'Show density';
+    else
+      this.#showDensityButton.textContent = 'Hide density';
+
+    this.#displayDensity = !this.#displayDensity;
+    this.draw();
+  }
+
   #showReputation() {
     if (this.#displayReputation)
       this.#showReputationButton.textContent = 'Show reputation';
@@ -1067,7 +1108,7 @@ export default class World {
   }
 
   #toggleStatsTab() {
-    let arrow = document.getElementById('arrow');
+    let arrow = document.getElementById('stats-arrow');
     if (arrow) {
       const stats = document.getElementById('statisticsPlaceholder');
       const idInfo = document.getElementById('idPlaceholder');
@@ -1083,6 +1124,24 @@ export default class World {
         stats.style.display = '';
         idInfo.style.display = '';
         arrowButton.style.right = '380px';
+      }
+    }
+  }
+
+  #toggleButtonsTab() {
+    let arrow = document.getElementById('buttons-arrow');
+    if (arrow) {
+      const buttons = document.getElementById('buttons');
+      const arrowButton = document.getElementById('buttonsButton');
+
+      if (arrow.className === 'arrow-left') {
+        arrow.className = 'arrow-right';
+        buttons.style.display = 'none';
+        arrowButton.style.left = '0px';
+      } else if (arrow.className === 'arrow-right') {
+        arrow.className = 'arrow-left';
+        buttons.style.display = '';
+        arrowButton.style.left = '240px';
       }
     }
   }

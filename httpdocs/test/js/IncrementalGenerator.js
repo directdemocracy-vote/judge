@@ -136,15 +136,12 @@ export default class IncrementalGenerator {
     for (const tile of this.#densityTiles)
       tile.createKmTileList(this.#densityTiles);
 
-    this.#pauseButton = document.createElement('button');
-    this.#pauseButton.textContent = 'Play';
+    this.#pauseButton = document.getElementById('play');
     this.#pauseButton.onclick = () => this.#run();
-    document.body.appendChild(this.#pauseButton);
 
-    const stepButton = document.createElement('button');
+    const stepButton = document.getElementById('step');
     stepButton.textContent = 'Step';
     stepButton.onclick = () => this.#step();
-    document.body.appendChild(stepButton);
   }
 
   #run() {
@@ -251,11 +248,11 @@ export default class IncrementalGenerator {
   }
 
   #getRandomNonZeroInt(max) {
-    return Math.floor(Math.random() * (max - 1)) + 2;
+    return Math.floor(World.instance.rng() * (max - 1)) + 2;
   }
 
   #getRandomInt(max) {
-    return Math.floor(Math.random() * (max + 1)); // +1 to include the max
+    return Math.floor(World.instance.rng() * (max + 1)); // +1 to include the max
   }
 
   #getValidNewCitizenNumber() {
@@ -293,7 +290,7 @@ export default class IncrementalGenerator {
   }
 
   #shouldCreateANewLink(days, boost) {
-    const p = Math.random() * (1 - (0.02 / (1 + Math.exp((10 - days) / 4))));
+    const p = World.instance.rng() * (1 - (0.02 / (1 + Math.exp((10 - days) / 4))));
     return typeof boost !== 'undefined' ? p > this.#thresholdBoosted : p > this.#threshold;
   }
 
@@ -337,7 +334,7 @@ export default class IncrementalGenerator {
     }
 
     if (typeof target === 'undefined') {
-      const rand = Math.random();
+      const rand = World.instance.rng();
       if (tile.boost && rand < 0.2)
         return;
       else if (rand < 0.7)
@@ -357,7 +354,7 @@ export default class IncrementalGenerator {
       return;
     const arrow = new Arrow(World.instance.idGenerator++, citizen.id, target.id);
 
-    const random = Math.random();
+    const random = World.instance.rng();
     if (random < 0.9) {
       arrow.arrowHead2 = new ArrowHead(World.instance.idGenerator++, target.id, citizen.id, World.instance.date, arrow);
       target.linksToGet[area]--;

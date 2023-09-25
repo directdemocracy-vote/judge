@@ -12,30 +12,47 @@
   </head>
   <body>
     <canvas id="worldMap" class="world-map" width="256" height="256"></canvas>
-    <button class="stats-button" id="statsButton" title="Show/Hide statistics."><div class="arrow-right" id="arrow"></div></button>
+    <button class="stats-button" id="statsButton" title="Show/Hide statistics."><div class="arrow-right" id="stats-arrow"></div></button>
+    <button class="buttons-button" id="buttonsButton" title="Show/Hide statistics."><div class="arrow-left" id="buttons-arrow"></div></button>
     <div id="idPlaceholder" class="id-placeholder"></div>
     <div id="statisticsPlaceholder" class='statistics-placeholder'></div>
-    <div id="menu">
-      <button id="reputation">Compute reputation</button>
-      <button id="year">Next Year</button>
-      <button id="month">Next Month</button>
-      <button id="show-reputation">Show reputation</button>
-      <button id="show-distance">Show distance (km)</button>
-      <button id="show-id">Show citizen id</button>
-      <button id="show-arrow">Hide arrows</button>
-    </div>
-    <div>
-      <input id="world-name" type="text" value="myWorld"></input>
-      <button id="save-world">Save</button>
-      <button id="load-world">Load</button>
-      <button id="generate-world">Generate</button>
-    </div>
-    <div id="load-menu" class="load-menu">
-      <div class="world-menu" id="world-menu">
+    <div class="buttons" id="buttons">
+      <div>
+        <p class="title">Actions</p>
+        <button id="reputation">Compute reputation</button>
+        <button id="year">Next Year</button>
+        <button id="month">Next Month</button>
+        <button id="day">Next Day</button>
       </div>
-      <button id="cancel" class="load-button">Cancel</button>
-      <button id="load" class="load-button">Load</button>
-    </div>
+      <div>
+        <p class="title">Display</p>
+        <button id="show-reputation">Show reputation</button>
+        <button id="show-distance">Show distance (km)</button>
+        <button id="show-id">Show citizen id</button>
+        <button id="show-arrow">Hide arrows</button>
+      </div>
+      <div>
+        <p class="title">Complex Simulation</p>
+        <span style="color:white;">Random seed: </span><input type="text" value="test2" class="seed-input" id="seedInput"></input>
+        <button id="incremental-load">Load World</button></br>
+        <button id="show-density">Hide density</button>
+        <button id="play">Play</button>
+        <button id="step">Step</button>
+      </div>
+      <div>
+        <p class="title">Simple Generator</p>
+        <input id="world-name" type="text" value="myWorld" class="save-input"></input>
+        <button id="save-world">Save</button>
+        <button id="load-world">Load</button>
+        <button id="generate-world">Generate</button>
+      </div>
+      <div id="load-menu" class="load-menu">
+        <div class="world-menu" id="world-menu">
+        </div>
+        <button id="cancel" class="load-button">Cancel</button>
+        <button id="load" class="load-button">Load</button>
+      </div>
+  </div>
     <div id="password-menu" class="password-menu">
       <input id="password" class="password-field" type="password"></input>
       <button id="cancel-delete" class="pass-button">Cancel</button>
