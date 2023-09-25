@@ -77,7 +77,7 @@ export default class IncrementalGenerator {
           fetch(this.#jsonUrl)
             .then(response => response.json())
             .then(json => {
-                this.#initialize(csv, json);
+              this.#initialize(csv, json);
             });
         } else
           this.#initialize(csv);
@@ -169,7 +169,7 @@ export default class IncrementalGenerator {
         let totalCreated = 0;
         const days = (World.instance.date - citizen.downloadDate) / 86400000;
         let tile = this.#getTile(citizen.number);
-        const boost = tile.boost
+        const boost = tile.boost;
         for (let i = 0; i < citizen.linksToGet[0]; i++) {
           if (this.#shouldCreateANewLink(days, boost)) {
             if (this.#createLink(citizen, tile, 0))
@@ -262,11 +262,11 @@ export default class IncrementalGenerator {
     let index;
     let counter = typeof this.#jsonUrl === 'undefined' ? 2 : 0;
     do {
-        index = this.#getRandomInt(this.#availableCitizenNumbers.length - 1);
-        counter++;
-        if (this.#getTile(index).boost)
-          counter === 2;
-    } while (counter < 2)
+      index = this.#getRandomInt(this.#availableCitizenNumbers.length - 1);
+      counter++;
+      if (this.#getTile(index).boost)
+        counter = 2;
+    } while (counter < 2);
     return this.#availableCitizenNumbers.splice(index, 1)[0];
   }
 
@@ -321,7 +321,7 @@ export default class IncrementalGenerator {
   #citizenToCreateArrow(citizen, tile, area, counter) {
     if (typeof counter === 'undefined')
       counter = 0;
-    else if (counter === 10 || tile.density === 1) // Prevent infinite recursion
+    else if (counter === 10 || (tile.density === 1 && counter !== 0)) // Prevent infinite recursion
       return;
 
     let targetNumber = this.#getRandomInt(tile.density - 1) + tile.firstNumber;
