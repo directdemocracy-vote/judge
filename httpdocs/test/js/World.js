@@ -16,6 +16,7 @@ export default class World {
   #displayId;
   #displayReputation;
   #endorsements;
+  #height;
   #idGenerator;
   #idPlaceholder;
   #incrementalGenerator;
@@ -41,13 +42,18 @@ export default class World {
   #threshold;
   #totalReputation;
   #translatePosition;
+  #width;
   #zoomLevel;
   constructor() {
     // Seed the random generator: https://github.com/davidbau/seedrandom
     Math.seedrandom('test2');
     this.#canvas = document.getElementById('worldMap');
+    this.#width = document.body.clientWidth;
+    this.#height = document.body.clientHeight;
+    const size = (this.#width < this.#height ? this.#height : this.#width); // Need to be a square
     this.#ctx = this.#canvas.getContext('2d');
-
+    this.#ctx.canvas.width = size;
+    this.#ctx.canvas.height = size;
     this.#citizens = new Map();
     this.#endorsements = new Map();
 
@@ -65,8 +71,7 @@ export default class World {
     this.#zoomLevel = 21;
     this.#maxZoomLevel = 21;
     this.#privateSpace = 0.0021; // to be able to see the arrows
-    this.#pixelToMeterRatio = 0.0325;
-
+    this.#pixelToMeterRatio = 0.0325 * 512 / size;
     this.#totalReputation = 0;
     this.#minimumReputation = 0;
     this.#maximumReputation = 0;
@@ -82,6 +87,9 @@ export default class World {
     };
 
     // Initialize buttons
+    if (document.getElementById('statsButton'))
+      document.getElementById('statsButton').onclick = () => this.#toggleStatsTab();
+
     const yearButton = document.getElementById('year');
     yearButton.onclick = () => { this.#date += 31536000000; };
 
@@ -185,7 +193,7 @@ export default class World {
     ];
     this.#testIndex = 0;
 
-    this.#incrementalGenerator = new IncrementalGenerator('./utils/gollion_region.csv', './utils/gollion_region.json');
+    this.#incrementalGenerator = new IncrementalGenerator('./utils/gollion_region.csv');
   }
 
   get ctx() {
@@ -557,27 +565,29 @@ export default class World {
   }
 
   #drawScaleIndicator() {
+    const height = this.#height * 0.9375;
+    const width = this.#width * 0.9375 - 380;
     this.#ctx.beginPath();
-    this.#ctx.moveTo(425, 480);
-    this.#ctx.lineTo(480, 480);
+    this.#ctx.moveTo(width - 90, height);
+    this.#ctx.lineTo(width, height);
     this.#ctx.lineWidth = 1;
     this.#ctx.stroke();
 
     this.#ctx.beginPath();
-    this.#ctx.moveTo(425, 475);
-    this.#ctx.lineTo(425, 485);
+    this.#ctx.moveTo(width - 90, height - 5);
+    this.#ctx.lineTo(width - 90, height + 5);
     this.#ctx.lineWidth = 1;
     this.#ctx.stroke();
 
     this.#ctx.beginPath();
-    this.#ctx.moveTo(480, 475);
-    this.#ctx.lineTo(480, 485);
+    this.#ctx.moveTo(width, height - 5);
+    this.#ctx.lineTo(width, height + 5);
     this.#ctx.lineWidth = 1;
     this.#ctx.stroke();
 
     this.#ctx.font = '11px serif';
-    const distance = (55 * Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) * this.#pixelToMeterRatio / 1000).toFixed(3);
-    this.#ctx.fillText(distance + 'km', 426, 478);
+    const distance = (90 * Math.pow(2, this.#maxZoomLevel - this.#zoomLevel) * this.#pixelToMeterRatio / 1000).toFixed(3);
+    this.#ctx.fillText(distance + 'km', width - 54, height - 2);
   }
 
   #drawPoint(x, y) {
@@ -818,6 +828,7 @@ export default class World {
     this.#zoomLevel = 20;
     this.#maxZoomLevel = 20;
     this.#pixelToMeterRatio = 0.075;
+    this.#incrementalGenerator = undefined;
   }
 
   #revokeButton(id) {
@@ -1052,6 +1063,27 @@ export default class World {
       this.#translatePosition.x = event.clientX - this.#startDragOffset.x;
       this.#translatePosition.y = event.clientY - this.#startDragOffset.y;
       this.draw();
+    }
+  }
+
+  #toggleStatsTab() {
+    let arrow = document.getElementById('arrow');
+    if (arrow) {
+      const stats = document.getElementById('statisticsPlaceholder');
+      const idInfo = document.getElementById('idPlaceholder');
+      const arrowButton = document.getElementById('statsButton');
+
+      if (arrow.className === 'arrow-right') {
+        arrow.className = 'arrow-left';
+        stats.style.display = 'none';
+        idInfo.style.display = 'none';
+        arrowButton.style.right = '0px';
+      } else if (arrow.className === 'arrow-left') {
+        arrow.className = 'arrow-right';
+        stats.style.display = '';
+        idInfo.style.display = '';
+        arrowButton.style.right = '380px';
+      }
     }
   }
 }

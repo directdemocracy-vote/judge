@@ -1,3 +1,16 @@
+html {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow-y: hidden;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
 .load-menu {
   width: 200px;
   height: 300px;
@@ -57,7 +70,7 @@
   cursor: pointer;
 }
 
-.password-menu{
+.password-menu {
   width: 200px;
   height: 50px;
   top: calc(50% - 25px);
@@ -66,6 +79,72 @@
   border: 1px black solid;
   background-color: lightgrey;
   display: none;
+}
+
+.world-map {
+  position: absolute;
+  border:1px solid black;
+}
+
+.statistics-placeholder {
+  position: absolute;
+  padding: 10px;
+  right: 0px;
+  width: 380px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  pointer-events: none;
+}
+
+.id-placeholder {
+  position: absolute;
+  padding: 10px;
+  right: 0px;
+  top: 260px;
+  width: 380px;
+  pointer-events: none;
+  color: white;
+  z-index: 1;
+}
+
+.stats-button .arrow-right {
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 4px;
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  position: absolute;
+  top: calc(50% - 5px);
+  left: calc(50% - 6px);
+  pointer-events: none;
+}
+
+.stats-button .arrow-left {
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 4px;
+  transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
+  position: absolute;
+  top: calc(50% - 5px);
+  left: calc(50% - 1px);
+  pointer-events: none;
+}
+
+.stats-button {
+  position: absolute;
+  top:calc(50% - 15px);
+  right: 380px;
+  width: 26px;
+  height: 52px;
+  border-top-left-radius: 24px;
+  border-bottom-left-radius: 24px;
+  background-color: #4c4c4c;
+  border-color: transparent;
+  z-index: 2;
 }
 
 /* World Generator */

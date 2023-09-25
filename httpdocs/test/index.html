@@ -11,9 +11,10 @@
     <link rel="stylesheet" href="css/main.css">
   </head>
   <body>
-    <canvas id="worldMap" width="512" height="512" style="border:1px solid #000000;"></canvas>
-    <div id="idPlaceholder" style="width: 256px; height: 512px; position: absolute; top: 0px; left: 600px"></div>
-    <div id="statisticsPlaceholder" style="width: 512px; height: 512px; position: absolute; top: 0px; left: 900px"></div>
+    <canvas id="worldMap" class="world-map" width="256" height="256"></canvas>
+    <button class="stats-button" id="statsButton" title="Show/Hide statistics."><div class="arrow-right" id="arrow"></div></button>
+    <div id="idPlaceholder" class="id-placeholder"></div>
+    <div id="statisticsPlaceholder" class='statistics-placeholder'></div>
     <div id="menu">
       <button id="reputation">Compute reputation</button>
       <button id="year">Next Year</button>
