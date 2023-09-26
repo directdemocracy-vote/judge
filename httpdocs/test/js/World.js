@@ -841,6 +841,7 @@ export default class World {
     this.#closeComplexWorldsPanel();
     this.resetWorld();
     this.#incrementalGenerator = new IncrementalGenerator(world, json, this.parameters);
+    this.draw();
   }
 
   #openWorldsPanel() {
