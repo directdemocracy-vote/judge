@@ -318,9 +318,9 @@ return this.#availableCitizenNumbers.splice(index, 1)[0];
 
 ### Recompute the reputation and increase the time.
 #### Recompute the reputation
-At the end of each day, it recomputes the reputation according to the function described in the [reputation_algorithm](reputation_algorithm.md) file.
+At the end of each day, the reputation is recomputed according to the function described in the [reputation_algorithm](reputation_algorithm.md) file.
 The reputation function is quite fast: we measured that it took around 350 milliseconds to perform the 15 iterations of computing the reputation of a world with 30'000 citizens and 200'000 links.
-So in the reality, the reputation will be computed more often, nearly every time there is a change in the network
+So in the reality, the reputation will be computed more often, nearly every time there is a change in the network.
 
 #### Increase the time
 In our example, we increase the time by 86400000 milliseconds, which correspond to one day.
@@ -328,9 +328,9 @@ It is possible to change this value to represent a shorter, or longer, time step
 However, it may be necessary to adjust the constants used in the calculation of the different probabilities.
 
 ### Events not simulated
-Some kind of events are simulated right now:
+Some categories of events are not simulated right now:
   - Revocation of a citizen: can happen if someone moves, or if he uninstalls the application.
   - Revocation of an endorsement: can happened if one end of the link is revoked, but someone can also manually revoke a link for a personal reason.
   - Renewal of an endorsements: the time since a endorsements has been created play a role in the weight of the endorsement. After one year, the weight will begin to decrease to reach zero around three years. So citizens are expected to renew their endorsements every one or two years.
 
-Even so those events are run simulated, it would be possible to add them.
+Even so those events are not simulated, it would be possible to add them.
