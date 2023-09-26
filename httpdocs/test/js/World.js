@@ -827,7 +827,7 @@ export default class World {
     const json = this.#selectedBoost;
     this.#closeComplexWorldsPanel();
     this.resetWorld();
-    this.#incrementalGenerator = new IncrementalGenerator(json);
+    this.#incrementalGenerator = new IncrementalGenerator(world, json);
   }
 
   #openWorldsPanel() {
