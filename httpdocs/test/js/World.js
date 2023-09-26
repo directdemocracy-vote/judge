@@ -875,6 +875,8 @@ export default class World {
     const menu = document.getElementById('world-complex-menu');
     menu.style.display = 'block';
     menu.innerHTML = '';
+    this.#csvs = [];
+    this.#jsons = [];
     fetch('/test/ajax/list_complex.php')
       .then(response => response.json())
       .then(response => {
