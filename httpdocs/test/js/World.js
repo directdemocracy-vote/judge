@@ -814,7 +814,7 @@ export default class World {
     if (typeof this.#selectedWorld === 'undefined')
       return;
 
-    this.#incrementalGenerator = new IncrementalGenerator(this.#selectedWorld, json);
+    this.#incrementalGenerator = new IncrementalGenerator(this.#selectedWorld);
   }
 
   #openWorldsPanel() {
