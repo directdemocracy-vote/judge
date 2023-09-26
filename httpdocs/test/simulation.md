@@ -1,5 +1,5 @@
 # Simulation of the adoption of DirectDemocraty in a population
-Given a geographic area, the algorithm will randomly generate new citizens according to density of the population in the area.
+Given a geographic area, the algorithm will randomly generate new citizens according to the density of population in the area.
 When created, a citizen is attributed a number of endorsements that she will create during her life.
 Everyday, the citizen has a small chance to endorse another citizen.
 Once new citizens and endorsements are created for a day, the algorithm recompute the reputation of each citizen.
@@ -16,7 +16,7 @@ Some important characteristics:
   - `firstNumber`: each citizen has a number from `0` to `size of population`.
     `firstNumber` is the smallest number attributed to a person living in this hectare.
     The citizen does not necessarily exist yet.
-    This number is used to find the range of numbers of the citizen that will live in this hectare.
+    This number is used to find the range of numbers of citizens that will live in this hectare.
   - `citizens`: the list of citizens living in this hectare.
   - `boost`: if the probability of new links/citizens should be boosted in this tile.
   - `threeKmList` / `tenKmList`: list of the hectares in the corresponding radius.
@@ -50,8 +50,8 @@ The arrow can be double-headed if the endorsement is reciprocal.
 Some important fields:
   - `distance`: the distance between the two citizens, useful to compute the weight of the endorsement.
   - `arrowHead1`/`arrowHead2`: contain the information regarding the endorsements.
-    - `age`: when the endorsements was created
-    - `source`/`destination`: the direction of the endorsement
+    - `age`: when the endorsements was created.
+    - `source`/`destination`: the direction of the endorsement.
 
 
 ## Input files
@@ -59,7 +59,7 @@ Two files can be given as input to the generator.
 
 ### Density file (mandatory)
 A csv file.
-It contains the information about the number of inhabitant per hectare.
+It contains the information about the number of inhabitants per hectare.
 This file is created by using the `/utils/extractor.py` script and the density of population by hectare for Switzerland, that you can download [here](https://www.bfs.admin.ch/bfs/en/home/services/geostat/swiss-federal-statistics-geodata/population-buildings-dwellings-persons/population-housholds-from-2010.assetdetail.27045772.html).
 In the `/utils/extractor.py` you must then specify the limit of the rectangle that will be extracted.
 
@@ -286,15 +286,15 @@ Then, we create the right number of new citizens.
 ```
 if World.instance.rng() > getRandomInt(noSpontaneousCitizen):
   numberOfNewCitizens = getRandomInt(floor(sqrt((citizens.size + 1) *
-      (1 - (citizens.size / totalPopulation)))));
+      (1 - (citizens.size / totalPopulation)))))
 
   if (citizens.size + numberOfNewCitizens > totalPopulation): // to avoid creating more citizens than possible
-    numberOfNewCitizens = totalPopulation - size;
-    citizensAllSpawned = true;
+    numberOfNewCitizens = totalPopulation - size
+    citizensAllSpawned = true
 
   for numberOfNewCitizens:
-    citizenNumber = getValidNewCitizenNumber();
-    spawnCitizen(citizenNumber);
+    citizenNumber = getValidNewCitizenNumber()
+    spawnCitizen(citizenNumber)
 ```
 
 #### getValidNewCitizenNumber()
@@ -308,12 +308,12 @@ index
 counter = if jsonUrl is undefined then 2 else 0
 do:
   index = getRandomInt(availableCitizenNumbers.length - 1)
-  counter++;
+  counter++
   if getTile(index).boost:
     break
 while counter < redrawBoosted
 
-return this.#availableCitizenNumbers.splice(index, 1)[0];
+return availableCitizenNumbers.splice(index, 1)[0]
 ```
 
 ### Recompute the reputation and increase the time.
