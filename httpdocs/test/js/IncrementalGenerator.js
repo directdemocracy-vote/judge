@@ -53,7 +53,8 @@ export default class IncrementalGenerator {
   }
 
   #load() {
-    fetch(this.#csvUrl)
+    const url = 'https://judge.directdemocracy.vote/test/storage/complex/';
+    fetch(url + this.#csvUrl)
       .then(response => response.text())
       .then(csv => {
         csv = csv.split('\n');
@@ -74,7 +75,7 @@ export default class IncrementalGenerator {
         }
 
         if (typeof this.#jsonUrl !== 'undefined') {
-          fetch(this.#jsonUrl)
+          fetch(url + this.#jsonUrl)
             .then(response => response.json())
             .then(json => {
               this.#initialize(csv, json);

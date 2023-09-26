@@ -228,8 +228,6 @@ export default class World {
       '1000Citizen2km_soluce.json'
     ];
     this.#testIndex = 0;
-
-    this.#incrementalGenerator = new IncrementalGenerator('./utils/gollion_region.csv');
   }
 
   get ctx() {
@@ -810,6 +808,13 @@ export default class World {
 
         this.draw();
       });
+  }
+
+  loadComplexWorld() {
+    if (typeof this.#selectedWorld === 'undefined')
+      return;
+
+    this.#incrementalGenerator = new IncrementalGenerator(this.#selectedWorld, json);
   }
 
   #openWorldsPanel() {
