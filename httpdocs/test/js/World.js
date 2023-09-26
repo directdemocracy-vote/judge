@@ -31,6 +31,7 @@ export default class World {
   #reputationButton;
   #selection;
   #selectedArrow;
+  #selectedBoost;
   #selectedWorld;
   #showArrowButton;
   #showDensityButton;
@@ -157,6 +158,9 @@ export default class World {
 
     const cancelComplexButton = document.getElementById('cancel-complex');
     cancelComplexButton.onclick = () => this.#closeComplexWorldsPanel();
+
+    const boostButton = document.getElementById('json-complex');
+    boostButton.onclick = () => this.#switchFileType();
 
     const loadComplexButton = document.getElementById('load-complex');
     loadComplexButton.onclick = () => this.loadComplexWorld();
@@ -322,6 +326,7 @@ export default class World {
   #closeComplexWorldsPanel() {
     document.getElementById('load-complex-menu').style.display = 'none';
     this.#selectedWorld = undefined;
+    this.#selectedBoost = undefined;
   }
 
   computeReputation(numberOfIteration) {
@@ -815,9 +820,10 @@ export default class World {
       return;
 
     const world = this.#selectedWorld;
+    const json = this.#selectedBoost;
     this.#closeComplexWorldsPanel();
     this.resetWorld();
-    this.#incrementalGenerator = new IncrementalGenerator(world);
+    this.#incrementalGenerator = new IncrementalGenerator(json);
   }
 
   #openWorldsPanel() {
@@ -827,6 +833,8 @@ export default class World {
     fetch('/test/ajax/list.php')
       .then(response => response.json())
       .then(response => {
+        this.jsons = [];
+        this.csvs = [];
         for (const name of response) {
           if (name === '.gitignore' || name === '.htaccess')
             continue;
@@ -870,24 +878,72 @@ export default class World {
           if (name === '.gitignore' || name === '.htaccess')
             continue;
           else {
-            const div = document.createElement('div');
-            div.className = 'world';
-            div.textContent = name;
-            div.onclick = () => {
-              this.#selectedWorld = name;
-              const worlds = document.getElementsByClassName('world');
-              for (const world of worlds)
-                world.parentNode.style.background = 'transparent';
+            if (name.endsWith('.csv')) {
+              this.csvs.push(name);
+              const div = document.createElement('div');
+              div.className = 'world';
+              div.textContent = name;
+              div.onclick = () => {
+                this.#selectedWorld = name;
+                const worlds = document.getElementsByClassName('world');
+                for (const world of worlds)
+                  world.parentNode.style.background = 'transparent';
 
-              div.parentNode.style.background = 'dodgerblue';
-            };
-            const container = document.createElement('div');
-            container.className = 'container';
-            container.appendChild(div);
-            menu.appendChild(container);
+                div.parentNode.style.background = 'dodgerblue';
+              };
+              const container = document.createElement('div');
+              container.className = 'container';
+              container.appendChild(div);
+              menu.appendChild(container);
+            } else
+              this.jsons.push(name);
           }
         }
       });
+  }
+
+  #switchFileType() {
+    const menu = document.getElementById('world-complex-menu');
+    menu.innerHTML = '';
+    if (document.getElementById('json-complex').innerText === 'Boost') {
+      document.getElementById('json-complex').innerText = 'Worlds';
+      for (const name of this.#jsons) {
+        const div = document.createElement('div');
+        div.className = 'world';
+        div.textContent = name;
+        div.onclick = () => {
+          this.#selectedBoost = name;
+          const worlds = document.getElementsByClassName('world');
+          for (const world of worlds)
+            world.parentNode.style.background = 'transparent';
+
+            div.parentNode.style.background = 'dodgerblue';
+        };
+        const container = document.createElement('div');
+        container.className = 'container';
+        container.appendChild(div);
+        menu.appendChild(container);
+      }
+    } else {
+      document.getElementById('json-complex').innerText = 'Boost';
+      for (const name of this.#csvs) {
+        const div = document.createElement('div');
+        div.className = 'world';
+        div.textContent = name;
+        div.onclick = () => {
+          this.#selectedWorld = name;
+          const worlds = document.getElementsByClassName('world');
+          for (const world of worlds)
+            world.parentNode.style.background = 'transparent';
+
+            div.parentNode.style.background = 'dodgerblue';
+        };
+        const container = document.createElement('div');
+        container.className = 'container';
+        container.appendChild(div);
+        menu.appendChild(container);
+      }
+    }
   }
 
   #resetSelection() {
