@@ -156,7 +156,7 @@ export default class World {
     cancelButton.onclick = () => this.#closeWorldsPanel();
 
     const loadButton = document.getElementById('load');
-    loadButton.onclick = () => this.loadWorld();
+    loadButton.onclick = () => this.#loadWorld();
 
     const cancelComplexButton = document.getElementById('cancel-complex');
     cancelComplexButton.onclick = () => this.#closeComplexWorldsPanel();
@@ -165,7 +165,16 @@ export default class World {
     boostButton.onclick = () => this.#switchFileType();
 
     const loadComplexButton = document.getElementById('load-complex');
-    loadComplexButton.onclick = () => this.loadComplexWorld();
+    loadComplexButton.onclick = () => this.#loadComplexWorld();
+
+    const openCoefButton = document.getElementById('show-coef');
+    openCoefButton.onclick = () => document.getElementById('coef-menu').style.display = 'block';
+
+    const applyCoefButton = document.getElementById('apply-coef');
+    applyCoefButton.onclick = () => this.#applyCoef();
+
+    const cancelCoefButton = document.getElementById('cancel-coef');
+    cancelCoefButton.onclick = () => this.#closeCoefPanel();
 
     const generateButton = document.getElementById('generate-world');
     generateButton.onclick = () => {
@@ -235,7 +244,7 @@ export default class World {
     ];
     this.#testIndex = 0;
 
-    this.#incrementalGenerator = new IncrementalGenerator("gollion_region.csv")
+    this.#incrementalGenerator = new IncrementalGenerator("gollion_region.csv", undefined, this.parameters)
   }
 
   get ctx() {
@@ -333,6 +342,10 @@ export default class World {
     this.#selectedBoost = undefined;
     this.#jsons = undefined;
     this.#csvs = undefined;
+  }
+
+  #closeCoefPanel() {
+    document.getElementById('coef-menu').style.display = 'none';
   }
 
   computeReputation(numberOfIteration) {
@@ -768,7 +781,7 @@ export default class World {
     }
   }
 
-  loadWorld(test) {
+  #loadWorld(test) {
     if (typeof this.#selectedWorld === 'undefined')
       return;
 
@@ -821,7 +834,7 @@ export default class World {
       });
   }
 
-  loadComplexWorld() {
+  #loadComplexWorld() {
     if (typeof this.#selectedWorld === 'undefined')
       return;
 
@@ -829,7 +842,7 @@ export default class World {
     const json = this.#selectedBoost;
     this.#closeComplexWorldsPanel();
     this.resetWorld();
-    this.#incrementalGenerator = new IncrementalGenerator(world, json);
+    this.#incrementalGenerator = new IncrementalGenerator(world, json, this.parameters);
   }
 
   #openWorldsPanel() {
@@ -983,6 +996,7 @@ export default class World {
   #revokeButton(id) {
     const button = document.createElement('button');
     button.textContent = 'Revoke';
+    button.className = 'revoke-button';
     button.onclick = () => {
       if (this.#citizens.has(id)) {
         this.#citizens.get(id).prepareDelete();
@@ -1015,6 +1029,23 @@ export default class World {
     this.#idPlaceholder.appendChild(button);
   }
 
+  #applyCoef() {
+    this.parameters = {};
+    this.parameters.threshold = parseFloat(document.getElementById('input-threshold').value);
+    this.parameters.thresholdBoosted = parseFloat(document.getElementById('input-thresholdBoosted').value);
+    this.parameters.daysToSimulate = parseInt(document.getElementById('input-daysToSimulate').value);
+    this.parameters.reciprocity = parseFloat(document.getElementById('input-reciprocity').value);
+    this.parameters.refuseToDownload = parseFloat(document.getElementById('input-refuseToDownload').value);
+    this.parameters.refuseToDownloadBoosted = parseFloat(document.getElementById('input-refuseToDownloadBoosted').value);
+    this.parameters.redrawBoosted = parseInt(document.getElementById('input-redrawBoosted').value);
+    this.parameters.noSpontaneousCitizen = parseFloat(document.getElementById('input-noSpontaneousCitizen').value);
+
+    if (typeof this.#incrementalGenerator !== 'undefined')
+      this.#incrementalGenerator.setParameters(this.parameters);
+
+    this.#closeCoefPanel();
+  }
+
   nextIndex() {
     if (this.#testIndex < this.#testList.length)
       this.#testIndex++;
@@ -1029,7 +1060,7 @@ export default class World {
     this.testResultDiv = document.getElementById('test-result');
     this.testResultDiv.innerHTML = '';
     this.#selectedWorld = this.#testList[this.#testIndex];
-    this.loadWorld(true)
+    this.#loadWorld(true)
       .then(() => this.#runTest());
   }
 

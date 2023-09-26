@@ -66,6 +66,23 @@
       <button id="cancel-delete" class="pass-button">Cancel</button>
       <button id="send-delete" class="pass-button">Delete</button>
     </div>
+    <div id="coef-menu" class="coef-menu">
+      <p style="padding-bottom: 20px;">More information can be found
+        <a href="https://github.com/directdemocracy-vote/judge/blob/master/httpdocs/test/simulation.md#variables" target="_blank" style="color: #5a75ef;">here</a>
+      </p>
+      <div class="input-menu" id="input-menu" style="display: grid; height: 195px;">
+        <span class="coef-title" style="grid-area: 1/1/1/1">threshold</span><input id="input-threshold" type=number value=0.97 style="grid-area: 1/2/1/2"></input></br>
+        <span class="coef-title" style="grid-area: 2/1/2/1">thresholdBoosted</span><input id="input-thresholdBoosted" type=number value=0.5 style="grid-area: 2/2/2/2"></input></br>
+        <span class="coef-title" style="grid-area: 3/1/3/1">daysToSimulate</span><input id="input-daysToSimulate" type=number value=1095 style="grid-area: 3/2/3/2"></input></br>
+        <span class="coef-title" style="grid-area: 4/1/4/1">reciprocity</span><input id="input-reciprocity" type=number value=0.9 style="grid-area: 4/2/4/2"></input></br>
+        <span class="coef-title" style="grid-area: 5/1/5/1">refuseToDownload</span><input id="input-refuseToDownload" type=number value=0.7 style="grid-area: 5/2/5/2"></input></br>
+        <span class="coef-title" style="grid-area: 6/1/6/1">refuseToDownloadBoosted</span><input id="input-refuseToDownloadBoosted" type=number value=0.2 style="grid-area: 6/2/6/2"></input></br>
+        <span class="coef-title" style="grid-area: 7/1/7/1">redrawBoosted</span><input id="input-redrawBoosted" type=number value=2 style="grid-area: 7/2/7/2"></input></br>
+        <span class="coef-title" style="grid-area: 8/1/8/1">noSpontaneousCitizen</span><input id="input-noSpontaneousCitizen" type=number value=0.5 style="grid-area: 8/2/8/2"></input></br>
+      </div>
+      <button id="cancel-coef" class="load-button">Cancel</button>
+      <button id="apply-coef" class="load-button">Apply</button>
+    </div>
   </body>
   <script type="module">
     import World from './js/World.js';

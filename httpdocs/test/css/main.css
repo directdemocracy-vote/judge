@@ -18,7 +18,7 @@ body {
   left: calc(50% - 100px);
   position: absolute;
   border: 1px black solid;
-  background-color: lightgrey;
+  background-color: #4c4c4c;
   display: none;
   z-index: 3;
 }
@@ -60,6 +60,25 @@ body {
 
 .container:hover {
   background: lightskyblue;
+}
+
+.coef-menu {
+  display: none;
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  left: calc(50% - 150px);
+  top: calc(50% - 150px);
+  z-index: 2;
+  border: 1px solid black;
+  background-color: #4c4c4c;
+  color: white;
+  padding: 15px;
+}
+
+.coef-menu input {
+  width: 60px;
+  justify-self: right;
 }
 
 .world {
@@ -151,8 +170,13 @@ body {
   border-top-left-radius: 24px;
   border-bottom-left-radius: 24px;
   background-color: #4c4c4c;
+  color: white;
   border-color: transparent;
   z-index: 2;
+}
+
+.revoke-button {
+  pointer-events: auto;
 }
 
 .buttons-button .arrow-right {
@@ -233,7 +257,8 @@ body {
   top: calc(50% - 115px);
   left: calc(50% - 110px);
   border: 1px black solid;
-  background-color: lightgrey;
+  background-color: #4c4c4c;
+  color: white;
   display: none;
   padding: 7px;
   z-index: 2;

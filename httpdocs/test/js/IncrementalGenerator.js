@@ -23,17 +23,20 @@ export default class IncrementalGenerator {
   #animation;
   #daysToSimulate;
   #totalBoostedCitizens;
-  constructor(csvLink, jsonLink) {
+  #reciprocity;
+  #refuseToDownload;
+  #refuseToDownloadBoosted;
+  #redrawBoosted;
+  #noSpontaneousCitizen
+  constructor(csvLink, jsonLink, parameters) {
     this.#csvUrl = csvLink;
     this.#jsonUrl = jsonLink;
     this.#top = 1000000;
     this.#left = 2850000;
     this.#right = 2480000;
     this.#bottom = 1300000;
-    this.#threshold = 0.97;
-    this.#thresholdBoosted = 0.5;
 
-    this.#daysToSimulate = 1095;
+    this.setParameters(parameters)
 
     this.#totalPopulation = 0;
     this.#daysElapsed = 0;
@@ -50,6 +53,18 @@ export default class IncrementalGenerator {
 
   get densityTiles() {
     return this.#densityTiles;
+  }
+
+  setParameters(parameters) {
+    this.#threshold = parameters?.threshold ? parameters.threshold : 0.97;
+    this.#thresholdBoosted = parameters?.thresholdBoosted ? parameters.thresholdBoosted : 0.5;
+    this.#daysToSimulate = parameters?.daysToSimulate ? parameters.daysToSimulate : 1095;
+    console.log(this.#daysToSimulate)
+    this.#reciprocity = parameters?.reciprocity ? parameters.reciprocity : 0.9;
+    this.#refuseToDownload = parameters?.refuseToDownload ? parameters.refuseToDownload : 0.7;
+    this.#refuseToDownloadBoosted = parameters?.refuseToDownloadBoosted ? parameters.refuseToDownloadBoosted : 0.2;
+    this.#redrawBoosted = parameters?.redrawBoosted ? parameters.redrawBoosted : 2;
+    this.#noSpontaneousCitizen = parameters?.noSpontaneousCitizen ? parameters.noSpontaneousCitizen : 0.5;
   }
 
   #load() {
@@ -205,17 +220,19 @@ export default class IncrementalGenerator {
     }
 
     // Citizens discovers the app by themself
-    let numberOfNewCitizens = this.#getRandomInt(Math.floor(Math.sqrt((World.instance.citizens.size + 1) *
-        (1 - (World.instance.citizens.size / this.#totalPopulation))))) * this.#getRandomInt(1);
+    if (World.instance.rng() > this.#getRandomInt(this.#noSpontaneousCitizen)) {
+      let numberOfNewCitizens = this.#getRandomInt(Math.floor(Math.sqrt((World.instance.citizens.size + 1) *
+          (1 - (World.instance.citizens.size / this.#totalPopulation)))));
 
-    if (World.instance.citizens.size + numberOfNewCitizens > this.#totalPopulation) {
-      numberOfNewCitizens = this.#totalPopulation - World.instance.citizens.size;
-      this.#citizensAllSpawned = true;
-    }
+      if (World.instance.citizens.size + numberOfNewCitizens > this.#totalPopulation) {
+        numberOfNewCitizens = this.#totalPopulation - World.instance.citizens.size;
+        this.#citizensAllSpawned = true;
+      }
 
-    for (let i = 0; i < numberOfNewCitizens; i++) {
-      const citizenNumber = this.#getValidNewCitizenNumber();
-      this.#spawnCitizen(citizenNumber);
+      for (let i = 0; i < numberOfNewCitizens; i++) {
+        const citizenNumber = this.#getValidNewCitizenNumber();
+        this.#spawnCitizen(citizenNumber);
+      }
     }
 
     World.instance.date += 86400000; // add one day
@@ -261,8 +278,8 @@ export default class IncrementalGenerator {
       index = this.#getRandomInt(this.#availableCitizenNumbers.length - 1);
       counter++;
       if (this.#getTile(index).boost)
-        counter = 2;
-    } while (counter < 2);
+        counter = this.#redrawBoosted;
+    } while (counter < this.#redrawBoosted);
     return this.#availableCitizenNumbers.splice(index, 1)[0];
   }
 
@@ -288,7 +305,7 @@ export default class IncrementalGenerator {
   }
 
   #shouldCreateANewLink(days, boost) {
-    const p = World.instance.rng() * (1 - (0.02 / (1 + Math.exp((10 - days) / 4))));
+    const p = World.instance.rng() * (1 - ((1 - this.#threshold) / (1 + Math.exp((10 - days) / 4))));
     return typeof boost !== 'undefined' ? p > this.#thresholdBoosted : p > this.#threshold;
   }
 
@@ -333,9 +350,9 @@ export default class IncrementalGenerator {
 
     if (typeof target === 'undefined') {
       const rand = World.instance.rng();
-      if (tile.boost && rand < 0.2)
+      if (tile.boost && rand < this.#refuseToDownloadBoosted)
         return;
-      else if (rand < 0.7)
+      else if (rand < this.#refuseToDownload)
         return;
       target = this.#createTarget(targetNumber);
     }
@@ -353,7 +370,7 @@ export default class IncrementalGenerator {
     const arrow = new Arrow(World.instance.idGenerator++, citizen.id, target.id);
 
     const random = World.instance.rng();
-    if (random < 0.9) {
+    if (random < this.#reciprocity) {
       arrow.arrowHead2 = new ArrowHead(World.instance.idGenerator++, target.id, citizen.id, World.instance.date, arrow);
       target.linksToGet[area]--;
     }
