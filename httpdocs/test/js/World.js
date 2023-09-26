@@ -321,7 +321,7 @@ export default class World {
     this.#selectedWorld = undefined;
   }
 
-  #closeComnplexWorldsPanel() {
+  #closeComplexWorldsPanel() {
     document.getElementById('load-complex-menu').style.display = 'none';
     this.#selectedWorld = undefined;
   }
