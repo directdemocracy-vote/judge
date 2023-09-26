@@ -817,7 +817,7 @@ export default class World {
     const world = this.#selectedWorld;
     this.#closeWorldsPanel();
     this.resetWorld();
-    this.#incrementalGenerator = new IncrementalGenerator(this.#selectedWorld);
+    this.#incrementalGenerator = new IncrementalGenerator(world);
   }
 
   #openWorldsPanel() {
