@@ -156,10 +156,10 @@ export default class World {
     loadButton.onclick = () => this.loadWorld();
 
     const cancelComplexButton = document.getElementById('cancel-complex');
-    cancelComplexButton.onclick = () => this.#closeWorldsPanel();
+    cancelComplexButton.onclick = () => this.#closeComplexWorldsPanel();
 
     const loadComplexButton = document.getElementById('load-complex');
-    loadComplexButton.onclick = () => this.loadWorld();
+    loadComplexButton.onclick = () => this.loadComplexWorld();
 
     const generateButton = document.getElementById('generate-world');
     generateButton.onclick = () => {
@@ -321,7 +321,7 @@ export default class World {
     this.#selectedWorld = undefined;
   }
 
-  #closeWorldsComplexPanel() {
+  #closeComnplexWorldsPanel() {
     document.getElementById('load-complex-menu').style.display = 'none';
     this.#selectedWorld = undefined;
   }
