@@ -29,6 +29,12 @@ body {
   margin-top: 8px;
 }
 
+.load-complex-button {
+  width: 28%;
+  margin-left: 5%;
+  margin-top: 8px;
+}
+
 .pass-button {
   width: 42%;
   margin-left: 5%;
