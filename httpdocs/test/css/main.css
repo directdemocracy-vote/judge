@@ -20,6 +20,7 @@ body {
   border: 1px black solid;
   background-color: lightgrey;
   display: none;
+  z-index: 3;
 }
 
 .load-button {
