@@ -1,4 +1,4 @@
-# Simulation of the adoption of DirectDemocraty on a population
+# Simulation of the adoption of DirectDemocraty in a population
 Given a geographic area, the algorithm will randomly generate new citizens according to density of the population in the area.
 When created, a citizen is attributed a number of endorsements that she will create during her life.
 Everyday, the citizen has a small chance to endorse another citizen.
@@ -95,10 +95,24 @@ Some important fields:
     They have the following format:
     ```
     {
-      "citizens": [{"x": 154400, "y": 159972}]
+      "citizens": [{"number": 5324}]
     }
     ```
-    The coordinates are in pixels.
+    The number correspond to a citizen in a tile.
+
+## Variables
+Several variables are available to configure the simulation:
+- `threshold`: the value that the probability computed in [shouldCreateANewLink](https://github.com/directdemocracy-vote/judge/blob/master/httpdocs/test/simulation.md#shouldcreateanewlinkdays-boost) must exceed to create a new endorsement. The value should be between 0 and 1.
+- `thresholdBoosted`: same as above except that this variable is used instead of `Threshold` when a `citizen` is on a boosted hectare. The value should be between 0 and 1.
+- `daysToSimulate`: the number of days that the simulation will run when `Play` is pressed. The value should be a positive integer.
+- `reciprocity`: percentage chance of reciprocal endorsement. The value should be between 0 and 1.
+- `refuseToDownload`: percentage that a person refuse to download the application when another one try to create an endorsement with her. The value should be between 0 and 1.
+- `refuseToDownloadBoosted`: same as above but is applied instead on boosted hectares. The value should be a positive integer.
+- `redrawBoosted`: used when creating new citizens that spontaneously discover the application to increase the chances of a new citizen being created on a boosted hectare. The value should be between 0 and 1.
+- `noSpontaneousCitizen`: the probability that, for a given day, nobody spontaneously discover the application (independtly of everything else). The value should be between 0 and 1.
+
+Those variables are those that can be modified through the GUI. 
+However, some other probabilities are too complex to be reduced to a single coefficient and you will need to modify the formula directly in the code.
 
 ## Initialization
 It first loads the input files.
@@ -184,7 +198,7 @@ This is a deliberate choice, because the boost represent a *local* incentive for
 
 ```
 p = Math.random() * (1 - (0.02 / (1 + Math.exp((10 - days) / 4))))
-return boost not undefined' then p > thresholdBoosted else p > threshold
+return if boost not undefined then p > thresholdBoosted else p > threshold
 ```
 Where the `thresholdBoosted`, `threshold` and the different coefficients can be modified to increase/decrease the frequency at which new links are created.
 
