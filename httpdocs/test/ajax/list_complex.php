@@ -4,7 +4,7 @@
   }
 
   $worlds = array();
-  foreach (new DirectoryIterator('../storage/complex') as $file) {
+  foreach (new DirectoryIterator('../storage/complex/') as $file) {
     if($file->isDot()) continue;
     array_push($worlds, $file->getFilename());
   }
