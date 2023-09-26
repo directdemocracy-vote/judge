@@ -109,7 +109,7 @@ if ($endorsements)
       if ($endorsed->signature !== $endorsement->endorsedSignature)
         die("Key mismatch for endorsed in notary database.");
       $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, endorsed, changed) "
-              ."VALUES('$endorsed->key', '$endorsed->signature', POINT($endorsed->longitude, $endorsed->latitude), $initial, 0, 0) ";
+              ."VALUES(FROM_BASE64('$endorsed->key'), FROM_BASE64('$endorsed->signature'), POINT($endorsed->longitude, $endorsed->latitude), $initial, 0, 0) ";
       $mysqli->query($query) or error($mysqli->error);
       $endorsed->id = $mysqli->insert_id;
     } else
@@ -173,7 +173,7 @@ $count_r = 0;
 $table = '';
 $schema = "https://directdemocracy.vote/json-schema/$version/endorsement.schema.json";
 $private_key = openssl_get_privatekey("file://../../id_rsa") or error("Failed to read private key file");
-$query = "SELECT id, `key`, signature, endorsed, reputation FROM participant WHERE changed=1";
+$query = "SELECT id, REPLACE(TO_BASE64(`key`), '\\n', ''), REPLACE(TO_BASE64(signature), '\\n', ''), endorsed, reputation FROM participant WHERE changed=1";
 $result = $mysqli->query($query) or error($mysqli->error);
 while($participant = $result->fetch_assoc()) {
   $id = intval($participant['id']);
