@@ -814,6 +814,7 @@ export default class World {
     if (typeof this.#selectedWorld === 'undefined')
       return;
 
+    const world = this.#selectedWorld;
     this.#closeWorldsPanel();
     this.resetWorld();
     this.#incrementalGenerator = new IncrementalGenerator(this.#selectedWorld);
