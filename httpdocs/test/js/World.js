@@ -8,8 +8,9 @@ import {computeDistance} from './utility.js';
 export default class World {
   #borders;
   #canvas;
-  #ctx;
   #citizens;
+  #csvs;
+  #ctx;
   #date;
   #displayArrow;
   #displayDensity;
@@ -21,6 +22,7 @@ export default class World {
   #idGenerator;
   #idPlaceholder;
   #incrementalGenerator;
+  #jsons
   #maximumReputation;
   #maxZoomLevel;
   #minimumReputation;
@@ -327,6 +329,8 @@ export default class World {
     document.getElementById('load-complex-menu').style.display = 'none';
     this.#selectedWorld = undefined;
     this.#selectedBoost = undefined;
+    this.#jsons = undefined;
+    this.#csvs = undefined;
   }
 
   computeReputation(numberOfIteration) {
@@ -833,8 +837,8 @@ export default class World {
     fetch('/test/ajax/list.php')
       .then(response => response.json())
       .then(response => {
-        this.jsons = [];
-        this.csvs = [];
+        this.#jsons = [];
+        this.#csvs = [];
         for (const name of response) {
           if (name === '.gitignore' || name === '.htaccess')
             continue;
@@ -879,7 +883,7 @@ export default class World {
             continue;
           else {
             if (name.endsWith('.csv')) {
-              this.csvs.push(name);
+              this.#csvs.push(name);
               const div = document.createElement('div');
               div.className = 'world';
               div.textContent = name;
@@ -896,7 +900,7 @@ export default class World {
               container.appendChild(div);
               menu.appendChild(container);
             } else
-              this.jsons.push(name);
+              this.#jsons.push(name);
           }
         }
       });
