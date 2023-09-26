@@ -155,6 +155,12 @@ export default class World {
     const loadButton = document.getElementById('load');
     loadButton.onclick = () => this.loadWorld();
 
+    const cancelComplexButton = document.getElementById('cancel-complex');
+    cancelComplexButton.onclick = () => this.#closeWorldsPanel();
+
+    const loadComplexButton = document.getElementById('load-complex');
+    loadComplexButton.onclick = () => this.loadWorld();
+
     const generateButton = document.getElementById('generate-world');
     generateButton.onclick = () => {
       document.getElementById('generator').style.display = 'block';
@@ -312,6 +318,11 @@ export default class World {
 
   #closeWorldsPanel() {
     document.getElementById('load-menu').style.display = 'none';
+    this.#selectedWorld = undefined;
+  }
+
+  #closeWorldsComplexPanel() {
+    document.getElementById('load-complex-menu').style.display = 'none';
     this.#selectedWorld = undefined;
   }
 
@@ -840,8 +851,8 @@ export default class World {
   }
 
   #openComplexWorldsPanel() {
-    document.getElementById('load-menu').style.display = 'block';
-    const menu = document.getElementById('world-menu');
+    const menu = document.getElementById('world-complex-menu');
+    menu.style.display = 'block';
     menu.innerHTML = '';
     fetch('/test/ajax/list_complex.php')
       .then(response => response.json())
@@ -860,12 +871,6 @@ export default class World {
                 world.parentNode.style.background = 'transparent';
 
               div.parentNode.style.background = 'dodgerblue';
-            };
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'trash';
-            deleteButton.onclick = () => {
-              this.#selectedWorld = name;
-              this.#askPassword();
             };
             const container = document.createElement('div');
             container.className = 'container';
