@@ -280,10 +280,12 @@ export default class IncrementalGenerator {
         y = hectare.yPixel + privatePixels +
           this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
       }
-      citizen = hectare.insert(x, y, number);
-      if (citizen) {
-        this.#uncompleteCitizens.add(citizen);
-        return citizen;
+      if (hectare) {
+        citizen = hectare.insert(x, y, number);
+        if (citizen) {
+          this.#uncompleteCitizens.add(citizen);
+          return citizen;
+        }  
       }
       x = undefined;
       y = undefined;
