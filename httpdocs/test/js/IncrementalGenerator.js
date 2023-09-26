@@ -128,10 +128,8 @@ export default class IncrementalGenerator {
 
     if (typeof json !== 'undefined') {
       // Create citizen present in the json file
-      for (const citizen of json.citizens) {
-        const number = this.#getNumberFromCoord(citizen.x, citizen.y);
-        this.#spawnCitizen(number, citizen.x, citizen.y);
-      }
+      for (const citizen of json.citizens)
+        this.#spawnCitizen(citizen.number);
     }
 
     for (const tile of this.#densityTiles)
@@ -268,27 +266,24 @@ export default class IncrementalGenerator {
     return this.#availableCitizenNumbers.splice(index, 1)[0];
   }
 
-  #spawnCitizen(number, x, y) {
+  #spawnCitizen(number) {
     const hectare = this.#getTile(number);
 
     let citizen = false;
     while (!citizen) { // Can never end if the density is too big (~> 2500)
-      if (typeof x === 'undefined' && typeof y === 'undefined') {
-        const privatePixels = Math.ceil((World.instance.privateSpace / 2 * 1000) / World.instance.pixelToMeterRatio);
-        x = hectare.xPixel + privatePixels +
-          this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
-        y = hectare.yPixel + privatePixels +
-          this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
-      }
+      const privatePixels = Math.ceil((World.instance.privateSpace / 2 * 1000) / World.instance.pixelToMeterRatio);
+      const x = hectare.xPixel + privatePixels +
+        this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
+      const y = hectare.yPixel + privatePixels +
+        this.#getRandomNonZeroInt((100 / World.instance.pixelToMeterRatio) - privatePixels);
+
       if (hectare) {
         citizen = hectare.insert(x, y, number);
         if (citizen) {
           this.#uncompleteCitizens.add(citizen);
           return citizen;
-        }  
+        }
       }
-      x = undefined;
-      y = undefined;
     }
   }
 
