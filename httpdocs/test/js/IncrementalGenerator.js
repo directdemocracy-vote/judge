@@ -59,7 +59,6 @@ export default class IncrementalGenerator {
     this.#threshold = parameters?.threshold ? parameters.threshold : 0.97;
     this.#thresholdBoosted = parameters?.thresholdBoosted ? parameters.thresholdBoosted : 0.5;
     this.#daysToSimulate = parameters?.daysToSimulate ? parameters.daysToSimulate : 1095;
-    console.log(this.#daysToSimulate)
     this.#reciprocity = parameters?.reciprocity ? parameters.reciprocity : 0.9;
     this.#refuseToDownload = parameters?.refuseToDownload ? parameters.refuseToDownload : 0.7;
     this.#refuseToDownloadBoosted = parameters?.refuseToDownloadBoosted ? parameters.refuseToDownloadBoosted : 0.2;
