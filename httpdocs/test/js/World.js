@@ -169,6 +169,9 @@ export default class World {
     const sendDelete = document.getElementById('send-delete');
     sendDelete.onclick = () => this.#sendDelete();
 
+    const complexLoadButton = document.getElementById('incremental-load');
+    complexLoadButton.onclick = () => this.#openComplexWorldsPanel();
+
     // prevent context menu to open
     this.#canvas.oncontextmenu = () => { return false; };
 
@@ -799,6 +802,44 @@ export default class World {
   }
 
   #openWorldsPanel() {
+    document.getElementById('load-menu').style.display = 'block';
+    const menu = document.getElementById('world-menu');
+    menu.innerHTML = '';
+    fetch('/test/ajax/list.php')
+      .then(response => response.json())
+      .then(response => {
+        for (const name of response) {
+          if (name === '.gitignore' || name === '.htaccess')
+            continue;
+          else {
+            const div = document.createElement('div');
+            div.className = 'world';
+            div.textContent = name;
+            div.onclick = () => {
+              this.#selectedWorld = name;
+              const worlds = document.getElementsByClassName('world');
+              for (const world of worlds)
+                world.parentNode.style.background = 'transparent';
+
+              div.parentNode.style.background = 'dodgerblue';
+            };
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'trash';
+            deleteButton.onclick = () => {
+              this.#selectedWorld = name;
+              this.#askPassword();
+            };
+            const container = document.createElement('div');
+            container.className = 'container';
+            container.appendChild(div);
+            container.appendChild(deleteButton);
+            menu.appendChild(container);
+          }
+        }
+      });
+  }
+
+  #openComplexWorldsPanel() {
     document.getElementById('load-menu').style.display = 'block';
     const menu = document.getElementById('world-menu');
     menu.innerHTML = '';
