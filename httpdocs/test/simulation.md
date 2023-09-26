@@ -134,7 +134,7 @@ During the simulation of one day, it performs three main steps:
   - Recompute the reputation and increase the time.
 
 ### Create new links
-#### Main loop
+#### In the main loop
 Iterate through the list of citizens who have yet to create links.
 For each area of this citizen, check if it should create a new link.
 ```
@@ -274,6 +274,7 @@ return target
 During this part, new citizens are spawns.
 They represents people that have heard of the application through the media or by themself.
 
+### In the main loop
 First, there is probability check that can totally cancel this phase.
 It is done to represent the fact that they will be days where no media talked about the application and nobody found about it.
 Then, the number of new citizens is computed.
@@ -294,6 +295,25 @@ if World.instance.rng() > getRandomInt(noSpontaneousCitizen):
   for numberOfNewCitizens:
     citizenNumber = getValidNewCitizenNumber();
     spawnCitizen(citizenNumber);
+```
+
+#### getValidNewCitizenNumber()
+Draw a random citizen number from the list of available numbers.
+The number will indicate in which hectare the new citizen will be spawned.
+If there is some boosted tiles (defined in jsonUrl) and the number drawn is not in a boosted tile, try again.
+The maximum number of trials is defined by the `redrawBoosted` variable.
+
+```
+index
+counter = if jsonUrl is undefined then 2 else 0
+do:
+  index = getRandomInt(availableCitizenNumbers.length - 1)
+  counter++;
+  if getTile(index).boost:
+    break
+while counter < redrawBoosted
+
+return this.#availableCitizenNumbers.splice(index, 1)[0];
 ```
 
 ### Recompute the reputation and increase the time.
