@@ -27,7 +27,7 @@ if ($mysqli->connect_errno)
   error("Failed to connect to MySQL database: $mysqli->connect_error ($mysqli->connect_errno)");
 $mysqli->set_charset('utf8mb4');
 
-$now = intval(microtime(true) * 1000);  # milliseconds
+$now = time();
 
 $query = "SELECT lastUpdate FROM status";
 $result = $mysqli->query($query) or error($mysqli->error);
@@ -36,10 +36,10 @@ $result->free();
 $last_update = floatval($status['lastUpdate']);
 
 $update_every = 10;
-if ($last_update + $update_every * 1000 > $now)
+if ($last_update + $update_every > $now)
   die("Updated in the last $update_every seconds");
 
-$query = "UPDATE status SET lastUpdate=$now";
+$query = "UPDATE status SET lastUpdate=FROM_UNIXTIME($now)";
 $mysqli->query($query) or error($mysqli->error);
 
 # remove broken links if any
@@ -74,7 +74,7 @@ if ($endorsements)
   foreach($endorsements as $endorsement) {
     if ($endorsement->key == $public_key)  # ignore mine
       continue;
-    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE `key`='$endorsement->key'";  # endorser
+    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE `key` = FROM_BASE64('$endorsement->key')";  # endorser
     $result = $mysqli->query($query) or error($mysqli->error);
     if (!$result->num_rows) {
       $key = urlencode($endorsement->key);
@@ -89,12 +89,12 @@ if ($endorsements)
       if ($endorser->key !== $endorsement->key)
         die("Key mismatch for endorser in notary database.");
       $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, endorsed, changed) "
-              ."VALUES('$endorser->key', '$endorser->signature', POINT($endorser->longitude, $endorser->latitude), 0, 0, 0) ";
+              ."VALUES(FROM_BASE64('$endorser->key'), FROM_BASE64('$endorser->signature'), POINT($endorser->longitude, $endorser->latitude), 0, 0, 0) ";
       $mysqli->query($query) or error("$query $mysqli->error");
       $endorser->id = $mysqli->insert_id;
     } else
       $endorser = $result->fetch_object();
-    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature='$endorsement->endorsedSignature'";
+    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature = FROM_BASE64('$endorsement->endorsedSignature')";
     $result = $mysqli->query($query) or error($mysqli->error);
     if (!$result->num_rows) {
       $fingerprint = sha1($endorsement->endorsedSignature);
@@ -120,8 +120,8 @@ if ($endorsements)
     else
       $distance = "ST_Distance_Sphere(POINT($endorsed->latitude, $endorsed->longitude), POINT($endorser->latitude, $endorser->longitude))";
     $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
-            ."VALUES($endorser->id, $endorsed->id, $distance, $endorsement->revoke, $endorsement->published) "
-            ."ON DUPLICATE KEY UPDATE `revoke` = $endorsement->revoke, date = $endorsement->published;";    
+            ."VALUES($endorser->id, $endorsed->id, $distance, $endorsement->revoke, FROM_UNIXTIME($endorsement->published)) "
+            ."ON DUPLICATE KEY UPDATE `revoke` = $endorsement->revoke, date =FROM_UNIXTIME($endorsement->published);";    
     $mysqli->query($query) or error($mysqli->error);
   }
 
@@ -144,7 +144,7 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
   $result = $mysqli->query($query) or error($mysqli->error);
   while($participant = $result->fetch_assoc()) {
     $id = intval($participant['id']);
-    $query = "SELECT link.endorser, link.distance, link.`revoke`, link.date, (SELECT COUNT(*) FROM link AS l WHERE l.endorser=link.endorser) AS links, participant.reputation "
+    $query = "SELECT link.endorser, link.distance, link.`revoke`, UNIX_TIMESTAMP(link.date), (SELECT COUNT(*) FROM link AS l WHERE l.endorser=link.endorser) AS links, participant.reputation "
             ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id";
     $r0 = $mysqli->query($query) or error($mysqli->error);
     $sum = 0;
@@ -152,7 +152,7 @@ for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
       $endorser = $link['endorser'];
       $distance = ($link['distance'] === '-1') ? 0 : floatval(floatval($link['distance']) / 1000);  # expressed in km
       $revoke = ($link['revoke'] === '0') ? 1 : 0;
-      $age = floatval(($now - intval($link['date'])) / (365.25 * 86400000));  # years
+      $age = floatval(($now - intval($link['date'])) / (365.25 * 86400));  # years
       $links = intval($link['links']);
       $reputation = floatval($link['reputation']);
       $sum += $reputation_factor * $revoke * $reputation / $links / (1 + $distance) / (1 + $age);
