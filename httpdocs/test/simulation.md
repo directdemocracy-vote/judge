@@ -197,7 +197,7 @@ Note that we do not furnish the boost parameter for the 10km area.
 This is a deliberate choice, because the boost represent a *local* incentive for people to download the app and create links, for example in the context of a local referendum.
 
 ```
-p = Math.random() * (1 - ((1 - threshold) / (1 + Math.exp((10 - days) / 4))))
+p = Math.random() * (1 - ({(1 - threshold) / (1 + Math.exp((10 - days) / 4))))
 return if boost not undefined then p > thresholdBoosted else p > threshold
 ```
 Where the `thresholdBoosted`, `threshold` and the different coefficients can be modified to increase/decrease the frequency at which new links are created.
