@@ -843,7 +843,7 @@ export default class World {
     document.getElementById('load-menu').style.display = 'block';
     const menu = document.getElementById('world-menu');
     menu.innerHTML = '';
-    fetch('/test/ajax/list.php')
+    fetch('/test/ajax/list_complex.php')
       .then(response => response.json())
       .then(response => {
         for (const name of response) {
