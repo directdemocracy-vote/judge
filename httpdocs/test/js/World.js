@@ -243,8 +243,6 @@ export default class World {
       '1000Citizen2km_soluce.json'
     ];
     this.#testIndex = 0;
-
-    this.#incrementalGenerator = new IncrementalGenerator("gollion_region.csv", undefined, this.parameters)
   }
 
   get ctx() {
