@@ -262,13 +262,38 @@ if target is undefined:
     return
   else if rand < 0.7:
     return
-  target = createTarget(targetNumber)
+  target = createTarget(targetNumber) // Actually create the citizen and add it to the world
 }
 
 if (target.linksToGet[area] <= 0 || citizen.endorsedBy.has(target.id) || citizen.endorse.has(target.id))
   return citizenToCreateArrow(citizen, tile, area, ++counter)
 
 return target
+```
+### Create new citizens
+During this part, new citizens are spawns.
+They represents people that have heard of the application through the media or by themself.
+
+First, there is probability check that can totally cancel this phase.
+It is done to represent the fact that they will be days where no media talked about the application and nobody found about it.
+Then, the number of new citizens is computed.
+The number is random but depends on the number of citizens that already exist and on the number of people that does not have the application yet.
+It depends on the number of citizens that already exist to represent the fact that the more people download the application, the more the media are going to talk about it.
+It depends on the number of people that does not have the application yet to represent the fact the when the vast majority of the population will have the application, the remaining part will be harder to convince through the media because they have already been exposed to it and have made the choice to not download the application.
+Then, we create the right number of new citizens.
+
+```
+if World.instance.rng() > getRandomInt(noSpontaneousCitizen):
+  numberOfNewCitizens = getRandomInt(floor(sqrt((citizens.size + 1) *
+      (1 - (citizens.size / totalPopulation)))));
+
+  if (citizens.size + numberOfNewCitizens > totalPopulation): // to avoid creating more citizens than possible
+    numberOfNewCitizens = totalPopulation - size;
+    citizensAllSpawned = true;
+
+  for numberOfNewCitizens:
+    citizenNumber = getValidNewCitizenNumber();
+    spawnCitizen(citizenNumber);
 ```
 
 ### Recompute the reputation and increase the time.
