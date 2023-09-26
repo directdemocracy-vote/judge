@@ -875,7 +875,6 @@ export default class World {
             const container = document.createElement('div');
             container.className = 'container';
             container.appendChild(div);
-            container.appendChild(deleteButton);
             menu.appendChild(container);
           }
         }
