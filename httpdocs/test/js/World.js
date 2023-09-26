@@ -852,6 +852,7 @@ export default class World {
 
   #openComplexWorldsPanel() {
     const menu = document.getElementById('load-complex-menu');
+    console.log(menu)
     menu.style.display = 'block';
     menu.innerHTML = '';
     fetch('/test/ajax/list_complex.php')
