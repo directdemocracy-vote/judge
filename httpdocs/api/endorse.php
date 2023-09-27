@@ -188,6 +188,8 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   }
 }
 
+die($total_reputation);
+
 $count_e = 0;
 $count_r = 0;
 $table = '';
