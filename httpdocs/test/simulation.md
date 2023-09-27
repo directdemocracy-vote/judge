@@ -53,20 +53,18 @@ Some important fields:
     - `age`: when the endorsements was created.
     - `source`/`destination`: the direction of the endorsement.
 
-
 ## Input files
 Two files can be given as input to the generator.
 
 ### Density file (mandatory)
 A csv file.
-It contains the information about the number of inhabitants per hectare.
+It contains the number of inhabitants per hectare.
 This file is created by using the `/utils/extractor.py` script and the density of population by hectare for Switzerland, that you can download [here](https://www.bfs.admin.ch/bfs/en/home/services/geostat/swiss-federal-statistics-geodata/population-buildings-dwellings-persons/population-housholds-from-2010.assetdetail.27045772.html).
-In the `/utils/extractor.py` you must then specify the limit of the rectangle that will be extracted.
+In the `/utils/extractor.py` you must then specify the boundaries of the rectangle that will be extracted.
 
 ### municipality file (optionnal)
 A json file.
 It contains the information about the hectares that we want to "boost" and about citizens we want to manually create.
-
 
 #### Boosting hectares
 The hectares, you want to boost are stored as an array in the `tile_to_boost` field of the json.
@@ -88,7 +86,7 @@ The `x` and `y` coordinates correspond to the coordinates displayed on this [map
 Those hectares will have a higher probability of having new citizens and those citizens will have more change to create new endorsements.
 
 They can represent the hectares that make up a village where a referendum is being held.
-In this specific village, residents will have a greater incentive to install the application and endorse people than in others locations of the map
+In this specific village, residents will have a greater incentive to install the application and endorse people than in others locations of the map.
 
 #### Initial citizens
 It represents the citizens that have already downloaded the application at the beginning of the simulation.
@@ -103,13 +101,13 @@ The number correspond to a citizen in a tile.
 ## Variables
 Several variables are available to configure the simulation:
 - `threshold`: the value that the probability computed in [shouldCreateANewLink](https://github.com/directdemocracy-vote/judge/blob/master/httpdocs/test/simulation.md#shouldcreateanewlinkdays-boost) must exceed to create a new endorsement. The value should be between 0 and 1.
-- `thresholdBoosted`: same as above except that this variable is used instead of `Threshold` when a `citizen` is on a boosted hectare. The value should be between 0 and 1.
+- `thresholdBoosted`: same as above except that this variable is used instead of `threshold` when a `citizen` is on a boosted hectare. The value should be between 0 and 1.
 - `daysToSimulate`: the number of days that the simulation will run when `Play` is pressed. The value should be a positive integer.
 - `reciprocity`: percentage chance of reciprocal endorsement. The value should be between 0 and 1.
-- `refuseToDownload`: percentage that a person refuse to download the application when another one try to create an endorsement with her. The value should be between 0 and 1.
+- `refuseToDownload`: probability that a person refuse to download the application when another one try to create an endorsement with her. The value should be between 0 and 1.
 - `refuseToDownloadBoosted`: same as above but is applied instead on boosted hectares. The value should be a positive integer.
-- `redrawBoosted`: used when creating new citizens that spontaneously discover the application to increase the chances of a new citizen being created on a boosted hectare. The value should be between 0 and 1.
-- `noSpontaneousCitizen`: the probability that, for a given day, nobody spontaneously discover the application (independtly of everything else). The value should be between 0 and 1.
+- `redrawBoosted`: used when creating new citizens that spontaneously discover the application to increase the chances of a new citizen to be created on a boosted hectare. The value should be between 0 and 1.
+- `noSpontaneousCitizen`: the probability that, for a given day, nobody spontaneously discover the application (independetly of everything else). The value should be between 0 and 1.
 
 Those variables are those that can be modified through the GUI. 
 However, some other probabilities are too complex to be reduced to a single coefficient and you will need to modify the formula directly in the code.
@@ -120,7 +118,7 @@ Then it uses them to creates:
   - `densityTiles`: list of all the hectares with a population of the world.
     Note that the hectare without inhabitant are not represented.
     For each tile, it needs to adapt the coordinates to fit the coordinates system of the canvas.
-    This also here that, if a json file is present, it defines which tile should benefit from boosted probabilities.
+    If a json file is present, it defines which tile should benefit from boosted probabilities.
   - `totalPopulation`: obtained by summing the density of all tiles.
   - `availableCitizenNumbers`: the numbers that are available to be affected to new citizens.
     Those numbers will determine in which hectare the citizen will placed.
@@ -129,7 +127,7 @@ Finally, if a json file is present, initial citizens are spawned according to th
 
 ## Simulation of one day
 During the simulation of one day, it performs three main steps:
-  - Look if existing citizens create new links
+  - Look if existing citizens create new links.
   - Add new citizens that spontaneously download the application.
   - Recompute the reputation and increase the time.
 
@@ -148,7 +146,7 @@ for citizen of citizenWithFreeLinks:
 
     totalCreated = 0
     for citizen.linksToGet[0]:
-      if shouldCreateANewLink(days, boost):
+      if shouldCreateANewLink(elapsedDays, boost):
         if createLink(citizen, tile, 0):
           totalCreated++
 
@@ -156,7 +154,7 @@ for citizen of citizenWithFreeLinks:
 
     totalCreated = 0
     for citizen.linksToGet[1]:
-      if shouldCreateANewLink(days, boost):
+      if shouldCreateANewLink(elapsedDays, boost):
         neighbourTile = densityTiles[tile.threeKmList[getRandomInt(tile.threeKmList.length - 1)]]
         if neighbourTile is undefined': // means that there is no populated tile around
           totalCreated++
@@ -169,7 +167,7 @@ for citizen of citizenWithFreeLinks:
 
     totalCreated = 0
     for citizen.linksToGet[2]:
-      if shouldCreateANewLink(days):
+      if shouldCreateANewLink(elapsedDays):
         neighbourTile = densityTiles[tile.tenKmList[getRandomInt(tile.tenKmList.length - 1)]]
         if neighbourTile is undefined': // means that there is no populated tile around
           totalCreated++
@@ -212,7 +210,7 @@ if (target is undefined) // no canditate was found in the area
 arrow = new Arrow(uniqueId++, citizen.id, target.id)
 
 random = Math.random()
-if (random < 0.9) {
+if (random < reciprocity) {
   arrow.arrowHead2 = new ArrowHead(uniqueId++, target.id, citizen.id, todayDate, arrow)
   target.linksToGet[area]--
 }
@@ -220,9 +218,8 @@ if (random < 0.9) {
 return true
 ```
 
-Note that there is 90% chance that, when creating an endorsement, we create the reciprocal.
+Note that there is `reciprocity` chance (by default 90%) that, when creating an endorsement, we create the reciprocal.
 Because in most cases, when you will endorse someone, you will ask her to endorse you as well.
-
 
 #### citizenToCreateArrow(citizen, tile, area, counter)
 Return a citizen that fulfill the following conditions:
@@ -238,7 +235,6 @@ It represents the chance that the citizen refuse to download the app.
 The check is easier if it is in an boosted tile.
 If the process fails at any point, try to find another citizen in the same tile.
 It tries at most 10 times to avoid infinite recursion.
-
 
 ```
 if typeof counter is undefined':
