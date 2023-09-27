@@ -52,9 +52,9 @@ $status = $result->fetch_assoc();
 $result->free();
 $last_update = intval($status['lastUpdate']);
 
-$update_every = 10;
-if ($last_update + $update_every > $now)
-  die("Updated in the last $update_every seconds");
+// $update_every = 10;
+// if ($last_update + $update_every > $now)
+//   die("Updated in the last $update_every seconds");
 
 $query = "UPDATE status SET lastUpdate=FROM_UNIXTIME($now)";
 $mysqli->query($query) or error($mysqli->error);
@@ -188,7 +188,7 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   }
 }
 
-die("test: ".$total_reputation);
+die("test: ".$N);
 
 $count_e = 0;
 $count_r = 0;
