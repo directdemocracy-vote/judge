@@ -30,7 +30,7 @@ function distance_function($distance) {
 }
 
 function time_function($time) {
-  return 1 - (1 / (1 + exp((63072000 - x) / 8000000)));
+  return 1 - (1 / (1 + exp((63072000 - $time) / 8000000)));
 }
 
 function reputation_function($x) {
