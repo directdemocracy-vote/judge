@@ -136,9 +136,10 @@ if ($endorsements)
       $distance = "-1";  # one of them is not a citizen (maybe a judge, a notary or a station)
     else
       $distance = "ST_Distance_Sphere(POINT($endorsed->latitude, $endorsed->longitude), POINT($endorser->latitude, $endorser->longitude))";
+    $revoke = $endorsement->revoke ? 1 : 0;
     $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
-            ."VALUES($endorser->id, $endorsed->id, $distance, $endorsement->revoke, FROM_UNIXTIME($endorsement->published)) "
-            ."ON DUPLICATE KEY UPDATE `revoke` = $endorsement->revoke, date = FROM_UNIXTIME($endorsement->published);";
+            ."VALUES($endorser->id, $endorsed->id, $distance, $revoke, FROM_UNIXTIME($endorsement->published)) "
+            ."ON DUPLICATE KEY UPDATE `revoke` = $revoke, date = FROM_UNIXTIME($endorsement->published);";
     $mysqli->query($query) or error($mysqli->error);
   }
 
@@ -160,7 +161,7 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   $result = $mysqli->query($query) or error($mysqli->error);
   while($participant = $result->fetch_assoc()) {
     $id = intval($participant['id']);
-    $query = "SELECT link.distance, UNIX_TIMESTAMP(link.date), participant.reputation "
+    $query = "SELECT link.distance, UNIX_TIMESTAMP(link.date) AS date, participant.reputation "
             ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id AND link.revoke=0";
     $r0 = $mysqli->query($query) or error($mysqli->error);
     $sum = 0;
@@ -188,7 +189,11 @@ $count_r = 0;
 $table = '';
 $schema = "https://directdemocracy.vote/json-schema/$version/endorsement.schema.json";
 $private_key = openssl_get_privatekey("file://../../id_rsa") or error("Failed to read private key file");
-$query = "SELECT id, REPLACE(TO_BASE64(`key`), '\\n', ''), REPLACE(TO_BASE64(signature), '\\n', ''), endorsed, reputation FROM participant WHERE changed=1";
+$query = "SELECT id, "
+        ."REPLACE(TO_BASE64(`key`), '\\n', '') AS `key`, "
+        ."REPLACE(TO_BASE64(signature), '\\n', '') AS signature, "
+        ."endorsed, reputation "
+        ."FROM participant WHERE changed=1";
 $result = $mysqli->query($query) or error($mysqli->error);
 while($participant = $result->fetch_assoc()) {
   $id = intval($participant['id']);
