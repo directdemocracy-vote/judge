@@ -25,11 +25,11 @@ header("Access-Control-Allow-Headers: content-type");
 
 $now = time();
 
-$query = "SELECT lastUpdate FROM status";
+$query = "SELECT UNIX_TIMESTAMP(lastUpdate) AS lastUpdate FROM status";
 $result = $mysqli->query($query) or error($mysqli->error);
 $status = $result->fetch_assoc();
 $result->free();
-$last_update = floatval($status['lastUpdate']);
+$last_update = intval($status['lastUpdate']);
 
 $update_every = 10;
 if ($last_update + $update_every > $now)
@@ -117,7 +117,7 @@ if ($endorsements)
       $distance = "ST_Distance_Sphere(POINT($endorsed->latitude, $endorsed->longitude), POINT($endorser->latitude, $endorser->longitude))";
     $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
             ."VALUES($endorser->id, $endorsed->id, $distance, $endorsement->revoke, FROM_UNIXTIME($endorsement->published)) "
-            ."ON DUPLICATE KEY UPDATE `revoke` = $endorsement->revoke, date =FROM_UNIXTIME($endorsement->published);";    
+            ."ON DUPLICATE KEY UPDATE `revoke` = $endorsement->revoke, date = FROM_UNIXTIME($endorsement->published);";    
     $mysqli->query($query) or error($mysqli->error);
   }
 
