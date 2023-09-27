@@ -47,7 +47,6 @@ $response = file_get_contents("$notary/api/area.php", false, stream_context_crea
 $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
-$now = intval(microtime(true) * 1000);  # milliseconds
 
 $url = "https://nominatim.openstreetmap.org/search?". $query . "zoom=10&polygon_geojson=1&format=json";
 $options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemocracy\r\n" ] ];
@@ -56,8 +55,7 @@ $result = file_get_contents($url, false, $context);
 $search = json_decode($result);
 
 $schema = "https://directdemocracy.vote/json-schema/$version/area.schema.json";
-$area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => $now,
-              'name' => $names, 'polygons' => null);
+$area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => time(), 'name' => $names, 'polygons' => null);
 if (count($search) == 0)
   die("Area not found: $message");
 $place = $search[0];
