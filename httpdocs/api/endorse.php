@@ -155,13 +155,13 @@ if ($N == 0)
 
 $threshold = 0.5;
 for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
-  $query = "SELECT id FROM participant";
-  $result = $mysqli->query($query) or error($mysqli->error);
-
   $query = "SELECT SUM(reputation) AS total_reputation FROM participant";
   $result = $mysqli->query($query) or error($mysqli->error);
   $count = $result->fetch_assoc();
   $total_reputation = floatval($count['total_reputation']);
+
+  $query = "SELECT id FROM participant";
+  $result = $mysqli->query($query) or error($mysqli->error);
   while($participant = $result->fetch_assoc()) {
     $id = intval($participant['id']);
     $query = "SELECT link.distance, UNIX_TIMESTAMP(link.date) AS date, participant.reputation "
@@ -180,7 +180,6 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
     $new_reputation = 0;//reputation_function(2 / (1 + sqrt($total_reputation / $N)) + $sum);
     $query = "UPDATE participant SET reputation=$new_reputation WHERE id=$id";
     $mysqli->query($query) or error($mysqli->error);
-    die('test'.$new_reputation);
     $query = "UPDATE participant SET endorsed=1, changed=1 WHERE id=$id AND endorsed=0 AND reputation>$threshold";
     $mysqli->query($query) or error($mysqli->error);
     $query = "UPDATE participant SET endorsed=0, changed=1 WHERE id=$id AND endorsed=1 AND reputation<$threshold";
