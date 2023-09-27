@@ -22,9 +22,6 @@ function distance_function($distance) {
   if ($distance < 1)
     $distance = 1;
 
-  if ($distance != 1)
-    die("test".$distance);
-
   if ($distance < 10)
     return 1 - (1 / (1 + exp((10 - $distance) / 2)));
   else if ($distance < 100)
@@ -172,17 +169,13 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
             ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id AND link.revoke=0";
     $r0 = $mysqli->query($query) or error($mysqli->error);
     $sum = 0;
-    $co = 0;
     while($link = $r0->fetch_assoc()) {
       $reputation = floatval($link['reputation']);
       $age = floatval(($now - intval($link['date'])));  # seconds
       $distance = ($link['distance'] === '-1') ? 0 : floatval(floatval($link['distance']) / 1000);  # expressed in km
-      if ($co ==1)
-        die($link['distance']);
       $distance_factor = distance_function($distance);
       $time_factor = time_function($age);
-      $sum += $reputation * $distance_factor;
-      $co += 1;
+      $sum += $reputation * $distance_factor; //* $time_factor;
     }
     $r0->free();
     $new_reputation = reputation_function(2 / (1 + sqrt($total_reputation / $N)) + $sum);
