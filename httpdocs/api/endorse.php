@@ -166,10 +166,11 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
     $id = intval($participant['id']);
     $query = "SELECT link.distance, UNIX_TIMESTAMP(link.date) AS date link.data as date1, participant.reputation "
             ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id AND link.revoke=0";
-    die(date1)
     $r0 = $mysqli->query($query) or error($mysqli->error);
     $sum = 0;
     while($link = $r0->fetch_assoc()) {
+      die($link['date1']);
+
       $reputation = floatval($link['reputation']);
       $age = floatval(($now - intval($link['date'])));  # seconds
       $distance = ($link['distance'] === '-1') ? 0 : floatval(floatval($link['distance']) / 1000);  # expressed in km
