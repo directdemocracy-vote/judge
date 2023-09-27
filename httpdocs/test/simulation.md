@@ -109,7 +109,7 @@ Several variables are available to configure the simulation:
 - `redrawBoosted`: used when creating new citizens that spontaneously discover the application to increase the chances of a new citizen to be created on a boosted hectare. The value should be between 0 and 1.
 - `noSpontaneousCitizen`: the probability that, for a given day, nobody spontaneously discover the application (independetly of everything else). The value should be between 0 and 1.
 
-Those variables are those that can be modified through the GUI. 
+Those variables are those that can be modified through the GUI.
 However, some other probabilities are too complex to be reduced to a single coefficient and you will need to modify the formula directly in the code.
 
 ## Initialization
@@ -314,7 +314,7 @@ return availableCitizenNumbers.splice(index, 1)[0]
 
 ### Recompute the reputation and increase the time.
 #### Recompute the reputation
-At the end of each day, the reputation is recomputed according to the function described in the [reputation_algorithm](reputation_algorithm.md) file.
+At the end of each day, the reputation is recomputed according to the function described in the [reputation_algorithm](../reputation_algorithm.md) file.
 The reputation function is quite fast: we measured that it took around 350 milliseconds to perform the 15 iterations of computing the reputation of a world with 30'000 citizens and 200'000 links.
 So in the reality, the reputation will be computed more often, nearly every time there is a change in the network.
 

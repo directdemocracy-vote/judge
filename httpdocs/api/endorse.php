@@ -121,9 +121,7 @@ if ($endorsements)
     $mysqli->query($query) or error($mysqli->error);
   }
 
-# run a modified page rank algorithm, see https://en.wikipedia.org/wiki/PageRank
-# the modification adds the revoke, distance and date in the equation
-$d = 0.85;  # d is the damping parameter (default value is 0.85)
+# run the reputation algorithm, see https://en.wikipedia.org/wiki/PageRank
 
 # N is the new total number of entities
 $query = "SELECT COUNT(*) AS N FROM participant";
