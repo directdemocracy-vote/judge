@@ -172,7 +172,7 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
             ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id AND link.revoke=0";
     $r0 = $mysqli->query($query) or error($mysqli->error);
     $sum = 0;
-    $co = 0
+    $co = 0;
     while($link = $r0->fetch_assoc()) {
       $reputation = floatval($link['reputation']);
       $age = floatval(($now - intval($link['date'])));  # seconds
