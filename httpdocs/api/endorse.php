@@ -139,7 +139,7 @@ if ($endorsements)
         ($endorser->latitude == 0 && $endorser->longitude == 0))
       $distance = "-1";  # one of them is not a citizen (maybe a judge, a notary or a station)
     else
-      $distance = "ST_Distance_Sphere(POINT($endorsed->latitude, $endorsed->longitude), POINT($endorser->latitude, $endorser->longitude))";
+      $distance = "ST_Distance_Sphere(POINT($endorsed->longitude, $endorsed->latitude), POINT($endorser->longitude, $endorser->latitude))";
     $revoke = $endorsement->revoke ? 1 : 0;
     $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
             ."VALUES($endorser->id, $endorsed->id, $distance, $revoke, FROM_UNIXTIME($endorsement->published)) "
