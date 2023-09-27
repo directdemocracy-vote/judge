@@ -146,19 +146,23 @@ if ($endorsements)
 # run the reputation algorithm, see https://github.com/directdemocracy-vote/judge/blob/master/httpdocs/reputation_algorithm.md
 
 # N is the new total number of entities
-$query = "SELECT COUNT(*) AS N, SUM(reputation) AS total_reputation FROM participant";
+$query = "SELECT COUNT(*) AS N FROM participant";
 $result = $mysqli->query($query) or error($mysqli->error);
 $count = $result->fetch_assoc();
 $N = intval($count['N']);
 if ($N == 0)
   die('Empty database.');
-$total_reputation = intval($count['total_reputation']);
 
 $threshold = 0.5;
 
 for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   $query = "SELECT id FROM participant";
   $result = $mysqli->query($query) or error($mysqli->error);
+
+  $query = "SELECT SUM(reputation) AS total_reputation FROM participant";
+  $result = $mysqli->query($query) or error($mysqli->error);
+  $count = $result->fetch_assoc();
+  $total_reputation = intval($count['total_reputation']);
   while($participant = $result->fetch_assoc()) {
     $id = intval($participant['id']);
     $query = "SELECT link.distance, UNIX_TIMESTAMP(link.date) AS date, participant.reputation "
