@@ -35,9 +35,9 @@ function time_function($time) {
 
 function reputation_function($x) {
   if ($x < 4)
-    return pow(x, 2) / 18;
+    return pow($x, 2) / 18;
   else
-    return 1 - (0.75 / (x - 15));
+    return 1 - (0.75 / ($x - 15));
 }
 
 header("Content-Type: application/json");
