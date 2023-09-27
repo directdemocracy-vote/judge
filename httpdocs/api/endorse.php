@@ -154,6 +154,7 @@ if ($N == 0)
   die('Empty database.');
 
 $threshold = 0.5;
+die("enter the loop");
 
 for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   $query = "SELECT id FROM participant";
@@ -164,7 +165,6 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   $count = $result->fetch_assoc();
   $total_reputation = floatval($count['total_reputation']);
   while($participant = $result->fetch_assoc()) {
-    die("enter the loop");
     $id = intval($participant['id']);
     $query = "SELECT link.distance, UNIX_TIMESTAMP(link.date) AS date, participant.reputation "
             ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id AND link.revoke=0";
