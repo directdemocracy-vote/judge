@@ -164,8 +164,9 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   $result = $mysqli->query($query) or error($mysqli->error);
   while($participant = $result->fetch_assoc()) {
     $id = intval($participant['id']);
-    $query = "SELECT link.distance, UNIX_TIMESTAMP(link.date) AS date, participant.reputation "
+    $query = "SELECT link.distance, UNIX_TIMESTAMP(link.date) AS date link.data as date1, participant.reputation "
             ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id AND link.revoke=0";
+    die(date1)
     $r0 = $mysqli->query($query) or error($mysqli->error);
     $sum = 0;
     while($link = $r0->fetch_assoc()) {
