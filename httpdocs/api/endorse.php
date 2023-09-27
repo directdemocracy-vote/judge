@@ -19,6 +19,7 @@ function stripped_key($public_key) {
 }
 
 function distance_function($distance) {
+  die($distance);
   if ($distance < 1)
     $distance = 1;
   if ($distance < 10)
