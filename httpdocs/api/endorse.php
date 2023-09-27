@@ -115,9 +115,10 @@ if ($endorsements)
       $distance = "-1";  # one of them is not a citizen (maybe a judge, a notary or a station)
     else
       $distance = "ST_Distance_Sphere(POINT($endorsed->latitude, $endorsed->longitude), POINT($endorser->latitude, $endorser->longitude))";
+    $revoke = $endorsement->revoke ? 1 : 0;
     $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
-            ."VALUES($endorser->id, $endorsed->id, $distance, $endorsement->revoke, FROM_UNIXTIME($endorsement->published)) "
-            ."ON DUPLICATE KEY UPDATE `revoke` = $endorsement->revoke, date = FROM_UNIXTIME($endorsement->published);";
+            ."VALUES($endorser->id, $endorsed->id, $distance, $revoke, FROM_UNIXTIME($endorsement->published)) "
+            ."ON DUPLICATE KEY UPDATE `revoke` = $revoke, date = FROM_UNIXTIME($endorsement->published);";    
     $mysqli->query($query) or error($mysqli->error);
   }
 
