@@ -117,7 +117,7 @@ if ($endorsements)
       $distance = "ST_Distance_Sphere(POINT($endorsed->latitude, $endorsed->longitude), POINT($endorser->latitude, $endorser->longitude))";
     $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
             ."VALUES($endorser->id, $endorsed->id, $distance, $endorsement->revoke, FROM_UNIXTIME($endorsement->published)) "
-            ."ON DUPLICATE KEY UPDATE `revoke` = $endorsement->revoke, date = FROM_UNIXTIME($endorsement->published);";    
+            ."ON DUPLICATE KEY UPDATE `revoke` = $endorsement->revoke, date = FROM_UNIXTIME($endorsement->published);";
     $mysqli->query($query) or error($mysqli->error);
   }
 
@@ -135,7 +135,7 @@ if ($N == 0)
 
 $threshold = 0.5 / $N;
 
-for($i = 0; $i < 13; $i++) {  # supposed to converge in about 13 iterations
+for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   $query = "SELECT id FROM participant";
   $result = $mysqli->query($query) or error($mysqli->error);
   while($participant = $result->fetch_assoc()) {

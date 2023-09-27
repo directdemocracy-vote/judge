@@ -22,7 +22,7 @@ export default class World {
   #idGenerator;
   #idPlaceholder;
   #incrementalGenerator;
-  #jsons
+  #jsons;
   #maximumReputation;
   #maxZoomLevel;
   #minimumReputation;
@@ -937,7 +937,7 @@ export default class World {
           for (const world of worlds)
             world.parentNode.style.background = 'transparent';
 
-            div.parentNode.style.background = 'dodgerblue';
+          div.parentNode.style.background = 'dodgerblue';
         };
         const container = document.createElement('div');
         container.className = 'container';
@@ -956,7 +956,7 @@ export default class World {
           for (const world of worlds)
             world.parentNode.style.background = 'transparent';
 
-            div.parentNode.style.background = 'dodgerblue';
+          div.parentNode.style.background = 'dodgerblue';
         };
         const container = document.createElement('div');
         container.className = 'container';
