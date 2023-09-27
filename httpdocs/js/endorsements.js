@@ -54,7 +54,7 @@ window.onload = function() {
         a.innerHTML = endorsement.givenNames + ' ' + endorsement.familyName;
         tr.appendChild(td);
         td = document.createElement('td');
-        td.innerHTML = new Date(endorsement.published).toLocaleString();
+        td.innerHTML = new Date(endorsement.published / 1000).toLocaleString();
         tr.appendChild(td);
       }
       content.appendChild(table);
