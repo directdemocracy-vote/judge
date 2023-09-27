@@ -155,8 +155,6 @@ if ($N == 0)
 
 $threshold = 0.5;
 for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
-  die("enter the loop15");
-
   $query = "SELECT id FROM participant";
   $result = $mysqli->query($query) or error($mysqli->error);
 
