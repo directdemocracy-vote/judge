@@ -170,7 +170,7 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
       $age = floatval(($now - intval($link['date'])));  # seconds
       $distance = ($link['distance'] === '-1') ? 0 : floatval(floatval($link['distance']) / 1000);  # expressed in km
       $distance_factor = distance_function($distance);
-      $time_factor = time_function($time);
+      $time_factor = time_function($age);
       $sum += $reputation * $distance_factor * $time_factor;
     }
     $r0->free();
