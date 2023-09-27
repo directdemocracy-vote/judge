@@ -1,7 +1,6 @@
 <?php
 require_once '../../php/database.php';
 
-$reputation_factor = 2.9;
 $version = '2';
 $notary = 'https://notary.directdemocracy.vote';
 
@@ -17,6 +16,28 @@ function stripped_key($public_key) {
   $stripped = str_replace("\r\n", '', $stripped);
   $stripped = str_replace("\n", '', $stripped);
   return $stripped;
+}
+
+function distance_function($distance) {
+  if ($distance < 1)
+    $distance = 1;
+  if ($distance < 10)
+    return 1 - (1 / (1 + exp((10 - $distance) / 2)));
+  else if ($distance < 100)
+    return (0.5 / 0.9) * (1 - 0.01 * $distance);
+  else
+    return 0;
+}
+
+function time_function($time) {
+  return 1 - (1 / (1 + exp((63072000 - x) / 8000000)));
+}
+
+function reputation_function($x) {
+  if ($x < 4)
+    return pow(x, 2) / 18;
+  else
+    return 1 - (0.75 / (x - 15));
 }
 
 header("Content-Type: application/json");
@@ -121,39 +142,39 @@ if ($endorsements)
     $mysqli->query($query) or error($mysqli->error);
   }
 
-# run the reputation algorithm, see https://en.wikipedia.org/wiki/PageRank
+# run the reputation algorithm, see https://github.com/directdemocracy-vote/judge/blob/master/httpdocs/reputation_algorithm.md
 
 # N is the new total number of entities
-$query = "SELECT COUNT(*) AS N FROM participant";
+$query = "SELECT COUNT(*) AS N, SUM(reputation) AS total_reputation FROM participant";
 $result = $mysqli->query($query) or error($mysqli->error);
 $count = $result->fetch_assoc();
 $N = intval($count['N']);
 if ($N == 0)
   die('Empty database.');
+$total_reputation = intval($count['total_reputation']);
 
-$threshold = 0.5 / $N;
+$threshold = 0.5;
 
 for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   $query = "SELECT id FROM participant";
   $result = $mysqli->query($query) or error($mysqli->error);
   while($participant = $result->fetch_assoc()) {
     $id = intval($participant['id']);
-    $query = "SELECT link.endorser, link.distance, link.`revoke`, UNIX_TIMESTAMP(link.date), (SELECT COUNT(*) FROM link AS l WHERE l.endorser=link.endorser) AS links, participant.reputation "
-            ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id";
+    $query = "SELECT link.distance, UNIX_TIMESTAMP(link.date), participant.reputation "
+            ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id AND link.revoke=0";
     $r0 = $mysqli->query($query) or error($mysqli->error);
     $sum = 0;
     while($link = $r0->fetch_assoc()) {
-      $endorser = $link['endorser'];
-      $distance = ($link['distance'] === '-1') ? 0 : floatval(floatval($link['distance']) / 1000);  # expressed in km
-      $revoke = ($link['revoke'] === '0') ? 1 : 0;
-      $age = floatval(($now - intval($link['date'])) / (365.25 * 86400));  # years
-      $links = intval($link['links']);
       $reputation = floatval($link['reputation']);
-      $sum += $reputation_factor * $revoke * $reputation / $links / (1 + $distance) / (1 + $age);
+      $age = floatval(($now - intval($link['date'])));  # seconds
+      $distance = ($link['distance'] === '-1') ? 0 : floatval(floatval($link['distance']) / 1000);  # expressed in km
+      $distance_factor = distance_function($distance);
+      $time_factor = time_factor($time);
+      $sum += $reputation * $distance_factor * $time_factor;
     }
     $r0->free();
-    $PR = (1 - $d) / $N + $d * $sum;
-    $query = "UPDATE participant SET reputation=$PR WHERE id=$id";
+    $new_reputation = reputation_function(2 / (1 + sqrt($total_reputation / $N)) + $sum);
+    $query = "UPDATE participant SET reputation=$new_reputation WHERE id=$id";
     $mysqli->query($query) or error($mysqli->error);
     $query = "UPDATE participant SET endorsed=1, changed=1 WHERE id=$id AND endorsed=0 AND reputation>$threshold";
     $mysqli->query($query) or error($mysqli->error);
