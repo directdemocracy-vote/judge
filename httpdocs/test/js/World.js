@@ -385,6 +385,7 @@ export default class World {
   }
 
   #reputationFunction(x) {
+    console.log(x)
     if (x < 3)
       return Math.pow(x, 2) / 18;
     else
