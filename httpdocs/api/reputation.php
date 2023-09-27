@@ -22,10 +22,6 @@ if ($participant) {
   $reputation = 0;
   $endorsed = 'false';
 }
-$query = "SELECT COUNT(*) AS N FROM participant";
-$result = $mysqli->query($query) or error($mysqli->error);
-$count = $result->fetch_assoc();
-$N = intval($count['N']);
-$reputation *= $N;
+
 die("{\"reputation\":$reputation,\"endorsed\":$endorsed}");
 ?>
