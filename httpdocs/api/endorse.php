@@ -35,7 +35,7 @@ function time_function($time) {
 }
 
 function reputation_function($x) {
-  if ($x < 4)
+  if ($x < 3)
     return pow($x, 2) / 18;
   else
     return 1 - (0.75 / ($x - 15));
@@ -179,7 +179,7 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
     }
     $r0->free();
     $new_reputation = reputation_function(2 / (1 + sqrt($total_reputation / $N)) + $sum);
-    $query = "UPDATE participant SET reputation=$new_reputation WHERE id=$id";
+    $query = "UPDATE participant SET reputation=0 WHERE id=$id";
     $mysqli->query($query) or error($mysqli->error);
     $query = "UPDATE participant SET endorsed=1, changed=1 WHERE id=$id AND endorsed=0 AND reputation>$threshold";
     $mysqli->query($query) or error($mysqli->error);
