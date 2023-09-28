@@ -35,6 +35,7 @@ function time_function($time) {
 }
 
 function reputation_function($x) {
+  die($x);
   if ($x < 3)
     return pow($x, 2) / 18;
   else
