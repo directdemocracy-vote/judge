@@ -1,10 +1,10 @@
-# Simulation of the adoption of DirectDemocraty in a population
+# Simulation of the adoption of DirectDemocracy in a population
 Given a geographic area, the algorithm will randomly generate new citizens according to the density of population in the area.
-When created, a citizen is attributed a number of endorsements that she will create during her life.
+When created, a citizen is attributed a number of endorsements that they will create during their life.
 Everyday, the citizen has a small chance to endorse another citizen.
 Once new citizens and endorsements are created for a day, the algorithm recompute the reputation of each citizen.
 According to this new reputation, it will then endorse the ones that have a reputation greater than a given threshold and revoke the others.
-The simulation run for a predetermined numbers of days.
+The simulation runs for a predetermined numbers of days.
 
 ## Data structures
 
@@ -87,6 +87,7 @@ Those hectares will have a higher probability of having new citizens and those c
 
 They can represent the hectares that make up a village where a referendum is being held.
 In this specific village, residents will have a greater incentive to install the application and endorse people than in others locations of the map.
+This is to simulate the fact that in this specific village, there is a popular referendum or petition project.
 
 #### Initial citizens
 It represents the citizens that have already downloaded the application at the beginning of the simulation.
@@ -267,8 +268,8 @@ if (target.linksToGet[area] <= 0 || citizen.endorsedBy.has(target.id) || citizen
 return target
 ```
 ### Create new citizens
-During this part, new citizens are spawns.
-They represents people that have heard of the application through the media or by themself.
+During this part, new citizens are spawned.
+They represents people that have heard of the application through the media or by themselves.
 
 ### In the main loop
 First, there is probability check that can totally cancel this phase.
