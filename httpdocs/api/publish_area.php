@@ -1,6 +1,6 @@
 <?php
 $version = "2";
-$notary = 'https://notary.directdemocracy.vote';
+$notary = 'https://notary-1.directdemocracy.vote';
 
 function error($message) {
   if ($message[0] != '{')
