@@ -50,7 +50,7 @@ window.onload = function() {
           td.title = 'endorsed';
         let a = document.createElement('a');
         td.appendChild(a);
-        a.href = `${notary}/citizen.html?signature=${endorsement.signature}`;
+        a.href = `${notary}/citizen.html?signature=${encodeURIComponent(endorsement.signature)}`;
         a.innerHTML = endorsement.givenNames + ' ' + endorsement.familyName;
         tr.appendChild(td);
         td = document.createElement('td');
