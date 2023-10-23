@@ -53,16 +53,9 @@ $status = $result->fetch_assoc();
 $result->free();
 $last_update = intval($status['lastUpdate']);
 
-// $query = "SELECT id, TO_BASE64(`key`), changed FROM participant";
-// $result = $mysqli->query($query) or error($mysqli->error);
-// $data = array();
-// while($row = $result->fetch_array(MYSQLI_ASSOC)) {
-//  array_push($data, $row);
-// }
-// die(json_encode($data));
-// $update_every = 10;
-// if ($last_update + $update_every > $now)
-//   die("Updated in the last $update_every seconds");
+$update_every = 10;
+if ($last_update + $update_every > $now)
+  die("Updated in the last $update_every seconds");
 
 $query = "UPDATE status SET lastUpdate=FROM_UNIXTIME($now)";
 $mysqli->query($query) or error($mysqli->error);
@@ -116,8 +109,7 @@ if ($endorsements)
       $response = file_get_contents("$notary/api/publication.php?fingerprint=$fingerprint", false, stream_context_create($options));
       $endorsed = json_decode($response);
       if (isset($endorsed->error))
-        continue;
-        // error($endorsed->error);
+        error($endorsed->error);
       if (!isset($endorsed->latitude))
         $endorsed->latitude = 0;
       if (!isset($endorsed->longitude))
