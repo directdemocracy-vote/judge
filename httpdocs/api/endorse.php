@@ -76,7 +76,7 @@ $options = array('http' => array('method' => 'GET',
 $url = "$notary/api/publications.php?type=endorsement";
 $response = file_get_contents($url, false, stream_context_create($options));
 $endorsements = json_decode($response);
-die($endorsements);
+die($response);
 if (isset($endorsements->error))
   error($endorsements->error);
 $public_key_file = fopen("../../id_rsa.pub", "r") or error("Failed to read public key file");
