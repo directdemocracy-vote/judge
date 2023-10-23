@@ -64,17 +64,6 @@ $mysqli->query($query) or error($mysqli->error);
 $query = "DELETE FROM link WHERE NOT EXISTS (SELECT NULL FROM participant WHERE id=endorser OR id=endorsed)";
 $mysqli->query($query) or error($mysqli->error);
 
-# compute the initial reputation value from the number of entities
-$query = "SELECT COUNT(*) AS N FROM participant";
-$result = $mysqli->query($query) or error($mysqli->error);
-$count = $result->fetch_assoc();
-$N = intval($count['N']);
-if ($N==0) {
-  $initial = 1.0;
-  $last_update = 0; // the database was likely wiped out
-} else
-  $initial = 1.0 / $N;
-
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
 $url = "$notary/api/publications.php?type=endorsement&published_from=$last_update";
@@ -127,7 +116,7 @@ if ($endorsements)
       if ($endorsed->signature !== $endorsement->endorsedSignature)
         die("Key mismatch for endorsed in notary database.");
       $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, endorsed, changed) "
-              ."VALUES(FROM_BASE64('$endorsed->key'), FROM_BASE64('$endorsed->signature'), POINT($endorsed->longitude, $endorsed->latitude), $initial, 0, 0) ";
+              ."VALUES(FROM_BASE64('$endorsed->key'), FROM_BASE64('$endorsed->signature'), POINT($endorsed->longitude, $endorsed->latitude), 0, 0, 0) ";
       $mysqli->query($query) or error($mysqli->error);
       $endorsed->id = $mysqli->insert_id;
     } else
