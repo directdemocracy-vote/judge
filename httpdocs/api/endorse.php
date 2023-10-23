@@ -116,7 +116,8 @@ if ($endorsements)
       $response = file_get_contents("$notary/api/publication.php?fingerprint=$fingerprint", false, stream_context_create($options));
       $endorsed = json_decode($response);
       if (isset($endorsed->error))
-        error($endorsed->error);
+        continue;
+        // error($endorsed->error);
       if (!isset($endorsed->latitude))
         $endorsed->latitude = 0;
       if (!isset($endorsed->longitude))
