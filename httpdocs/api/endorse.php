@@ -53,13 +53,13 @@ $status = $result->fetch_assoc();
 $result->free();
 $last_update = intval($status['lastUpdate']);
 
-$query = "SELECT id, TO_BASE64(`key`), changed FROM participant";
-$result = $mysqli->query($query) or error($mysqli->error);
-$data = array();
-while($row = $result->fetch_array(MYSQLI_ASSOC)) {
- array_push($data, $row);
-}
-die(json_encode($data));
+// $query = "SELECT id, TO_BASE64(`key`), changed FROM participant";
+// $result = $mysqli->query($query) or error($mysqli->error);
+// $data = array();
+// while($row = $result->fetch_array(MYSQLI_ASSOC)) {
+//  array_push($data, $row);
+// }
+// die(json_encode($data));
 // $update_every = 10;
 // if ($last_update + $update_every > $now)
 //   die("Updated in the last $update_every seconds");
@@ -76,6 +76,7 @@ $options = array('http' => array('method' => 'GET',
 $url = "$notary/api/publications.php?type=endorsement&published_from=$last_update";
 $response = file_get_contents($url, false, stream_context_create($options));
 $endorsements = json_decode($response);
+die($endorsements)
 if (isset($endorsements->error))
   error($endorsements->error);
 $public_key_file = fopen("../../id_rsa.pub", "r") or error("Failed to read public key file");
