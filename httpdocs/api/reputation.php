@@ -19,7 +19,7 @@ if ($participant) {
   $reputation = floatval($participant['reputation']);
   $endorsed = $participant['endorsed'] == '1' ? 'true' : 'false';
 } else {
-  $reputation = -;
+  $reputation = -1;
   $endorsed = 'false';
 }
 
