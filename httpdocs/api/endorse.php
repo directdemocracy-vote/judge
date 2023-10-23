@@ -66,10 +66,9 @@ $mysqli->query($query) or error($mysqli->error);
 
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
-$url = "$notary/api/publications.php?type=endorsement";
+$url = "$notary/api/publications.php?type=endorsement&published_from=$last_update";
 $response = file_get_contents($url, false, stream_context_create($options));
 $endorsements = json_decode($response);
-
 if (isset($endorsements->error))
   error($endorsements->error);
 $public_key_file = fopen("../../id_rsa.pub", "r") or error("Failed to read public key file");
