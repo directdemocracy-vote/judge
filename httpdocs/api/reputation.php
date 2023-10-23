@@ -10,7 +10,7 @@ if (!isset($_GET['key']))
   die("\"error\":\"Missing key argument\"}");
 
 $response = file_get_contents("$myself/api/endorse.php");
-die($response)
+die($response);
 $key = $mysqli->escape_string($_GET['key']);
 $query = "SELECT reputation, endorsed FROM participant WHERE `key` = FROM_BASE64('$key')";
 $result = $mysqli->query($query) or die("{\"error\":\"$mysqli->error\"}");
