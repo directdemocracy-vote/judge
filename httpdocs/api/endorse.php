@@ -53,7 +53,7 @@ $status = $result->fetch_assoc();
 $result->free();
 $last_update = intval($status['lastUpdate']);
 
-$query = "SELECT `key` FROM participant";
+$query = "SELECT id, `key` FROM participant";
 $result = $mysqli->query($query) or error($mysqli->error);
 $data = array();
 while($row = $result->fetch_array(MYSQLI_ASSOC)) {
