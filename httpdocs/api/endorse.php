@@ -53,9 +53,9 @@ $status = $result->fetch_assoc();
 $result->free();
 $last_update = intval($status['lastUpdate']);
 
-$update_every = 10;
-if ($last_update + $update_every > $now)
-  die("Updated in the last $update_every seconds");
+// $update_every = 10;
+// if ($last_update + $update_every > $now)
+//   die("Updated in the last $update_every seconds");
 
 $query = "UPDATE status SET lastUpdate=FROM_UNIXTIME($now)";
 $mysqli->query($query) or error($mysqli->error);
