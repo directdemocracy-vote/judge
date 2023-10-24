@@ -66,7 +66,7 @@ $mysqli->query($query) or error($mysqli->error);
 
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
-$url = "$notary/api/publications.php?type=endorsement&published_from=$last_update";
+$url = "$notary/api/publications.php?type=endorsement";
 $response = file_get_contents($url, false, stream_context_create($options));
 $endorsements = json_decode($response);
 if (isset($endorsements->error))
