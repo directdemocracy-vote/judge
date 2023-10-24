@@ -53,9 +53,9 @@ $status = $result->fetch_assoc();
 $result->free();
 $last_update = intval($status['lastUpdate']);
 
-// $update_every = 10;
-// if ($last_update + $update_every > $now)
-//   die("Updated in the last $update_every seconds");
+$update_every = 10;
+if ($last_update + $update_every > $now)
+  die("Updated in the last $update_every seconds");
 
 $query = "UPDATE status SET lastUpdate=FROM_UNIXTIME($now)";
 $mysqli->query($query) or error($mysqli->error);
@@ -66,9 +66,8 @@ $mysqli->query($query) or error($mysqli->error);
 
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
-$url = "$notary/api/publications.php?type=endorsement";
+$url = "$notary/api/publications.php?type=endorsement&published_from=$last_update";
 $response = file_get_contents($url, false, stream_context_create($options));
-die($response);
 $endorsements = json_decode($response);
 if (isset($endorsements->error))
   error($endorsements->error);
