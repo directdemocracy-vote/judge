@@ -1,6 +1,6 @@
 <?php
 require_once '../../php/database.php';
-$myself = 'https://judge.directdemocracy.vote';
+$myself = 'https://judge-1.directdemocracy.vote';
 
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
