@@ -108,7 +108,7 @@ if ($endorsements)
       $response = file_get_contents("$notary/api/publication.php?signature=$signature", false, stream_context_create($options));
       $endorsed = json_decode($response);
       if (isset($endorsed->error))
-        error($endorsed->error);
+        error($endorsed->error . " from $notary/api/publication.php?signature=$signature");
       if (!isset($endorsed->latitude))
         $endorsed->latitude = 0;
       if (!isset($endorsed->longitude))
