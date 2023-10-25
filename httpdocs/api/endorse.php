@@ -76,7 +76,7 @@ $k = fread($public_key_file, filesize("../../id_rsa.pub"));
 fclose($public_key_file);
 $public_key = stripped_key($k);
 
-# insert endorser and endorsed in entities, links
+# insert endorser and endorsed in participant, link
 if ($endorsements)
   foreach($endorsements as $endorsement) {
     if ($endorsement->key == $public_key)  # ignore mine
