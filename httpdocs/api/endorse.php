@@ -47,7 +47,11 @@ header("Access-Control-Allow-Headers: content-type");
 
 $now = time();
 
-$query = "SELECT UNIX_TIMESTAMP(lastUpdate) AS lastUpdate FROM status";
+if (isset($_POST['reset']))
+  $mysqli->query("UPDATE `status` SET lastUpdate=DATE('2000-01-01 00:00:00')") or error($mysqli->error);
+
+
+$query = "SELECT UNIX_TIMESTAMP(lastUpdate) AS lastUpdate FROM `status`";
 $result = $mysqli->query($query) or error($mysqli->error);
 $status = $result->fetch_assoc();
 $result->free();
