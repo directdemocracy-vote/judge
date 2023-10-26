@@ -1,4 +1,5 @@
 const directdemocracyVersion = '2';
+const notary = 'https://notary.directdemocracy.vote';
 
 function findGetParameter(parameterName, result = null) {
   location.search.substr(1).split('&').forEach(function(item) {
@@ -69,7 +70,6 @@ window.onload = function() {
   document.getElementById('question').addEventListener('input', validate);
   document.getElementById('answers').addEventListener('input', validate);
   document.getElementById('deadline').addEventListener('input', validate);
-  document.getElementById('notary').addEventListener('input', validate);
 
   await generateCryptographicKey();
 
@@ -168,8 +168,6 @@ window.onload = function() {
     }
     if (document.getElementById('deadline').value === '')
       return;
-    if (document.getElementById('notary').value === '')
-      return;
     document.getElementById('publish').removeAttribute('disabled');
   }
 
@@ -177,7 +175,6 @@ window.onload = function() {
     const button = event.currentTarget;
     button.classList.add('is-loading');
     button.setAttribute('disabled', '');
-    const notary = document.getElementById('notary').value;
     const query = area.trim().replace(/(\r\n|\n|\r)/g, '&');
     fetch(`/api/publish_area.php?${query}`)
       .then(response => response.json())
@@ -206,7 +203,6 @@ window.onload = function() {
           const website = document.getElementById('website').value.trim();
           if (website)
             publication.website = website;
-          publication.notary = notary;
           fetch(`/api/publish_proposal.php`, { 'method': 'POST', 'body': JSON.stringify(publication) })
             .then(response => response.json())
             .then(answer => {
