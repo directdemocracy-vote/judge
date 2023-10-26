@@ -19,7 +19,7 @@ function closeModal() {
   document.getElementById('modal').classList.remove('is-active');
 }
 
-window.onload = async function() {
+window.onload = function() {
   let area = '';
   if (localStorage.getItem('password')) {
     const a = document.createElement('a');
@@ -34,8 +34,6 @@ window.onload = async function() {
   document.getElementById('modal-close-button').addEventListener('click', closeModal);
   document.getElementById('modal-ok-button').addEventListener('click', closeModal);
 
-  let publicationPublicKeyBase64;
-  let publicationPrivateKey;
   let latitude = parseFloat(findGetParameter('latitude', '-1'));
   let longitude = parseFloat(findGetParameter('longitude', '-1'));
   let geolocation = false;
@@ -71,7 +69,7 @@ window.onload = async function() {
   document.getElementById('question').addEventListener('input', validate);
   document.getElementById('answers').addEventListener('input', validate);
   document.getElementById('deadline').addEventListener('input', validate);
-  document.getElementById('judge').addEventListener('input', validate);
+  document.getElementById('notary').addEventListener('input', validate);
 
   await generateCryptographicKey();
 
@@ -153,23 +151,6 @@ window.onload = async function() {
     validate();
   }
 
-  async function generateCryptographicKey() {
-    const keyPair = await window.crypto.subtle.generateKey(
-      {
-        name: 'RSASSA-PKCS1-v1_5',
-        modulusLength: 2048,
-        publicExponent: new Uint8Array([1, 0, 1]),
-        hash: 'SHA-256'
-      },
-      true,
-      ['sign', 'verify']
-    );
-
-    publicationPrivateKey = keyPair.privateKey;
-    const publicKey = await window.crypto.subtle.exportKey('spki', keyPair.publicKey);
-    publicationPublicKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(publicKey)));
-  }
-
   function validate() {
     document.getElementById('publish').setAttribute('disabled', '');
     if (!document.querySelector('input[name="type"]:checked'))
@@ -187,7 +168,7 @@ window.onload = async function() {
     }
     if (document.getElementById('deadline').value === '')
       return;
-    if (document.getElementById('judge').value === '')
+    if (document.getElementById('notary').value === '')
       return;
     document.getElementById('publish').removeAttribute('disabled');
   }
@@ -196,11 +177,11 @@ window.onload = async function() {
     const button = event.currentTarget;
     button.classList.add('is-loading');
     button.setAttribute('disabled', '');
-    const judge = document.getElementById('judge').value;
+    const notary = document.getElementById('notary').value;
     const query = area.trim().replace(/(\r\n|\n|\r)/g, '&');
-    fetch(`${judge}/api/publish_area.php?${query}`)
+    fetch(`/api/publish_area.php?${query}`)
       .then(response => response.json())
-      .then(async function(answer) {
+      .then(function(answer) {
         if (answer.error) {
           showModal('Area publication error', JSON.stringify(answer.error));
           button.classList.remove('is-loading');
@@ -208,10 +189,9 @@ window.onload = async function() {
         } else {
           let publication = {};
           publication.schema = `https://directdemocracy.vote/json-schema/${directdemocracyVersion}/proposal.schema.json`;
-          publication.key = publicationPublicKeyBase64;
+          publication.key = '';
           publication.signature = '';
           publication.published = Math.round(new Date().getTime() / 1000);
-          publication.judge = judge;
           publication.area = answer.signature;
           publication.title = document.getElementById('title').value.trim();
           publication.description = document.getElementById('description').value.trim();
@@ -226,14 +206,8 @@ window.onload = async function() {
           const website = document.getElementById('website').value.trim();
           if (website)
             publication.website = website;
-          const str = JSON.stringify(publication);
-          const signature = await window.crypto.subtle.sign(
-            'RSASSA-PKCS1-v1_5',
-            publicationPrivateKey,
-            new TextEncoder().encode(str)
-          );
-          publication.signature = btoa(String.fromCharCode(...new Uint8Array(signature)));
-          fetch(`/api/publish.php`, { 'method': 'POST', 'body': JSON.stringify(publication) })
+          publication.notary = notary;
+          fetch(`/api/publish_proposal.php`, { 'method': 'POST', 'body': JSON.stringify(publication) })
             .then(response => response.json())
             .then(answer => {
               button.classList.remove('is-loading');
@@ -244,7 +218,7 @@ window.onload = async function() {
                 showModal('Publication success',
                   `Your ${type} was just published!<br>You will be redirected to it.`);
                 document.getElementById('modal-ok-button').addEventListener('click', function() {
-                  window.location.href = `/proposal.html?signature=${encodeURIComponent(answer.signature)}`;
+                  window.location.href = `${notary}/proposal.html?signature=${encodeURIComponent(answer.signature)}`;
                 });
               }
             });
