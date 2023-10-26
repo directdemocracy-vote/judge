@@ -4,12 +4,6 @@ require_once '../../php/database.php';
 $version = '2';
 $notary = 'https://notary.directdemocracy.vote';
 
-function error($message) {
-  if ($message[0] != '{')
-    $message = '"'.$message.'"';
-  die("{\"error\":$message}");
-}
-
 function stripped_key($public_key) {
   $stripped = str_replace("-----BEGIN PUBLIC KEY-----", "", $public_key);
   $stripped = str_replace("-----END PUBLIC KEY-----", "", $stripped);
@@ -48,12 +42,12 @@ header("Access-Control-Allow-Headers: content-type");
 $now = time();
 
 if (isset($_GET['reset'])) {
-  $mysqli->query("UPDATE `status` SET lastUpdate=DATE('2000-01-01 00:00:00')") or error($mysqli->error);
+  $mysqli->query("UPDATE `status` SET lastUpdate=DATE('2000-01-01 00:00:00')") or die($mysqli->error);
   die('reset');
 }
 
 $query = "SELECT UNIX_TIMESTAMP(lastUpdate) AS lastUpdate FROM `status`";
-$result = $mysqli->query($query) or error($mysqli->error);
+$result = $mysqli->query($query) or die($mysqli->error);
 $status = $result->fetch_assoc();
 $result->free();
 $last_update = intval($status['lastUpdate']);
@@ -63,20 +57,22 @@ if ($last_update + $update_every > $now)
   die("Updated in the last $update_every seconds");
 
 $query = "UPDATE status SET lastUpdate=FROM_UNIXTIME($now)";
-$mysqli->query($query) or error($mysqli->error);
+$mysqli->query($query) or die($mysqli->error);
 
 # remove broken links if any
 $query = "DELETE FROM link WHERE NOT EXISTS (SELECT NULL FROM participant WHERE id=endorser OR id=endorsed)";
-$mysqli->query($query) or error($mysqli->error);
+$mysqli->query($query) or die($mysqli->error);
 
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
 $url = "$notary/api/publications.php?type=endorsement&published_from=$last_update";
 $response = file_get_contents($url, false, stream_context_create($options));
-$endorsements = json_decode($response);
+$endorsements = @json_decode($response);
+if ($endorsements === null && json_last_error() !== JSON_ERROR_NONE)
+  die($response);
 if (isset($endorsements->error))
-  error($endorsements->error);
-$public_key_file = fopen("../../id_rsa.pub", "r") or error("Failed to read public key file");
+  die($endorsements->error);
+$public_key_file = fopen("../../id_rsa.pub", "r") or die("Failed to read public key file");
 $k = fread($public_key_file, filesize("../../id_rsa.pub"));
 fclose($public_key_file);
 $public_key = stripped_key($k);
@@ -87,13 +83,15 @@ if ($endorsements)
     if ($endorsement->key == $public_key)  # ignore mine
       continue;
     $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE `key` = FROM_BASE64('$endorsement->key')";  # endorser
-    $result = $mysqli->query($query) or error($mysqli->error);
+    $result = $mysqli->query($query) or die($mysqli->error);
     if (!$result->num_rows) {
       $key = urlencode($endorsement->key);
       $response = file_get_contents("$notary/api/publication.php?key=$key", false, stream_context_create($options));
-      $endorser = json_decode($response);
+      $endorser = @json_decode($response);
+      if ($endorser === null && json_last_error() !== JSON_ERROR_NONE)
+        die($response);
       if (isset($endorser->error))
-        error("$endorser->error from $notary/api/publication.php?key=$key");
+        die("$endorser->error from $notary/api/publication.php?key=$key");
       if (!isset($endorser->latitude))
         $endorser->latitude = 0;
       if (!isset($endorser->longitude))
@@ -102,18 +100,20 @@ if ($endorsements)
         die("Key mismatch for endorser in notary database.");
       $query = "INSERT IGNORE INTO participant(`key`, `signature`, home, reputation, endorsed, changed) "
               ."VALUES(FROM_BASE64('$endorser->key'), FROM_BASE64('$endorser->signature'), POINT($endorser->longitude, $endorser->latitude), 0, 0, 0) ";
-      $mysqli->query($query) or error("$query $mysqli->error");
+      $mysqli->query($query) or die("$query $mysqli->error");
       $endorser->id = $mysqli->insert_id;
     } else
       $endorser = $result->fetch_object();
     $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature=FROM_BASE64('$endorsement->endorsedSignature')";
-    $result = $mysqli->query($query) or error($mysqli->error);
+    $result = $mysqli->query($query) or die($mysqli->error);
     if (!$result->num_rows) {
       $signature = urlencode($endorsement->endorsedSignature);
       $response = file_get_contents("$notary/api/publication.php?signature=$signature", false, stream_context_create($options));
-      $endorsed = json_decode($response);
+      $endorsed = @json_decode($response);
+      if ($endorsed === null && json_last_error() !== JSON_ERROR_NONE)
+        die($response);
       if (isset($endorsed->error))
-        error("$endorsed->error from $notary/api/publication.php?signature=$signature");
+        die("$endorsed->error from $notary/api/publication.php?signature=$signature");
       if (!isset($endorsed->latitude))
         $endorsed->latitude = 0;
       if (!isset($endorsed->longitude))
@@ -122,7 +122,7 @@ if ($endorsements)
         die("Key mismatch for endorsed in notary database.");
       $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, endorsed, changed) "
               ."VALUES(FROM_BASE64('$endorsed->key'), FROM_BASE64('$endorsed->signature'), POINT($endorsed->longitude, $endorsed->latitude), 0, 0, 0) ";
-      $mysqli->query($query) or error($mysqli->error);
+      $mysqli->query($query) or die($mysqli->error);
       $endorsed->id = $mysqli->insert_id;
     } else
       $endorsed = $result->fetch_object();
@@ -135,14 +135,14 @@ if ($endorsements)
     $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
             ."VALUES($endorser->id, $endorsed->id, $distance, $revoke, FROM_UNIXTIME($endorsement->published)) "
             ."ON DUPLICATE KEY UPDATE `revoke` = $revoke, date = FROM_UNIXTIME($endorsement->published);";
-    $mysqli->query($query) or error($mysqli->error);
+    $mysqli->query($query) or die($mysqli->error);
   }
 
 # run the reputation algorithm, see https://github.com/directdemocracy-vote/judge/blob/master/httpdocs/reputation_algorithm.md
 
 # N is the new total number of entities
 $query = "SELECT COUNT(*) AS N FROM participant";
-$result = $mysqli->query($query) or error($mysqli->error);
+$result = $mysqli->query($query) or die($mysqli->error);
 $count = $result->fetch_assoc();
 $N = intval($count['N']);
 if ($N == 0)
@@ -151,17 +151,17 @@ if ($N == 0)
 $threshold = 0.5;
 for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   $query = "SELECT SUM(reputation) AS total_reputation FROM participant";
-  $result = $mysqli->query($query) or error($mysqli->error);
+  $result = $mysqli->query($query) or die($mysqli->error);
   $count = $result->fetch_assoc();
   $total_reputation = floatval($count['total_reputation']);
 
   $query = "SELECT id FROM participant";
-  $result = $mysqli->query($query) or error($mysqli->error);
+  $result = $mysqli->query($query) or die($mysqli->error);
   while($participant = $result->fetch_assoc()) {
     $id = intval($participant['id']);
     $query = "SELECT link.distance, UNIX_TIMESTAMP(link.date) AS date, participant.reputation "
             ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id AND link.revoke=0";
-    $r0 = $mysqli->query($query) or error($mysqli->error);
+    $r0 = $mysqli->query($query) or die($mysqli->error);
     $sum = 0;
     while($link = $r0->fetch_assoc()) {
       $reputation = floatval($link['reputation']);
@@ -174,11 +174,11 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
     $r0->free();
     $new_reputation = reputation_function(2 / (1 + sqrt($total_reputation / $N)) + $sum);
     $query = "UPDATE participant SET reputation=$new_reputation WHERE id=$id";
-    $mysqli->query($query) or error($mysqli->error);
+    $mysqli->query($query) or die($mysqli->error);
     $query = "UPDATE participant SET endorsed=1, changed=1 WHERE id=$id AND endorsed=0 AND reputation>$threshold";
-    $mysqli->query($query) or error($mysqli->error);
+    $mysqli->query($query) or die($mysqli->error);
     $query = "UPDATE participant SET endorsed=0, changed=1 WHERE id=$id AND endorsed=1 AND reputation<$threshold";
-    $mysqli->query($query) or error($mysqli->error);
+    $mysqli->query($query) or die($mysqli->error);
   }
 }
 
@@ -186,13 +186,13 @@ $count_e = 0;
 $count_r = 0;
 $table = '';
 $schema = "https://directdemocracy.vote/json-schema/$version/endorsement.schema.json";
-$private_key = openssl_get_privatekey("file://../../id_rsa") or error("Failed to read private key file");
+$private_key = openssl_get_privatekey("file://../../id_rsa") or die("Failed to read private key file");
 $query = "SELECT id, "
         ."REPLACE(TO_BASE64(`key`), '\\n', '') AS `key`, "
         ."REPLACE(TO_BASE64(signature), '\\n', '') AS signature, "
         ."endorsed, reputation "
         ."FROM participant WHERE changed=1";
-$result = $mysqli->query($query) or error($mysqli->error);
+$result = $mysqli->query($query) or die($mysqli->error);
 while($participant = $result->fetch_assoc()) {
   $id = intval($participant['id']);
   $table .= "$id:\t" . floatval($participant['reputation']) ."\n";
@@ -210,7 +210,7 @@ while($participant = $result->fetch_assoc()) {
   $data = json_encode($endorsement, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
   if ($success === FALSE)
-    error("Failed to sign endorsement");
+    die("Failed to sign endorsement");
   $endorsement['signature'] = base64_encode($signature);
   # publish endorsement for citizen is allowed to vote by this judge
   $data = json_encode($endorsement, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -219,14 +219,14 @@ while($participant = $result->fetch_assoc()) {
                                    'header' => "Content-Type: application/json\r\n" .
                                                "Accept: application/json\r\n"));
   $response = file_get_contents("$notary/api/publish.php", false, stream_context_create($options));
-  $json = json_decode($response);
-  if ($json == NULL)
+  $json = @json_decode($response);
+  if ($json === null && json_last_error() !== JSON_ERROR_NONE)
     die($response);
   if (isset($json->error))
-    error(json_encode($json->error));
+    die(json_encode($json->error));
 
   $query = "UPDATE participant SET changed=0";
-  $mysqli->query($query) or error($mysqli->error);
+  $mysqli->query($query) or die($mysqli->error);
 }
 
 die("endorsed $count_e and revoked $count_r citizens out of $N:\n$table");
