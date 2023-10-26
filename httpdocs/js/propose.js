@@ -210,7 +210,7 @@ window.onload = function() {
                 showModal('Publication error', JSON.stringify(answer.error));
               else {
                 showModal('Publication success',
-                  `Your ${type} was just published!<br>You will be redirected to it.`);
+                  `Your ${type} was just published!\nYou will be redirected to it.`);
                 document.getElementById('modal-ok-button').addEventListener('click', function() {
                   window.location.href = `${notary}/proposal.html?signature=${encodeURIComponent(answer.signature)}`;
                 });
