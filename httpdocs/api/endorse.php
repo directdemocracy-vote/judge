@@ -109,7 +109,7 @@ if ($endorsements)
     $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature = FROM_BASE64('$endorsement->endorsedSignature')";
     $result = $mysqli->query($query) or error($mysqli->error);
     if (!$result->num_rows) {
-      $signature = base64_encode($endorsement->endorsedSignature);
+      $signature = urlencode(base64_encode($endorsement->endorsedSignature));
       $response = file_get_contents("$notary/api/publication.php?signature=$signature", false, stream_context_create($options));
       $endorsed = json_decode($response);
       if (isset($endorsed->error))
