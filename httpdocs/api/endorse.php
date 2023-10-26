@@ -93,27 +93,27 @@ if ($endorsements)
       $response = file_get_contents("$notary/api/publication.php?key=$key", false, stream_context_create($options));
       $endorser = json_decode($response);
       if (isset($endorser->error))
-        error("Trying to get $notary/api/publication.php?key=$endorsement->key, however $endorser->error");
+        error("$endorser->error from $notary/api/publication.php?key=$key");
       if (!isset($endorser->latitude))
         $endorser->latitude = 0;
       if (!isset($endorser->longitude))
         $endorser->longitude = 0;
       if ($endorser->key !== $endorsement->key)
         die("Key mismatch for endorser in notary database.");
-      $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, endorsed, changed) "
+      $query = "INSERT IGNORE INTO participant(`key`, `signature`, home, reputation, endorsed, changed) "
               ."VALUES(FROM_BASE64('$endorser->key'), FROM_BASE64('$endorser->signature'), POINT($endorser->longitude, $endorser->latitude), 0, 0, 0) ";
       $mysqli->query($query) or error("$query $mysqli->error");
       $endorser->id = $mysqli->insert_id;
     } else
       $endorser = $result->fetch_object();
-    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature = FROM_BASE64('$endorsement->endorsedSignature')";
+    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature=FROM_BASE64('$endorsement->endorsedSignature')";
     $result = $mysqli->query($query) or error($mysqli->error);
     if (!$result->num_rows) {
       $signature = urlencode(base64_encode($endorsement->endorsedSignature));
       $response = file_get_contents("$notary/api/publication.php?signature=$signature", false, stream_context_create($options));
       $endorsed = json_decode($response);
       if (isset($endorsed->error))
-        error($endorsed->error . " from $notary/api/publication.php?signature=$signature");
+        error("$endorsed->error from $notary/api/publication.php?signature=$signature");
       if (!isset($endorsed->latitude))
         $endorsed->latitude = 0;
       if (!isset($endorsed->longitude))
