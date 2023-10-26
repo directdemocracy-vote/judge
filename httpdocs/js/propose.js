@@ -71,8 +71,6 @@ window.onload = function() {
   document.getElementById('answers').addEventListener('input', validate);
   document.getElementById('deadline').addEventListener('input', validate);
 
-  await generateCryptographicKey();
-
   function updateArea() {
     fetch(`https://nominatim.openstreetmap.org/reverse.php?format=json&lat=${latitude}&lon=${longitude}&zoom=10`)
       .then(response => response.json())
