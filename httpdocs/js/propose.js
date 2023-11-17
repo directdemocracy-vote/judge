@@ -35,6 +35,11 @@ window.onload = function() {
   document.getElementById('modal-close-button').addEventListener('click', closeModal);
   document.getElementById('modal-ok-button').addEventListener('click', closeModal);
 
+  const type = findGetParameter('type', 'none');
+  if (type === 'referendum' || type === 'petition') {
+    document.getElementById(type).checked = true;
+    updateProposalType();
+  }
   let latitude = parseFloat(findGetParameter('latitude', '-1'));
   let longitude = parseFloat(findGetParameter('longitude', '-1'));
   let geolocation = false;
