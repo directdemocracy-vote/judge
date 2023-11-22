@@ -209,7 +209,7 @@ while($participant = $result->fetch_assoc()) {
   $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
   if ($success === FALSE)
     die("Failed to sign endorsement");
-  $endorsement['signature'] = substring(base64_encode($signature), 0, -2);
+  $endorsement['signature'] = substr(base64_encode($signature), 0, -2);
   # publish endorsement for citizen is allowed to vote by this judge
   $data = json_encode($endorsement, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   $options = array('http' => array('method' => 'POST',
