@@ -80,7 +80,7 @@ if ($endorsements)
   foreach($endorsements as $endorsement) {
     if ($endorsement->key == $public_key)  # ignore mine
       continue;
-    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE `key` = FROM_BASE64('$endorsement->key')";  # endorser
+    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE `key` = FROM_BASE64('$endorsement->key==')";  # endorser
     $result = $mysqli->query($query) or die($mysqli->error);
     if (!$result->num_rows) {
       $key = urlencode($endorsement->key);
@@ -97,12 +97,12 @@ if ($endorsements)
       if ($endorser->key !== $endorsement->key)
         die("Key mismatch for endorser in notary database.");
       $query = "INSERT IGNORE INTO participant(`key`, `signature`, home, reputation, endorsed, changed) "
-              ."VALUES(FROM_BASE64('$endorser->key'), FROM_BASE64('$endorser->signature'), POINT($endorser->longitude, $endorser->latitude), 0, 0, 0) ";
+              ."VALUES(FROM_BASE64('$endorser->key=='), FROM_BASE64('$endorser->signature=='), POINT($endorser->longitude, $endorser->latitude), 0, 0, 0) ";
       $mysqli->query($query) or die("$query $mysqli->error");
       $endorser->id = $mysqli->insert_id;
     } else
       $endorser = $result->fetch_object();
-    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature=FROM_BASE64('$endorsement->endorsedSignature')";
+    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature=FROM_BASE64('$endorsement->endorsedSignature==')";
     $result = $mysqli->query($query) or die($mysqli->error);
     if (!$result->num_rows) {
       $signature = urlencode($endorsement->endorsedSignature);
@@ -119,7 +119,7 @@ if ($endorsements)
       if ($endorsed->signature !== $endorsement->endorsedSignature)
         die("Key mismatch for endorsed in notary database.");
       $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, endorsed, changed) "
-              ."VALUES(FROM_BASE64('$endorsed->key'), FROM_BASE64('$endorsed->signature'), POINT($endorsed->longitude, $endorsed->latitude), 0, 0, 0) ";
+              ."VALUES(FROM_BASE64('$endorsed->key=='), FROM_BASE64('$endorsed->signature=='), POINT($endorsed->longitude, $endorsed->latitude), 0, 0, 0) ";
       $mysqli->query($query) or die($mysqli->error);
       $endorsed->id = $mysqli->insert_id;
     } else
@@ -186,8 +186,8 @@ $table = '';
 $schema = "https://directdemocracy.vote/json-schema/$version/endorsement.schema.json";
 $private_key = openssl_get_privatekey("file://../../id_rsa") or die("Failed to read private key file");
 $query = "SELECT id, "
-        ."REPLACE(TO_BASE64(`key`), '\\n', '') AS `key`, "
-        ."REPLACE(TO_BASE64(signature), '\\n', '') AS signature, "
+        ."REPLACE(REPLACE(TO_BASE64(`key`), '\\n', ''), '=', '') AS `key`, "
+        ."REPLACE(REPLACE(TO_BASE64(signature), '\\n', ''), '=', '') AS signature, "
         ."endorsed, reputation "
         ."FROM participant WHERE changed=1";
 $result = $mysqli->query($query) or die($mysqli->error);
@@ -209,7 +209,7 @@ while($participant = $result->fetch_assoc()) {
   $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
   if ($success === FALSE)
     die("Failed to sign endorsement");
-  $endorsement['signature'] = base64_encode($signature);
+  $endorsement['signature'] = substring(base64_encode($signature), 0, -2);
   # publish endorsement for citizen is allowed to vote by this judge
   $data = json_encode($endorsement, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   $options = array('http' => array('method' => 'POST',
