@@ -42,7 +42,7 @@ $now = time();
 
 if (isset($_GET['reset'])) {
   $mysqli->query("UPDATE `status` SET lastUpdate=DATE('2000-01-01 00:00:00')") or die($mysqli->error);
-  die('reset');
+  die('{"reset":"OK"}');
 }
 
 $query = "SELECT UNIX_TIMESTAMP(lastUpdate) AS lastUpdate FROM `status`";
