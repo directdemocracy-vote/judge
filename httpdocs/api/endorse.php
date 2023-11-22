@@ -34,7 +34,6 @@ function reputation_function($x) {
     return 1 - (0.75 / ($x - 1.5));
 }
 
-header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: content-type");
 
@@ -42,7 +41,7 @@ $now = time();
 
 if (isset($_GET['reset'])) {
   $mysqli->query("UPDATE `status` SET lastUpdate=DATE('2000-01-01 00:00:00')") or die($mysqli->error);
-  die('{"reset":"OK"}');
+  die('reset');
 }
 
 $query = "SELECT UNIX_TIMESTAMP(lastUpdate) AS lastUpdate FROM `status`";
@@ -222,7 +221,7 @@ while($participant = $result->fetch_assoc()) {
   if ($json === null && json_last_error() !== JSON_ERROR_NONE)
     die($response);
   if (isset($json->error))
-    die(json_encode($json->error));
+    die($json->error);
 
   $query = "UPDATE participant SET changed=0";
   $mysqli->query($query) or die($mysqli->error);
