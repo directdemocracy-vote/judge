@@ -12,7 +12,7 @@ if (!isset($_GET['key']))
 $response = file_get_contents("$myself/api/endorse.php");
 
 $key = $mysqli->escape_string($_GET['key']);
-$query = "SELECT reputation, endorsed FROM participant WHERE `key` = FROM_BASE64('$key')";
+$query = "SELECT reputation, endorsed FROM participant WHERE `key` = FROM_BASE64('$key==')";
 $result = $mysqli->query($query) or die("{\"error\":\"$mysqli->error\"}");
 $participant = $result->fetch_assoc();
 if ($participant) {
