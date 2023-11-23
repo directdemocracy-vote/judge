@@ -3,9 +3,8 @@
 function stripped_key($public_key) {
   $stripped = str_replace("-----BEGIN PUBLIC KEY-----", "", $public_key);
   $stripped = str_replace("-----END PUBLIC KEY-----", "", $stripped);
-  $stripped = str_replace("\r\n", '', $stripped);
-  $stripped = str_replace("\n", '', $stripped);
-  return $stripped;
+  $stripped = str_replace(array("\r", "\n", '='), '', $stripped);
+  return substr($stripped, 44, -6);
 }
 
 header("Content-Type: application/json");
