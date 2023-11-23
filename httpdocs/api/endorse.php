@@ -216,6 +216,8 @@ while($participant = $result->fetch_assoc()) {
                                    'content' => $data,
                                    'header' => "Content-Type: application/json\r\n" .
                                                "Accept: application/json\r\n"));
+  print($data);
+  /*
   $response = file_get_contents("$notary/api/publish.php", false, stream_context_create($options));
   $json = @json_decode($response);
   if ($json === null && json_last_error() !== JSON_ERROR_NONE)
@@ -225,6 +227,7 @@ while($participant = $result->fetch_assoc()) {
 
   $query = "UPDATE participant SET changed=0";
   $mysqli->query($query) or die($mysqli->error);
+  */
 }
 
 die("endorsed $count_e and revoked $count_r citizens out of $N:\n$table");
