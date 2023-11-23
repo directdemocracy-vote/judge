@@ -11,9 +11,8 @@ function error($message) {
 function stripped_key($public_key) {
   $stripped = str_replace("-----BEGIN PUBLIC KEY-----", "", $public_key);
   $stripped = str_replace("-----END PUBLIC KEY-----", "", $stripped);
-  $stripped = str_replace("\r\n", '', $stripped);
-  $stripped = str_replace("\n", '', $stripped);
-  return $stripped;
+  $stripped = str_replace(array("\r", "\n", '='), '', $stripped);
+  return substr($stripped, 44, -6);
 }
 
 header("Content-Type: application/json");
@@ -38,7 +37,7 @@ $signature = '';
 $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
 if ($success === FALSE)
   error("Failed to sign proposal");
-$proposal->signature = base64_encode($signature);
+$proposal->signature = substr(base64_encode($signature), 0, -2);
 
 # publish proposal
 $proposal_data = json_encode($proposal, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
