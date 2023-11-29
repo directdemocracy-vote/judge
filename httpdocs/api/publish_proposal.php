@@ -39,6 +39,10 @@ if ($success === FALSE)
   error("Failed to sign proposal");
 $proposal->signature = substr(base64_encode($signature), 0, -2);
 
+$myfile = fopen("proposal.json", "w") or die("Unable to open file!");
+fwrite($myfile, json_encode($proposal, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+fclose($myfile);
+
 # publish proposal
 $proposal_data = json_encode($proposal, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 $options = array('http' => array('method' => 'POST',
