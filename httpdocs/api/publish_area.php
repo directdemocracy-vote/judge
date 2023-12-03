@@ -86,9 +86,9 @@ $options = array('http' => array('method' => 'POST',
                                              "Accept: application/json\r\n"));
 $response = file_get_contents("$notary/api/publish.php", false, stream_context_create($options));
 $json = json_decode($response);
+if (json_last_error() !== JSON_ERROR_NONE)
+  die($reponse);
 if (isset($json->error))
   error($json->error);
-
 die("{\"signature\":\"$area[signature]\"}");
-
 ?>
