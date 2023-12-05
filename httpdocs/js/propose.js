@@ -36,7 +36,7 @@ window.onload = function() {
   document.getElementById('modal-ok-button').addEventListener('click', closeModal);
   let deadlineDefaultDate = new Date();
   deadlineDefaultDate.setMonth(deadlineDefaultDate.getMonth() + 6);
-  document.getElementById('deadline-day').valueAsDate = deadlineDefaultDate;
+  document.getElementById('deadline-date').valueAsDate = deadlineDefaultDate;
   const type = findGetParameter('type', 'none');
   if (type === 'referendum' || type === 'petition') {
     document.getElementById(type).checked = true;
