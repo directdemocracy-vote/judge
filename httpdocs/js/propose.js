@@ -38,8 +38,6 @@ window.onload = function() {
   deadlineDefaultDate.setMonth(deadlineDefaultDate.getMonth() + 6);
   document.getElementById('deadline-date').valueAsDate = deadlineDefaultDate;
   document.getElementById('time-zone').textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  var offset = deadlineDefaultDate.getTimezoneOffset();
-  console.log(offset);
   const type = findGetParameter('type', 'none');
   if (type === 'referendum' || type === 'petition') {
     document.getElementById(type).checked = true;
@@ -212,7 +210,8 @@ window.onload = function() {
           } else
             publication.secret = false;
           const hour = parseInt(document.getElementById('deadline-hour').value);
-          publication.deadline = Math.round(Date.parse(document.getElementById('deadline-date').value) / 1000) + hour * 3600;
+          const offset = Math.ceil(new Date().getTimezoneOffset() / 60);
+          publication.deadline = Math.round(Date.parse(document.getElementById('deadline-date').value) / 1000) + (hour + offset) * 3600;
           const website = document.getElementById('website').value.trim();
           if (website)
             publication.website = website;
