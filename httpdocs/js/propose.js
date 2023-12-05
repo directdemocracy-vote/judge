@@ -35,7 +35,7 @@ window.onload = function() {
   document.getElementById('modal-close-button').addEventListener('click', closeModal);
   document.getElementById('modal-ok-button').addEventListener('click', closeModal);
   let deadlineDefaultDate = new Date();
-  deadlineDefaultDate.setMonth(deadlineDefaultDate.getMonth() + 6);
+  deadlineDefaultDate.setMonth(deadlineDefaultDate.getMonth() + 3);
   document.getElementById('deadline-date').valueAsDate = deadlineDefaultDate;
   document.getElementById('time-zone').textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const type = findGetParameter('type', 'none');
