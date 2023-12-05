@@ -38,6 +38,8 @@ window.onload = function() {
   deadlineDefaultDate.setMonth(deadlineDefaultDate.getMonth() + 6);
   document.getElementById('deadline-date').valueAsDate = deadlineDefaultDate;
   document.getElementById('time-zone').textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  var offset = deadlineDefaultDate.getTimezoneOffset();
+  console.log(offset);
   const type = findGetParameter('type', 'none');
   if (type === 'referendum' || type === 'petition') {
     document.getElementById(type).checked = true;
