@@ -34,8 +34,8 @@ window.onload = function() {
   }
   document.getElementById('modal-close-button').addEventListener('click', closeModal);
   document.getElementById('modal-ok-button').addEventListener('click', closeModal);
-  // const date = new Date();
-  const deadlineDefaultDate = new Date(date.setMonth(date.getMonth() + 6));
+  let deadlineDefaultDate = new Date();
+  deadlineDefaultDate.setMonth(deadlineDefaultDate.getMonth() + 6);
   document.getElementById('deadline-day').valueAsDate = deadlineDefaultDate;
   const type = findGetParameter('type', 'none');
   if (type === 'referendum' || type === 'petition') {
