@@ -76,7 +76,8 @@ window.onload = function() {
   document.getElementById('description').addEventListener('input', validate);
   document.getElementById('question').addEventListener('input', validate);
   document.getElementById('answers').addEventListener('input', validate);
-  document.getElementById('deadline').addEventListener('input', validate);
+  document.getElementById('deadline-date').addEventListener('input', validate);
+  document.getElementById('deadline-hour').addEventListener('input', validate);
 
   function updateArea() {
     fetch(`https://nominatim.openstreetmap.org/reverse.php?format=json&lat=${latitude}&lon=${longitude}&zoom=10`)
@@ -171,7 +172,10 @@ window.onload = function() {
       if (document.getElementById('answers').value === '')
         return;
     }
-    if (document.getElementById('deadline').value === '')
+    if (document.getElementById('deadline-date').value === '')
+      return;
+    const hour = document.getElementById('deadline-hour').value;
+    if (hour === '' || hour > 23 || hour < 0)
       return;
     document.getElementById('publish').removeAttribute('disabled');
   }
@@ -204,7 +208,8 @@ window.onload = function() {
             publication.secret = true;
           } else
             publication.secret = false;
-          publication.deadline = Math.round(Date.parse(document.getElementById('deadline').value) / 1000);
+          const hour = parseInt(document.getElementById('deadline-hour').value);
+          publication.deadline = Math.round(Date.parse(document.getElementById('deadline-date').value) / 1000) + hour * 3600;
           const website = document.getElementById('website').value.trim();
           if (website)
             publication.website = website;
