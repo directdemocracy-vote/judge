@@ -7,7 +7,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: content-type");
 
 if (!isset($_GET['key']))
-  die("\"error\":\"Missing key argument\"}");
+  die('{"error":"missing key argument"}');
 
 $response = file_get_contents("$myself/api/endorse.php");
 
@@ -22,6 +22,17 @@ if ($participant) {
   $reputation = 0;
   $endorsed = 'false';
 }
-
-die("{\"reputation\":$reputation,\"endorsed\":$endorsed}");
+if (!isset($_GET['challenge']))
+  die("{\"reputation\":$reputation,\"endorsed\":$endorsed}");
+$challenge = base64_decode($mysqli->escape_string($_GET['challenge']));
+$private_key = openssl_get_privatekey("file://../../id_rsa");
+if ($private_key == FALSE)
+  die('{"error":"failed to read private key"}');
+$signature = '';
+$success = openssl_sign($challenge, $signature, $private_key, OPENSSL_ALGO_SHA256);
+if ($success === FALSE)
+  die('{"error": "failed to sign area"}');
+$base64_signature = base64_encode($signature);
+$timestamp = time();
+die("{\"reputation\":$reputation,\"endorsed\":$endorsed,\"signature\":\"$base64_signature\",\"timestamp\":$timestamp}");
 ?>
