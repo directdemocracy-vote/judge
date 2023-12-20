@@ -96,16 +96,16 @@ if ($endorsements)
         $endorser->longitude = 0;
       if ($endorser->key !== $endorsement->key)
         die("Key mismatch for endorser in notary database.");
-      $query = "INSERT IGNORE INTO participant(`key`, `signature`, home, reputation, endorsed, changed) "
+      $query = "INSERT IGNORE INTO participant(`key`, `signature`, home, reputation, trusted, changed) "
               ."VALUES(FROM_BASE64('$endorser->key=='), FROM_BASE64('$endorser->signature=='), POINT($endorser->longitude, $endorser->latitude), 0, 0, 0) ";
       $mysqli->query($query) or die("$query $mysqli->error");
       $endorser->id = $mysqli->insert_id;
     } else
       $endorser = $result->fetch_object();
-    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature=FROM_BASE64('$endorsement->endorsedSignature==')";
+    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature=FROM_BASE64('$endorsement->publication==')";
     $result = $mysqli->query($query) or die($mysqli->error);
     if (!$result->num_rows) {
-      $signature = urlencode($endorsement->endorsedSignature);
+      $signature = urlencode($endorsement->publication);
       $response = file_get_contents("$notary/api/publication.php?signature=$signature", false, stream_context_create($options));
       $endorsed = @json_decode($response);
       if ($endorsed === null && json_last_error() !== JSON_ERROR_NONE)
@@ -116,9 +116,9 @@ if ($endorsements)
         $endorsed->latitude = 0;
       if (!isset($endorsed->longitude))
         $endorsed->longitude = 0;
-      if ($endorsed->signature !== $endorsement->endorsedSignature)
+      if ($endorsed->signature !== $endorsement->publication)
         die("Key mismatch for endorsed in notary database.");
-      $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, endorsed, changed) "
+      $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, trusted, changed) "
               ."VALUES(FROM_BASE64('$endorsed->key=='), FROM_BASE64('$endorsed->signature=='), POINT($endorsed->longitude, $endorsed->latitude), 0, 0, 0) ";
       $mysqli->query($query) or die($mysqli->error);
       $endorsed->id = $mysqli->insert_id;
@@ -129,10 +129,10 @@ if ($endorsements)
       $distance = "-1";  # one of them is not a citizen (maybe a judge, a notary or a station)
     else
       $distance = "ST_Distance_Sphere(POINT($endorsed->longitude, $endorsed->latitude), POINT($endorser->longitude, $endorser->latitude))";
-    $revoke = $endorsement->revoke ? 1 : 0;
-    $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
-            ."VALUES($endorser->id, $endorsed->id, $distance, $revoke, FROM_UNIXTIME($endorsement->published)) "
-            ."ON DUPLICATE KEY UPDATE `revoke` = $revoke, date = FROM_UNIXTIME($endorsement->published);";
+    $report = $endorsement->report ? 1 : 0;
+    $query = "INSERT INTO link(endorser, endorsed, distance, report, date) "
+            ."VALUES($endorser->id, $endorsed->id, $distance, $report, FROM_UNIXTIME($endorsement->published)) "
+            ."ON DUPLICATE KEY UPDATE report = $report, date = FROM_UNIXTIME($endorsement->published);";
     $mysqli->query($query) or die($mysqli->error);
   }
 
@@ -158,7 +158,7 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   while($participant = $result->fetch_assoc()) {
     $id = intval($participant['id']);
     $query = "SELECT link.distance, UNIX_TIMESTAMP(link.date) AS date, participant.reputation "
-            ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id AND link.revoke=0";
+            ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id AND link.report=0";
     $r0 = $mysqli->query($query) or die($mysqli->error);
     $sum = 0;
     while($link = $r0->fetch_assoc()) {
@@ -180,38 +180,41 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   }
 }
 
-$count_e = 0;
-$count_r = 0;
+$count_t = 0;
+$count_u = 0;
 $table = '';
 $schema = "https://directdemocracy.vote/json-schema/$version/endorsement.schema.json";
 $private_key = openssl_get_privatekey("file://../../id_rsa") or die("Failed to read private key file");
 $query = "SELECT id, "
         ."REPLACE(REPLACE(TO_BASE64(`key`), '\\n', ''), '=', '') AS `key`, "
         ."REPLACE(REPLACE(TO_BASE64(signature), '\\n', ''), '=', '') AS signature, "
-        ."endorsed, reputation "
+        ."trusted, reputation "
         ."FROM participant WHERE changed=1";
 $result = $mysqli->query($query) or die($mysqli->error);
 while($participant = $result->fetch_assoc()) {
   $id = intval($participant['id']);
   $table .= "$id:\t" . floatval($participant['reputation']) ."\n";
-  $endorsement = array('schema' => $schema,
-                       'key' => $public_key,
-                       'signature' => '',
-                       'published' => $now,
-                       'endorsedSignature' => $participant['signature']);
-  if ($participant['endorsed'] == 0) {
-    $count_r++;
-    $endorsement['revoke'] = true;
-  } else
-    $count_e++;
+  $commitment = array('schema' => $schema,
+                      'key' => $public_key,
+                      'signature' => '',
+                      'published' => $now,
+                      'type': '',
+                      'publication' => $participant['signature']);
+  if ($participant['trusted'] == 0) {
+    $count_t++;
+    $commitment['type'] = 'untrusted';
+  } else {
+    $count_u++;
+    $commitment['type'] = 'trusted';
+  }
   $signature = '';
-  $data = json_encode($endorsement, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+  $data = json_encode($commitment, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
   if ($success === FALSE)
     die("Failed to sign endorsement");
-  $endorsement['signature'] = substr(base64_encode($signature), 0, -2);
+  $commitment['signature'] = substr(base64_encode($signature), 0, -2);
   # publish endorsement for citizen is allowed to vote by this judge
-  $data = json_encode($endorsement, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+  $data = json_encode($commitment, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   $options = array('http' => array('method' => 'POST',
                                    'content' => $data,
                                    'header' => "Content-Type: application/json\r\n" .
@@ -227,5 +230,5 @@ while($participant = $result->fetch_assoc()) {
   $mysqli->query($query) or die($mysqli->error);
 }
 
-die("endorsed $count_e and revoked $count_r citizens out of $N:\n$table");
+die("trusted $count_t and untrusted $count_u citizens out of $N:\n$table");
 ?>
