@@ -212,7 +212,8 @@ window.onload = function() {
           const hour = parseInt(document.getElementById('deadline-hour').value);
           const offset = Math.ceil(new Date().getTimezoneOffset() / 60);
           publication.deadline = Math.round(Date.parse(document.getElementById('deadline-date').value) / 1000) + (hour + offset) * 3600;
-          publication.trust = 3600 * 24 * 7; // one week
+          publication.trust = parseInt(document.getElementById('trust').value);
+          console.log('publication.trust = ' + publication.trust);
           const website = document.getElementById('website').value.trim();
           if (website)
             publication.website = website;
