@@ -194,27 +194,27 @@ $result = $mysqli->query($query) or die($mysqli->error);
 while($participant = $result->fetch_assoc()) {
   $id = intval($participant['id']);
   $table .= "$id:\t" . floatval($participant['reputation']) ."\n";
-  $commitment = array('schema' => $schema,
-                      'key' => $public_key,
-                      'signature' => '',
-                      'published' => $now,
-                      'type': '',
-                      'publication' => $participant['signature']);
+  $certificate = array('schema' => $schema,
+                       'key' => $public_key,
+                       'signature' => '',
+                       'published' => $now,
+                       'type': '',
+                       'publication' => $participant['signature']);
   if ($participant['trusted'] == 0) {
     $count_t++;
-    $commitment['type'] = 'untrusted';
+    $certificate['type'] = 'untrusted';
   } else {
     $count_u++;
-    $commitment['type'] = 'trusted';
+    $certificate['type'] = 'trusted';
   }
   $signature = '';
-  $data = json_encode($commitment, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+  $data = json_encode($certificate, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
   if ($success === FALSE)
     die("Failed to sign endorsement");
-  $commitment['signature'] = substr(base64_encode($signature), 0, -2);
+  $certificate['signature'] = substr(base64_encode($signature), 0, -2);
   # publish endorsement for citizen is allowed to vote by this judge
-  $data = json_encode($commitment, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+  $data = json_encode($certificate, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   $options = array('http' => array('method' => 'POST',
                                    'content' => $data,
                                    'header' => "Content-Type: application/json\r\n" .
