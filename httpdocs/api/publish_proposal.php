@@ -29,7 +29,6 @@ $public_key_file = fopen("../../id_rsa.pub", "r") or die("{\"error\":\"unable to
 $k = fread($public_key_file, filesize("../../id_rsa.pub"));
 fclose($public_key_file);
 $proposal->key = stripped_key($k);
-$proposal->trust = 3600 * 24 * 7; # at least one week before allow a trusted citizen to vote/sign
 $data = json_encode($proposal, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 $private_key = openssl_get_privatekey("file://../../id_rsa");
 if ($private_key == FALSE)
