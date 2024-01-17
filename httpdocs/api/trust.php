@@ -198,7 +198,7 @@ while($participant = $result->fetch_assoc()) {
                        'key' => $public_key,
                        'signature' => '',
                        'published' => $now,
-                       'type': '',
+                       'type' => '',
                        'publication' => $participant['signature']);
   if ($participant['trusted'] == 0) {
     $count_t++;
