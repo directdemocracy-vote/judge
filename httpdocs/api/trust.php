@@ -204,10 +204,10 @@ while($participant = $result->fetch_assoc()) {
                        'publication' => $participant['signature']);
   if ($participant['trusted'] == 0) {
     $count_t++;
-    $certificate['type'] = 'untrusted';
+    $certificate['type'] = 'distrust';
   } else {
     $count_u++;
-    $certificate['type'] = 'trusted';
+    $certificate['type'] = 'trust';
   }
   $signature = '';
   $data = json_encode($certificate, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
