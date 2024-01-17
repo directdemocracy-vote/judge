@@ -50,7 +50,7 @@ $status = $result->fetch_assoc();
 $result->free();
 $last_update = intval($status['lastUpdate']);
 
-if (isset(_GET['force']))
+if (isset($_GET['force']))
   $last_update = 0;
 
 $update_every = 10;
