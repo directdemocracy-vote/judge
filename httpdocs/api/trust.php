@@ -78,8 +78,6 @@ $k = fread($public_key_file, filesize("../../id_rsa.pub"));
 fclose($public_key_file);
 $public_key = stripped_key($k);
 
-die($response);
-
 # insert endorser and endorsed in participant, link
 if ($certificates)
   foreach($certificates as $certificate) {
