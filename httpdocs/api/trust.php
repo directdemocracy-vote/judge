@@ -134,7 +134,7 @@ if ($certificates)
     $revoke = ($certificate->type === 'report' && str_starts_with($certificate->comment, 'revoked+')) ? 1 : 0;
     $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
             ."VALUES($endorser->id, $endorsed->id, $distance, $revoke, FROM_UNIXTIME($certificate->published)) "
-            ."ON DUPLICATE KEY UPDATE report=$revoke, date=FROM_UNIXTIME($certificate->published);";
+            ."ON DUPLICATE KEY UPDATE `revoke`=$revoke, date=FROM_UNIXTIME($certificate->published);";
     $mysqli->query($query) or die($mysqli->error);
   }
 
@@ -160,7 +160,7 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   while($participant = $result->fetch_assoc()) {
     $id = intval($participant['id']);
     $query = "SELECT link.distance, UNIX_TIMESTAMP(link.date) AS date, participant.reputation "
-            ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id AND link.report=0";
+            ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id AND link.`revoke`=0";
     $r0 = $mysqli->query($query) or die($mysqli->error);
     $sum = 0;
     while($link = $r0->fetch_assoc()) {
