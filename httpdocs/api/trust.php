@@ -182,8 +182,8 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
   }
 }
 
-$count_t = 0;
-$count_u = 0;
+$count_trust = 0;
+$count_distrust = 0;
 $table = '';
 $schema = "https://directdemocracy.vote/json-schema/$version/certificate.schema.json";
 $private_key = openssl_get_privatekey("file://../../id_rsa") or die("Failed to read private key file");
@@ -203,10 +203,10 @@ while($participant = $result->fetch_assoc()) {
                        'type' => '',
                        'publication' => $participant['signature']);
   if ($participant['trusted'] == 0) {
-    $count_t++;
+    $count_distrust++;
     $certificate['type'] = 'distrust';
   } else {
-    $count_u++;
+    $count_trust++;
     $certificate['type'] = 'trust';
   }
   $signature = '';
@@ -232,5 +232,5 @@ while($participant = $result->fetch_assoc()) {
   $mysqli->query($query) or die($mysqli->error);
 }
 
-die("trusted $count_t and untrusted $count_u citizens out of $N:\n$table");
+die("trusted $count_trust and untrusted $count_distrust citizens out of $N:\n$table");
 ?>
