@@ -63,7 +63,7 @@ $mysqli->query($query) or die($mysqli->error);
 
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
-$url = "$notary/api/publications.php?type=endorsement&published_from=$last_update";
+$url = "$notary/api/publications.php?type=certificate&certificate_type=endorse+report&since=$last_update";
 $response = file_get_contents($url, false, stream_context_create($options));
 $endorsements = @json_decode($response);
 if ($endorsements === null && json_last_error() !== JSON_ERROR_NONE)
