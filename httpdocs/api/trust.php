@@ -131,7 +131,7 @@ if ($certificates)
       $distance = "-1";  # one of them is not a citizen (maybe a judge, a notary or a station)
     else
       $distance = "ST_Distance_Sphere(POINT($endorsed->longitude, $endorsed->latitude), POINT($endorser->longitude, $endorser->latitude))";
-    $report = $certificate->report ? 1 : 0;
+    $report = $certificate->type === 'report' && str_starts_with($certificate->comment, 'revoked+');
     $query = "INSERT INTO link(endorser, endorsed, distance, report, date) "
             ."VALUES($endorser->id, $endorsed->id, $distance, $report, FROM_UNIXTIME($certificate->published)) "
             ."ON DUPLICATE KEY UPDATE report = $report, date = FROM_UNIXTIME($certificate->published);";
