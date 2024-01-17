@@ -65,27 +65,28 @@ $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
 $url = "$notary/api/publications.php?type=certificate&certificate_type=endorse+report&since=$last_update";
 $response = file_get_contents($url, false, stream_context_create($options));
-$endorsements = @json_decode($response);
-if ($endorsements === null && json_last_error() !== JSON_ERROR_NONE)
+$certificates = @json_decode($response);
+if ($certificates === null && json_last_error() !== JSON_ERROR_NONE)
   die($response);
-if (isset($endorsements->error))
-  die($endorsements->error);
+if (isset($certificates->error))
+  die($certificates->error);
 $public_key_file = fopen("../../id_rsa.pub", "r") or die("Failed to read public key file");
 $k = fread($public_key_file, filesize("../../id_rsa.pub"));
 fclose($public_key_file);
 $public_key = stripped_key($k);
 
+die($response);
+
 # insert endorser and endorsed in participant, link
-if ($endorsements)
-  foreach($endorsements as $endorsement) {
-    if ($endorsement->key == $public_key)  # ignore mine
-      continue;
-    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE `key` = FROM_BASE64('$endorsement->key==')";  # endorser
+if ($certificates)
+  foreach($certificates as $certificate) {
+    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE `key` = FROM_BASE64('$certificate->key==')";  # endorser
     $result = $mysqli->query($query) or die($mysqli->error);
     if (!$result->num_rows) {
-      $key = urlencode($endorsement->key);
+      $key = urlencode($certificate->key);
       $response = file_get_contents("$notary/api/publication.php?key=$key", false, stream_context_create($options));
       $endorser = @json_decode($response);
+      # TODO: verify signatures of publication
       if ($endorser === null && json_last_error() !== JSON_ERROR_NONE)
         die($response);
       if (isset($endorser->error))
@@ -94,7 +95,7 @@ if ($endorsements)
         $endorser->latitude = 0;
       if (!isset($endorser->longitude))
         $endorser->longitude = 0;
-      if ($endorser->key !== $endorsement->key)
+      if ($endorser->key !== $certificate->key)
         die("Key mismatch for endorser in notary database.");
       $query = "INSERT IGNORE INTO participant(`key`, `signature`, home, reputation, trusted, changed) "
               ."VALUES(FROM_BASE64('$endorser->key=='), FROM_BASE64('$endorser->signature=='), POINT($endorser->longitude, $endorser->latitude), 0, 0, 0) ";
@@ -102,10 +103,10 @@ if ($endorsements)
       $endorser->id = $mysqli->insert_id;
     } else
       $endorser = $result->fetch_object();
-    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature=FROM_BASE64('$endorsement->publication==')";
+    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature=FROM_BASE64('$certificate->publication==')";
     $result = $mysqli->query($query) or die($mysqli->error);
     if (!$result->num_rows) {
-      $signature = urlencode($endorsement->publication);
+      $signature = urlencode($certificate->publication);
       $response = file_get_contents("$notary/api/publication.php?signature=$signature", false, stream_context_create($options));
       $endorsed = @json_decode($response);
       if ($endorsed === null && json_last_error() !== JSON_ERROR_NONE)
@@ -116,7 +117,7 @@ if ($endorsements)
         $endorsed->latitude = 0;
       if (!isset($endorsed->longitude))
         $endorsed->longitude = 0;
-      if ($endorsed->signature !== $endorsement->publication)
+      if ($endorsed->signature !== $certificate->publication)
         die("Key mismatch for endorsed in notary database.");
       $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, trusted, changed) "
               ."VALUES(FROM_BASE64('$endorsed->key=='), FROM_BASE64('$endorsed->signature=='), POINT($endorsed->longitude, $endorsed->latitude), 0, 0, 0) ";
@@ -129,10 +130,10 @@ if ($endorsements)
       $distance = "-1";  # one of them is not a citizen (maybe a judge, a notary or a station)
     else
       $distance = "ST_Distance_Sphere(POINT($endorsed->longitude, $endorsed->latitude), POINT($endorser->longitude, $endorser->latitude))";
-    $report = $endorsement->report ? 1 : 0;
+    $report = $certificate->report ? 1 : 0;
     $query = "INSERT INTO link(endorser, endorsed, distance, report, date) "
-            ."VALUES($endorser->id, $endorsed->id, $distance, $report, FROM_UNIXTIME($endorsement->published)) "
-            ."ON DUPLICATE KEY UPDATE report = $report, date = FROM_UNIXTIME($endorsement->published);";
+            ."VALUES($endorser->id, $endorsed->id, $distance, $report, FROM_UNIXTIME($certificate->published)) "
+            ."ON DUPLICATE KEY UPDATE report = $report, date = FROM_UNIXTIME($certificate->published);";
     $mysqli->query($query) or die($mysqli->error);
   }
 
