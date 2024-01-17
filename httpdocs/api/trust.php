@@ -175,9 +175,9 @@ for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
     $new_reputation = reputation_function(2 / (1 + sqrt($total_reputation / $N)) + $sum);
     $query = "UPDATE participant SET reputation=$new_reputation WHERE id=$id";
     $mysqli->query($query) or die($mysqli->error);
-    $query = "UPDATE participant SET endorsed=1, changed=1 WHERE id=$id AND endorsed=0 AND reputation>$threshold";
+    $query = "UPDATE participant SET trusted=1, changed=1 WHERE id=$id AND trusted=0 AND reputation>$threshold";
     $mysqli->query($query) or die($mysqli->error);
-    $query = "UPDATE participant SET endorsed=0, changed=1 WHERE id=$id AND endorsed=1 AND reputation<$threshold";
+    $query = "UPDATE participant SET trusted=0, changed=1 WHERE id=$id AND trusted=1 AND reputation<$threshold";
     $mysqli->query($query) or die($mysqli->error);
   }
 }
