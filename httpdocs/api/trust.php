@@ -134,7 +134,7 @@ if ($certificates)
     $revoke = ($certificate->type === 'report' && str_starts_with($certificate->comment, 'revoked+')) ? 1 : 0;
     $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
             ."VALUES($endorser->id, $endorsed->id, $distance, $revoke, FROM_UNIXTIME($certificate->published)) "
-            ."ON DUPLICATE KEY UPDATE report = $report, date = FROM_UNIXTIME($certificate->published);";
+            ."ON DUPLICATE KEY UPDATE report=$revoke, date=FROM_UNIXTIME($certificate->published);";
     $mysqli->query($query) or die($mysqli->error);
   }
 
