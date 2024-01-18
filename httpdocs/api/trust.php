@@ -129,7 +129,7 @@ if ($certificates)
     else
       $distance = "ST_Distance_Sphere(POINT($endorsed->longitude, $endorsed->latitude), POINT($endorser->longitude, $endorser->latitude))";
     if ($certificate->type === 'report' && ($certificate->comment === 'updated' || $certificate->comment === 'transferred' || $certificate->comment === 'deleted'))
-      $query = "UPDATE participant SET trusted=-1, changed=1 WHERE participant.`key`=FROM_BASE64('$endorsed->key==')";
+      $query = "UPDATE participant SET trusted=-1, changed=1 WHERE participant.id=$endorsed->id)";
     else {
       $revoke = ($certificate->type === 'report' && str_starts_with($certificate->comment, 'revoked+')) ? 1 : 0;
       $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
