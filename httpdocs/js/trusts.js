@@ -2,7 +2,7 @@ window.onload = function() {
   const judge = window.location.protocol + '//' + window.location.host;
   const notary = judge.replace('judge', 'notary');
   const content = document.getElementById('content');
-  fetch(`${notary}/api/judge.php`, {method: 'POST',
+  fetch(`${notary}/api/trusts.php`, {method: 'POST',
     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
     body: `judge=${encodeURIComponent(judge)}`})
     .then(response => response.json())
