@@ -103,7 +103,7 @@ if ($certificates)
       $endorser = $result->fetch_object();
     $deleted = $certificate->type === 'report' && ($certificate->comment === 'updated' || $certificate->comment === 'transferred' || $certificate->comment === 'deleted');
     if ($deleted)
-      $mysqli->query("UPDATE participant SET updated=trusted, trusted=-1 WHERE signature=FROM_BASE64('$certificate->publication==')") or die($mysqli->error);
+      $mysqli->query("UPDATE participant SET changed=trusted, trusted=-1 WHERE signature=FROM_BASE64('$certificate->publication==')") or die($mysqli->error);
     else {
       $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature=FROM_BASE64('$certificate->publication==')";
       $result = $mysqli->query($query) or die($mysqli->error);
