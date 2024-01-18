@@ -63,7 +63,7 @@ $mysqli->query($query) or die($mysqli->error);
 
 $options = array('http' => array('method' => 'GET',
                                  'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"));
-$url = "$notary/api/publications.php?type=certificate&certificate_type=endorse+report&since=$last_update";
+$url = "$notary/api/publications.php?type=certificate&since=$last_update";
 $response = file_get_contents($url, false, stream_context_create($options));
 $certificates = @json_decode($response);
 if ($certificates === null && json_last_error() !== JSON_ERROR_NONE)
@@ -128,10 +128,14 @@ if ($certificates)
       $distance = "-1";  # one of them is not a citizen (maybe a judge, a notary or a station)
     else
       $distance = "ST_Distance_Sphere(POINT($endorsed->longitude, $endorsed->latitude), POINT($endorser->longitude, $endorser->latitude))";
-    $revoke = ($certificate->type === 'report' && str_starts_with($certificate->comment, 'revoked+')) ? 1 : 0;
-    $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
-            ."VALUES($endorser->id, $endorsed->id, $distance, $revoke, FROM_UNIXTIME($certificate->published)) "
-            ."ON DUPLICATE KEY UPDATE `revoke`=$revoke, date=FROM_UNIXTIME($certificate->published);";
+    if ($certificate->type === 'report' && ($certificate->comment === 'updated' || $certificate->comment === 'transferred' || $certificate->comment === 'deleted')) {
+      $query = "UPDATE participant SET trusted=-1, changed=1 WHERE participant.`key`=FROM_BASE64('$endorsed->key==')";
+    else {
+      $revoke = ($certificate->type === 'report' && str_starts_with($certificate->comment, 'revoked+')) ? 1 : 0;
+      $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
+              ."VALUES($endorser->id, $endorsed->id, $distance, $revoke, FROM_UNIXTIME($certificate->published)) "
+              ."ON DUPLICATE KEY UPDATE `revoke`=$revoke, date=FROM_UNIXTIME($certificate->published);";
+    }
     $mysqli->query($query) or die($mysqli->error);
   }
 
@@ -147,17 +151,17 @@ if ($N == 0)
 
 $threshold = 0.5;
 for($i = 0; $i < 15; $i++) {  # supposed to converge in about 13 iterations
-  $query = "SELECT SUM(reputation) AS total_reputation FROM participant";
+  $query = "SELECT SUM(reputation) AS total_reputation FROM participant WHERE trusted!=-1";
   $result = $mysqli->query($query) or die($mysqli->error);
   $count = $result->fetch_assoc();
   $total_reputation = floatval($count['total_reputation']);
 
-  $query = "SELECT id FROM participant";
+  $query = "SELECT id FROM participant WHERE trusted!=-1";
   $result = $mysqli->query($query) or die($mysqli->error);
   while($participant = $result->fetch_assoc()) {
     $id = intval($participant['id']);
     $query = "SELECT link.distance, UNIX_TIMESTAMP(link.date) AS date, participant.reputation "
-            ."FROM link INNER JOIN participant ON participant.id = link.endorser WHERE link.endorsed=$id AND link.`revoke`=0";
+            ."FROM link INNER JOIN participant ON participant.id = link.endorser AND participant.trusted!=-1 WHERE link.endorsed=$id AND link.`revoke`=0";
     $r0 = $mysqli->query($query) or die($mysqli->error);
     $sum = 0;
     while($link = $r0->fetch_assoc()) {
@@ -193,13 +197,14 @@ $result = $mysqli->query($query) or die($mysqli->error);
 while($participant = $result->fetch_assoc()) {
   $id = intval($participant['id']);
   $table .= "$id:\t" . floatval($participant['reputation']) ."\n";
+  $trusted = intval($participant['trusted']);
   $certificate = array('schema' => $schema,
                        'key' => $public_key,
                        'signature' => '',
                        'published' => $now,
                        'type' => '',
                        'publication' => $participant['signature']);
-  if ($participant['trusted'] == 0) {
+  if ($trusted <= 0) {
     $count_distrust++;
     $certificate['type'] = 'distrust';
   } else {
