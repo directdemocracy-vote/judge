@@ -38,6 +38,6 @@ ALTER TABLE `participant`
 
 
 ALTER TABLE `link`
-  ADD CONSTRAINT `endorsed` FOREIGN KEY (`endorsed`) REFERENCES `participant` (`id`),
-  ADD CONSTRAINT `endorser` FOREIGN KEY (`endorser`) REFERENCES `participant` (`id`);
+  ADD CONSTRAINT `endorsed` FOREIGN KEY (`endorsed`) REFERENCES `participant` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `endorser` FOREIGN KEY (`endorser`) REFERENCES `participant` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 COMMIT;
