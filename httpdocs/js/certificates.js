@@ -34,16 +34,17 @@ window.onload = function() {
         tbody.appendChild(tr);
         const certificate = answer.certificates[i];
         let td = document.createElement('td');
+        const trusted = certificate.type === 'trust';
         if (certificate.latest) {
           td.setAttribute('align', 'center');
-          const title = certificate.trusted ? 'trusted' : 'distrusted';
-          const color = certificate.trusted ? 'green' : 'red';
-          const icon = certificate.trusted ? 'checkmark_seal_fill' : 'xmark_seal_fill';
+          const title = trusted ? 'trusted' : 'distrusted';
+          const color = trusted ? 'green' : 'red';
+          const icon = trusted ? 'checkmark_seal_fill' : 'xmark_seal_fill';
           td.innerHTML = `<i title="${title}" class="icon f7-icons" style="color:${color};font-size:110%">${icon}</i>`;
         }
         tr.appendChild(td);
         td = document.createElement('td');
-        if (!certificate.trusted) {
+        if (!trusted) {
           td.style.textDecoration = 'line-through';
           td.title = 'distrusted';
         } else
