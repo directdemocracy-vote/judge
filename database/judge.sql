@@ -8,7 +8,7 @@ CREATE TABLE `link` (
   `revoke` tinyint(1) NOT NULL,
   `date` datetime NOT NULL,
   `distance` float NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `participant` (
   `id` int(11) NOT NULL,
@@ -18,11 +18,11 @@ CREATE TABLE `participant` (
   `reputation` float NOT NULL,
   `trusted` tinyint(1) NOT NULL,
   `changed` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `status` (
   `lastUpdate` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 ALTER TABLE `link`
