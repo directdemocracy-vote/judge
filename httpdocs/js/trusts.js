@@ -29,32 +29,32 @@ window.onload = function() {
       th.innerHTML = 'Date';
       const tbody = document.createElement('tbody');
       table.appendChild(tbody);
-      for (let i = 0; i < answer.endorsements.length; i++) {
+      for (let i = 0; i < answer.trusts.length; i++) {
         const tr = document.createElement('tr');
         tbody.appendChild(tr);
-        const endorsement = answer.endorsements[i];
+        const trust = answer.trusts[i];
         let td = document.createElement('td');
-        if (endorsement.latest) {
+        if (trust.latest) {
           td.setAttribute('align', 'center');
-          const title = endorsement.revoke ? 'revoked' : 'endorsed';
-          const color = endorsement.revoke ? 'red' : 'green';
-          const icon = endorsement.revoke ? 'xmark_seal_fill' : 'checkmark_seal_fill';
+          const title = trust.trusted ? 'trusted' : 'distrusted';
+          const color = trust.trusted ? 'green' : 'red';
+          const icon = trust.trusted ? 'checkmark_seal_fill' : 'xmark_seal_fill';
           td.innerHTML = `<i title="${title}" class="icon f7-icons" style="color:${color};font-size:110%">${icon}</i>`;
         }
         tr.appendChild(td);
         td = document.createElement('td');
-        if (endorsement.revoke) {
+        if (!trust.trusted) {
           td.style.textDecoration = 'line-through';
-          td.title = 'revoked';
+          td.title = 'distrusted';
         } else
-          td.title = 'endorsed';
+          td.title = 'trusted';
         const a = document.createElement('a');
         td.appendChild(a);
-        a.href = `${notary}/citizen.html?signature=${encodeURIComponent(endorsement.signature)}`;
-        a.innerHTML = endorsement.givenNames + ' ' + endorsement.familyName;
+        a.href = `${notary}/citizen.html?signature=${encodeURIComponent(trust.signature)}`;
+        a.innerHTML = trust.givenNames + ' ' + trust.familyName;
         tr.appendChild(td);
         td = document.createElement('td');
-        td.innerHTML = new Date(endorsement.published * 1000).toLocaleString();
+        td.innerHTML = new Date(trust.published * 1000).toLocaleString();
         tr.appendChild(td);
       }
       content.appendChild(table);
