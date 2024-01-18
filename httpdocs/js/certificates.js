@@ -51,7 +51,7 @@ window.onload = function() {
           td.title = 'trusted';
         const a = document.createElement('a');
         td.appendChild(a);
-        a.href = `${notary}/citizen.html?signature=${encodeURIComponent(trust.signature)}`;
+        a.href = `${notary}/citizen.html?signature=${encodeURIComponent(certificate.signature)}`;
         a.innerHTML = certificate.givenNames + ' ' + certificate.familyName;
         tr.appendChild(td);
         td = document.createElement('td');
