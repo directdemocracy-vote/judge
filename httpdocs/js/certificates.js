@@ -2,7 +2,7 @@ window.onload = function() {
   const judge = window.location.protocol + '//' + window.location.host;
   const notary = judge.replace('judge', 'notary');
   const content = document.getElementById('content');
-  fetch(`${notary}/api/judge.php`, {method: 'POST',
+  fetch(`${notary}/api/certificates.php`, {method: 'POST',
     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
     body: `judge=${encodeURIComponent(judge)}`})
     .then(response => response.json())
@@ -29,21 +29,21 @@ window.onload = function() {
       th.innerHTML = 'Date';
       const tbody = document.createElement('tbody');
       table.appendChild(tbody);
-      for (let i = 0; i < answer.trusts.length; i++) {
+      for (let i = 0; i < answer.certificates.length; i++) {
         const tr = document.createElement('tr');
         tbody.appendChild(tr);
-        const trust = answer.trusts[i];
+        const certificate = answer.certificates[i];
         let td = document.createElement('td');
-        if (trust.latest) {
+        if (certificate.latest) {
           td.setAttribute('align', 'center');
-          const title = trust.trusted ? 'trusted' : 'distrusted';
-          const color = trust.trusted ? 'green' : 'red';
-          const icon = trust.trusted ? 'checkmark_seal_fill' : 'xmark_seal_fill';
+          const title = certificate.trusted ? 'trusted' : 'distrusted';
+          const color = certificate.trusted ? 'green' : 'red';
+          const icon = certificate.trusted ? 'checkmark_seal_fill' : 'xmark_seal_fill';
           td.innerHTML = `<i title="${title}" class="icon f7-icons" style="color:${color};font-size:110%">${icon}</i>`;
         }
         tr.appendChild(td);
         td = document.createElement('td');
-        if (!trust.trusted) {
+        if (!certificate.trusted) {
           td.style.textDecoration = 'line-through';
           td.title = 'distrusted';
         } else
@@ -51,10 +51,10 @@ window.onload = function() {
         const a = document.createElement('a');
         td.appendChild(a);
         a.href = `${notary}/citizen.html?signature=${encodeURIComponent(trust.signature)}`;
-        a.innerHTML = trust.givenNames + ' ' + trust.familyName;
+        a.innerHTML = certificate.givenNames + ' ' + certificate.familyName;
         tr.appendChild(td);
         td = document.createElement('td');
-        td.innerHTML = new Date(trust.published * 1000).toLocaleString();
+        td.innerHTML = new Date(certificate.published * 1000).toLocaleString();
         tr.appendChild(td);
       }
       content.appendChild(table);
