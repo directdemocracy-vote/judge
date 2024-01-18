@@ -128,7 +128,7 @@ if ($certificates)
       $distance = "-1";  # one of them is not a citizen (maybe a judge, a notary or a station)
     else
       $distance = "ST_Distance_Sphere(POINT($endorsed->longitude, $endorsed->latitude), POINT($endorser->longitude, $endorser->latitude))";
-    if ($certificate->type === 'report' && ($certificate->comment === 'updated' || $certificate->comment === 'transferred' || $certificate->comment === 'deleted')) {
+    if ($certificate->type === 'report' && ($certificate->comment === 'updated' || $certificate->comment === 'transferred' || $certificate->comment === 'deleted'))
       $query = "UPDATE participant SET trusted=-1, changed=1 WHERE participant.`key`=FROM_BASE64('$endorsed->key==')";
     else {
       $revoke = ($certificate->type === 'report' && str_starts_with($certificate->comment, 'revoked+')) ? 1 : 0;
