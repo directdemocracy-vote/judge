@@ -144,7 +144,7 @@ if ($certificates)
 # run the reputation algorithm, see https://github.com/directdemocracy-vote/judge/blob/master/httpdocs/reputation_algorithm.md
 
 # N is the new total number of entities
-$query = "SELECT COUNT(*) AS N FROM participant WHERE trust!=-1";
+$query = "SELECT COUNT(*) AS N FROM participant WHERE trusted!=-1";
 $result = $mysqli->query($query) or die($mysqli->error);
 $count = $result->fetch_assoc();
 $N = intval($count['N']);
