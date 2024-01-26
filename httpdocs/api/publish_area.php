@@ -65,28 +65,29 @@ $context = stream_context_create($options);
 $result = file_get_contents($url, false, $context);
 $search = json_decode($result);
 if (!$names) {
-  if (isset($search->suburb))
-    $names[] = "suburb=$search->suburb";
-  if (isset($search->borough))
-    $names[] = "borough=$search->borough";
-  if (isset($search->village))
-    $names[] = "village=$search->village";
-  if (isset($search->town))
-    $names[] = "town=$search->town";
-  if (isset($search->city))
-    $names[] = "city=$search->city";
-  if (isset($search->county))
-    $names[] = "county=$search->county";
-  if (isset($search->district))
-    $names[] = "district=$search->district";
-  if (isset($search->province))
-    $names[] = "province=$search->province";
-  if (isset($search->state_district))
-    $names[] = "state_district=$search->state_district";
-  if (isset($search->state))
-    $names[] = "state=$search->state";
-  if (isset($search->country))
-    $names[] = "country=$search->country";
+  $address = &$search->address;
+  if (isset($address->suburb))
+    $names[] = "suburb=$address->suburb";
+  if (isset($address->borough))
+    $names[] = "borough=$address->borough";
+  if (isset($address->village))
+    $names[] = "village=$address->village";
+  if (isset($address->town))
+    $names[] = "town=$address->town";
+  if (isset($address->city))
+    $names[] = "city=$address->city";
+  if (isset($address->county))
+    $names[] = "county=$address->county";
+  if (isset($address->district))
+    $names[] = "district=$address->district";
+  if (isset($address->province))
+    $names[] = "province=$address->province";
+  if (isset($address->state_district))
+    $names[] = "state_district=$address->state_district";
+  if (isset($address->state))
+    $names[] = "state=$address->state";
+  if (isset($address->country))
+    $names[] = "country=$address->country";
 }
 $schema = "https://directdemocracy.vote/json-schema/$version/area.schema.json";
 $area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => time(), 'name' => $names, 'polygons' => null, 'local' => $local);
