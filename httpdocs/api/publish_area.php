@@ -67,7 +67,7 @@ $search = json_decode($result);
 
 $schema = "https://directdemocracy.vote/json-schema/$version/area.schema.json";
 $area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => time(), 'name' => $names, 'polygons' => null, 'local' => $local);
-if ($local) {
+if ($local)
   $place = &$search;
 else {
   if (count($search) == 0)
