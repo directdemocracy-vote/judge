@@ -102,6 +102,7 @@ window.onload = function() {
           'county',
           'district',
           'province',
+          'state_district',
           'state',
           'country'];
         admin.forEach(function(item) { addAdminLevel(item); });
