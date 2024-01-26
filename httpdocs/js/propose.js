@@ -92,8 +92,11 @@ window.onload = function() {
           if (level in address)
             select.options[count++] = new Option(address[level], level);
         }
-        // we ignore admin levels lower than 'village': 'block', 'neighbourhood', 'quarter', 'suburb', 'borough' and 'hamlet'
+        // we ignore admin levels lower than 'suburb': 'block', 'neighbourhood', 'quarter'
         const admin = [
+          'suburb',
+          'borough',
+          'hamlet',
           'village',
           'town',
           'city',
