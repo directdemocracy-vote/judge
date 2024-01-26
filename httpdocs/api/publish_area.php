@@ -20,20 +20,25 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: content-type");
 
 $names = array();
-$query = '';
 $message = '';
-$local = false;
-foreach($_GET as $key => $value) {
-  if ($key === 'local')
-    $local = ($value == '1');
-  else {
+
+if (isset($_GET['lat']) && isset($_GET['lon'])) {
+  $local = true;
+  $lat = floatval($_GET['lat']);
+  $lon = floatval($_GET['lon']);
+  $query = "reverse?lat=$lat&lon=$lon&";
+  $message = "($lat, $lon)";
+} else {
+  $local = false;
+  $query = 'search?':
+  foreach($_GET as $key => $value) {
     $names[] = "$key=$value";
     $query .= "$key=" . urlencode($value) . "&";
     $message .= "$value, ";
   }
+  if ($message)
+    $message = substr($message, 0, -2);
 }
-if ($message)
-  $message = substr($message, 0, -2);
 
 # check if the area is not already published with a validity of at least 1 year.
 $public_key_file = fopen("../../id_rsa.pub", "r") or die("{\"error\":\"unable to open public key file\"}");
@@ -52,7 +57,7 @@ $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
 
-$url = "https://nominatim.openstreetmap.org/search?". $query . "zoom=12&polygon_geojson=1&format=json";
+$url = "https://nominatim.openstreetmap.org/". $query . "zoom=12&polygon_geojson=1&format=json";
 $options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemocracy\r\n" ] ];
 $context = stream_context_create($options);
 $result = file_get_contents($url, false, $context);
