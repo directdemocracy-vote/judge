@@ -26,7 +26,6 @@ if (isset($_GET['lat']) && isset($_GET['lon'])) {
   $lat = floatval($_GET['lat']);
   $lon = floatval($_GET['lon']);
   $query = "reverse?lat=$lat&lon=$lon&";
-  $message = "($lat, $lon)";
 } else {
   $local = false;
   $query = 'search?';
@@ -68,12 +67,13 @@ $search = json_decode($result);
 
 $schema = "https://directdemocracy.vote/json-schema/$version/area.schema.json";
 $area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => time(), 'name' => $names, 'polygons' => null, 'local' => $local);
-if (!$local)
+if ($local) {
+  $place = &$search;
+else {
   if (count($search) == 0)
     die("Area not found: $message");
   $place = $search[0]; // FIXME: &$search[0]
-} else
-  $place = &$search;
+}
 $geojson = $place->geojson;
 if ($geojson->type == 'Polygon') {
   $polygons = array();
