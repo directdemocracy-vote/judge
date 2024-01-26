@@ -22,10 +22,15 @@ header("Access-Control-Allow-Headers: content-type");
 $names = array();
 $query = '';
 $message = '';
+$local = false;
 foreach($_GET as $key => $value) {
-  $names[] = "$key=$value";
-  $query .= "$key=" . urlencode($value) . "&";
-  $message .= "$value, ";
+  if ($key === 'local')
+    $local = ($value == '1');
+  else {
+    $names[] = "$key=$value";
+    $query .= "$key=" . urlencode($value) . "&";
+    $message .= "$value, ";
+  }
 }
 if ($message)
   $message = substr($message, 0, -2);
@@ -47,14 +52,14 @@ $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
 
-$url = "https://nominatim.openstreetmap.org/search?". $query . "zoom=10&polygon_geojson=1&format=json";
+$url = "https://nominatim.openstreetmap.org/search?". $query . "zoom=12&polygon_geojson=1&format=json";
 $options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemocracy\r\n" ] ];
 $context = stream_context_create($options);
 $result = file_get_contents($url, false, $context);
 $search = json_decode($result);
 
 $schema = "https://directdemocracy.vote/json-schema/$version/area.schema.json";
-$area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => time(), 'name' => $names, 'polygons' => null);
+$area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => time(), 'name' => $names, 'polygons' => null, 'local' => $local);
 if (count($search) == 0)
   die("Area not found: $message");
 $place = $search[0];
@@ -67,6 +72,7 @@ if ($geojson->type == 'Polygon') {
 } else
   error("Unsupported geometry type: '$geojson->type'");
 $area['polygons'] = &$polygons;
+
 # sign area
 $data = json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 $private_key = openssl_get_privatekey("file://../../id_rsa");
