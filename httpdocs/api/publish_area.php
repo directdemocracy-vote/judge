@@ -64,14 +64,16 @@ $url = "https://nominatim.openstreetmap.org/". $query . "zoom=12&polygon_geojson
 $options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemocracy\r\n" ] ];
 $context = stream_context_create($options);
 $result = file_get_contents($url, false, $context);
-die($url . ' ==== ' . $result);
 $search = json_decode($result);
 
 $schema = "https://directdemocracy.vote/json-schema/$version/area.schema.json";
 $area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => time(), 'name' => $names, 'polygons' => null, 'local' => $local);
-if (count($search) == 0)
-  die("Area not found: $message");
-$place = $search[0];
+if (!$local)
+  if (count($search) == 0)
+    die("Area not found: $message");
+  $place = $search[0]; // FIXME: &$search[0]
+} else
+  $place = &$search;
 $geojson = $place->geojson;
 if ($geojson->type == 'Polygon') {
   $polygons = array();
