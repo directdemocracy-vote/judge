@@ -20,7 +20,6 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: content-type");
 
 $names = array();
-$message = '';
 
 if (isset($_GET['lat']) && isset($_GET['lon'])) {
   $local = true;
@@ -30,7 +29,8 @@ if (isset($_GET['lat']) && isset($_GET['lon'])) {
   $message = "($lat, $lon)";
 } else {
   $local = false;
-  $query = 'search?':
+  $query = 'search?';
+  $message = '';
   foreach($_GET as $key => $value) {
     $names[] = "$key=$value";
     $query .= "$key=" . urlencode($value) . "&";
