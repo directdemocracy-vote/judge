@@ -19,7 +19,7 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: content-type");
 
-$names = array();
+$names = [];
 
 if (isset($_GET['lat']) && isset($_GET['lon'])) {
   $local = true;
@@ -64,7 +64,30 @@ $options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemoc
 $context = stream_context_create($options);
 $result = file_get_contents($url, false, $context);
 $search = json_decode($result);
-
+if (!$names) {
+  if (isset($search->suburb))
+    $names[] = "suburb=$search->suburb";
+  if (isset($search->borough))
+    $names[] = "borough=$search->borough";
+  if (isset($search->village))
+    $names[] = "village=$search->village";
+  if (isset($search->town))
+    $names[] = "town=$search->town";
+  if (isset($search->city))
+    $names[] = "city=$search->city";
+  if (isset($search->county))
+    $names[] = "county=$search->county";
+  if (isset($search->district))
+    $names[] = "district=$search->district";
+  if (isset($search->province))
+    $names[] = "province=$search->province";
+  if (isset($search->state_district))
+    $names[] = "state_district=$search->state_district";
+  if (isset($search->state))
+    $names[] = "state=$search->state";
+  if (isset($search->country))
+    $names[] = "country=$search->country";
+}
 $schema = "https://directdemocracy.vote/json-schema/$version/area.schema.json";
 $area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => time(), 'name' => $names, 'polygons' => null, 'local' => $local);
 if ($local)
