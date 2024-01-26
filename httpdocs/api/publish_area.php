@@ -46,7 +46,10 @@ $k = fread($public_key_file, filesize("../../id_rsa.pub"));
 fclose($public_key_file);
 $key = stripped_key($k);
 
-$request = array("judge" => $key, "area" => implode("\n", $names));
+if ($local)
+  $request = array("judge" => $key, "lat" => $lat, "lon" => $lon);
+else
+  $request = array("judge" => $key, "area" => implode("\n", $names));
 $data = json_encode($request, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 $options = array('http' => array('method' => 'POST',
                                  'content' => $data,
