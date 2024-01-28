@@ -207,9 +207,12 @@ window.onload = function() {
           if (type === 'referendum') {
             publication.question = document.getElementById('question').value.trim();
             publication.answers = document.getElementById('answers').value.trim().split('\n');
+            publication.type = type;
             publication.secret = true;
-          } else
+          } else {
+            publication.type = type;
             publication.secret = false;
+          }
           const hour = parseInt(document.getElementById('deadline-hour').value);
           const offset = Math.ceil(new Date().getTimezoneOffset() / 60);
           publication.deadline = Math.round(Date.parse(document.getElementById('deadline-date').value) / 1000) + (hour + offset) * 3600;
