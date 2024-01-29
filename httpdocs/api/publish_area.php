@@ -58,6 +58,8 @@ $response = file_get_contents("$notary/api/area.php", false, stream_context_crea
 $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
+if (isset($json->signature))
+  die($response);
 
 $url = "https://nominatim.openstreetmap.org/". $query . "zoom=12&polygon_geojson=1&format=json";
 $options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemocracy\r\n" ] ];
