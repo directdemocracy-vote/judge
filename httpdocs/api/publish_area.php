@@ -94,7 +94,7 @@ if (!$names) {
     $names[] = "country=$address->country";
 }
 $schema = "https://directdemocracy.vote/json-schema/$version/area.schema.json";
-$area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => time(), 'name' => $names, 'polygons' => null, 'local' => $local);
+$area = array('schema' => $schema, 'key' => $key, 'signature' => '', 'published' => time(), 'id' => 0, 'name' => $names, 'polygons' => null, 'local' => $local);
 if ($local)
   $place = &$search;
 else {
@@ -112,7 +112,7 @@ else
   error("Unsupported geometry type: '$geojson->type'");
 $area['polygons'] = &$polygons;
 $mysqli->query("UPDATE status SET areaCount=LAST_INSERT_ID(areaCount+1)") or die($mysqli->error);
-$area['id'] = $mysqli->insert_id;
+$area['id'] = intval($mysqli->insert_id);
 # sign area
 $data = json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 $private_key = openssl_get_privatekey("file://../../id_rsa");
