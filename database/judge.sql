@@ -21,7 +21,8 @@ CREATE TABLE `participant` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `status` (
-  `lastUpdate` datetime NOT NULL
+  `lastUpdate` datetime NOT NULL,
+  `areaCount` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
