@@ -60,7 +60,7 @@ $response = file_get_contents("$notary/api/area.php", false, stream_context_crea
 $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
-if (isset($json->signature))
+if (isset($json->id) && $json->id !== 0)
   die($response);
 
 $url = "https://nominatim.openstreetmap.org/". $query . "zoom=12&polygon_geojson=1&format=json";
