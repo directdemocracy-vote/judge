@@ -2,7 +2,7 @@
 $version = "2";
 $notary = 'https://notary.directdemocracy.vote';
 
-require_omnce '../../php/database.php';
+require_once '../../php/database.php';
 
 function error($message) {
   if ($message[0] != '{')
