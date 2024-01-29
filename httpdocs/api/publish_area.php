@@ -136,5 +136,5 @@ if (json_last_error() !== JSON_ERROR_NONE)
   die($response);
 if (isset($json->error))
   error($json->error);
-die("{\"signature\":\"$area[signature]\"}");
+die("{\"id\":\"$area[id]\"}");
 ?>
