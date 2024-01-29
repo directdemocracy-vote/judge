@@ -104,12 +104,13 @@ $geojson = $place->geojson;
 if ($geojson->type == 'Polygon') {
   $polygons = array();
   array_push($polygons, $geojson->coordinates);
-} elseif ($geojson->type == 'MultiPolygon') {
+} elseif ($geojson->type == 'MultiPolygon')
   $polygons = &$geojson->coordinates;
-} else
+else
   error("Unsupported geometry type: '$geojson->type'");
 $area['polygons'] = &$polygons;
-
+$mysqli->query("UPDATE status SET areaCount=LAST_INSERT_ID(areaCount+1)") or die($mysqli->error);
+$area['id'] = $mysqli->last_insert_id();
 # sign area
 $data = json_encode($area, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 $private_key = openssl_get_privatekey("file://../../id_rsa");
