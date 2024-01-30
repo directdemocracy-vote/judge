@@ -49,6 +49,5 @@ $response = file_get_contents("$notary/api/publish.php", false, stream_context_c
 $json = json_decode($response);
 if (isset($json->error))
   error($json->error);
-die($proposal_data);
 die("{\"signature\":\"$proposal->signature\"}");
 ?>
