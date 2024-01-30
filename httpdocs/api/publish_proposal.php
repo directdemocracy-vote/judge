@@ -47,8 +47,4 @@ $options = array('http' => array('method' => 'POST',
                                              "Accept: application/json\r\n"));
 $response = file_get_contents("$notary/api/publish.php", false, stream_context_create($options));
 die($response);
-$json = json_decode($response);
-if (isset($json->error))
-  error($json->error);
-die("{\"signature\":\"$proposal->signature\"}");
 ?>
