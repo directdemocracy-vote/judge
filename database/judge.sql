@@ -17,7 +17,8 @@ CREATE TABLE `participant` (
   `home` point NOT NULL,
   `reputation` float NOT NULL,
   `trusted` tinyint(1) NOT NULL,
-  `changed` tinyint(1) NOT NULL
+  `changed` tinyint(1) NOT NULL,
+  `issued` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `status` (
