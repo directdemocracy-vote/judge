@@ -12,15 +12,17 @@ if (!isset($_GET['key']))
 $response = file_get_contents("$myself/api/trust.php");
 
 $key = $mysqli->escape_string($_GET['key']);
-$query = "SELECT reputation, trusted FROM participant WHERE `key` = FROM_BASE64('$key==')";
+$query = "SELECT reputation, trusted, UNIX_TIMESTAMP(issued) AS issued FROM participant WHERE `key` = FROM_BASE64('$key==')";
 $result = $mysqli->query($query) or die("{\"error\":\"$mysqli->error\"}");
 $participant = $result->fetch_assoc();
 if ($participant) {
   $reputation = floatval($participant['reputation']);
   $trusted = $participant['trusted'] == '1' ? 'true' : 'false';
+  $issued = intval($participant['issued']);
 } else {
   $reputation = 0;
   $trusted = 'false';
+  $issued = 0;
 }
 if (!isset($_GET['challenge']))
   die("{\"reputation\":$reputation,\"trusted\":$trusted}");
@@ -34,5 +36,5 @@ if ($success === FALSE)
   die('{"error": "failed to sign area"}');
 $base64_signature = base64_encode($signature);
 $timestamp = time();
-die("{\"reputation\":$reputation,\"trusted\":$trusted,\"signature\":\"$base64_signature\",\"timestamp\":$timestamp}");
+die("{\"reputation\":$reputation,\"trusted\":$trusted,\"issued\":$issued,\"signature\":\"$base64_signature\",\"timestamp\":$timestamp}");
 ?>
