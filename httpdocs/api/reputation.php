@@ -17,11 +17,11 @@ $result = $mysqli->query($query) or die("{\"error\":\"$mysqli->error\"}");
 $participant = $result->fetch_assoc();
 if ($participant) {
   $reputation = floatval($participant['reputation']);
-  $trusted = $participant['trusted'] == '1' ? 'true' : 'false';
+  $trusted = $participant['trusted'] == '1' ? 1 : -1;
   $issued = intval($participant['issued']);
 } else {
   $reputation = 0;
-  $trusted = 'false';
+  $trusted = 0;
   $issued = 0;
 }
 if (!isset($_GET['challenge']))
