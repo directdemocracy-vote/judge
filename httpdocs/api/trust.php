@@ -197,6 +197,7 @@ $query = "SELECT id, "
         ."FROM participant WHERE changed=1";
 $result = $mysqli->query($query) or die($mysqli->error);
 while($participant = $result->fetch_assoc()) {
+  $now = time();
   $id = intval($participant['id']);
   $table .= "$id:\t" . floatval($participant['reputation']) ."\n";
   $trusted = intval($participant['trusted']);
@@ -232,7 +233,7 @@ while($participant = $result->fetch_assoc()) {
   if (isset($json->error))
     die($json->error);
 
-  $query = "UPDATE participant SET changed=0";
+  $query = "UPDATE participant SET changed=0, issued=FROM_UNIXTIME($now)";
   $mysqli->query($query) or die($mysqli->error);
 }
 
