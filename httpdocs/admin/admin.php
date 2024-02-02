@@ -1,6 +1,6 @@
 <?php
 
-require '../../../php/database.php';
+require '../../php/database.php';
 
 function error($error) {
   die("{\"error\":\"$error\"}");
