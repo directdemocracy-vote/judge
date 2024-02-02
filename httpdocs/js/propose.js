@@ -200,7 +200,7 @@ window.onload = function() {
           publication.key = '';
           publication.signature = '';
           publication.published = Math.round(new Date().getTime() / 1000);
-          publication.area = answer.signature;
+          publication.area = answer.id;
           publication.title = document.getElementById('title').value.trim();
           publication.description = document.getElementById('description').value.trim();
           const type = document.querySelector('input[name="type"]:checked').value;
