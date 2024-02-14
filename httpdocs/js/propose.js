@@ -108,9 +108,14 @@ window.onload = function() {
         admin.forEach(function(item) { addAdminLevel(item); });
         const countryCode = address.country_code.toUpperCase();
         if (['DE', 'FR', 'IT', 'SE', 'PL', 'RO', 'HR', 'ES', 'NL', 'IE', 'BG', 'DK', 'GR',
-          'AT', 'HU', 'FI', 'CZ', 'PT', 'BE', 'MT', 'CY', 'LU', 'SI', 'LU', 'SK', 'EE', 'LV'].indexOf(countryCode) >= 0)
-          select.options[count++] = new Option('European Union', 'union');
-        select.options[count++] = new Option('Earth', 'world');
+          'AT', 'HU', 'FI', 'CZ', 'PT', 'BE', 'MT', 'CY', 'LU', 'SI', 'LU', 'SK', 'EE', 'LV'].indexOf(countryCode) >= 0) {
+          select.options[count] = new Option('', 'union');
+          translator.translateElement(select.options[count], 'european-union');
+          count++;
+        }
+        select.options[count] = new Option('', 'world');
+        translator.translateElement(select.options[count], 'world');
+        count++;
         areaChange();
       });
   }
@@ -133,9 +138,9 @@ window.onload = function() {
     query = query.slice(0, -1);
     const place = document.getElementById('place');
     place.textContent = selectedName;
-    if (selectedType === 'union' && selectedName === 'European Union')
+    if (selectedType === 'union')
       place.href = 'https://en.wikipedia.org/wiki/European_Union';
-    else if (selectedType === 'world' && selectedName === 'Earth')
+    else if (selectedType === 'world')
       place.href = 'https://en.wikipedia.org/wiki/Earth';
     else
       place.href = 'https://nominatim.openstreetmap.org/ui/search.html?' + query + '&polygon_geojson=1';
@@ -146,15 +151,9 @@ window.onload = function() {
     if (document.querySelector('input[name="type"]:checked').value === 'referendum') {
       document.getElementById('question-block').style.display = 'block';
       document.getElementById('answers-block').style.display = 'block';
-      document.getElementById('title').setAttribute('placeholder', 'Enter the title of your referendum');
-      document.getElementById('description').setAttribute('placeholder', 'Enter the description of your referendum');
-      document.getElementById('publish').textContent = 'Publish your referendum';
     } else {
       document.getElementById('question-block').style.display = 'none';
       document.getElementById('answers-block').style.display = 'none';
-      document.getElementById('title').setAttribute('placeholder', 'Enter the title of your petition');
-      document.getElementById('description').setAttribute('placeholder', 'Enter the description of your petition');
-      document.getElementById('publish').textContent = 'Publish your petition';
     }
     validate();
   }
@@ -226,10 +225,9 @@ window.onload = function() {
               button.classList.remove('is-loading');
               button.removeAttribute('disabled');
               if (answer.error)
-                showModal('Publication error', JSON.stringify(answer.error));
+                showModal(translator.translate('publication-error'), JSON.stringify(answer.error));
               else {
-                showModal('Publication success',
-                  `Your ${type} was just published!<br>You will be redirected to it.`);
+                showModal(translator.translate('publication-success'), translator.translate(type === 'petition' ? 'petition-confirmation' : 'referendum-confirmation');
                 document.getElementById('modal-ok-button').addEventListener('click', function() {
                   window.location.href = `${notary}/proposal.html?signature=${encodeURIComponent(answer.signature)}`;
                 });
