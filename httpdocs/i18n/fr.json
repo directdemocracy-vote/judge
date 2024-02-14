@@ -1,5 +1,5 @@
 {
-  "moto": "un juge qui approuve les participants",
+  "moto": "un juge pour approuver les participants",
   "introduction": "Ce service web héberge le juge d'exemple de direct<b>democracy</b> judge. Les juges approuvent les participants en leur attribuant une réputation. L'algorithme utilisé par ce juge est documenté <a target=\"_blank\" href=\"https://github.com/directdemocracy-vote/judge\">ici</a>.",
   "more-info": "Pour plus d'informations, veuillez consulter <a href=\"//directdemocracy.vote\" target=\"_blank\">directdemocracy.vote</a>."
 }
