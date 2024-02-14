@@ -3,5 +3,9 @@
   "introduction": "This webservice is the home of the sample direct<b>democracy</b> judge. Judges are trusting participants by attributing a reputation to them. The reputation algorithm is documented <a target=\"_blank\" href=\"https://github.com/directdemocracy-vote/judge\">here</a>.",  
   "check-link": "&raquo; Check the <a target=\"_blank\" href=\"certificates.html\">certificates</a> granted by this judge.",
   "propose-link": "&raquo; Propose your own <a target=\"_blank\" href=\"propose.html\">referendum or petition</a> managed by this judge.",
-  "more-info": "More information is available from <a href=\"//directdemocracy.vote\" target=\"_blank\">directdemocracy.vote</a>."
+  "more-info": "More information is available from <a href=\"//directdemocracy.vote\" target=\"_blank\">directdemocracy.vote</a>.",
+  "certificates": "certificates",
+  "status": "Status",
+  "name": "Name",
+  "date": "Date"
 }
