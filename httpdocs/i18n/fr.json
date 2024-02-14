@@ -13,7 +13,7 @@
   "type": "Type",
   "referendum": "Référendum",
   "petition": "Pétition",
-  "area": "Zone géographique:"
+  "area": "Zone géographique:",
   "change-location": "changer de zone géographique",
   "areas-are-computed": "Les zones géographiques sont calculées automatiquement d'après votre position GPS",
   "title": "Titre",
