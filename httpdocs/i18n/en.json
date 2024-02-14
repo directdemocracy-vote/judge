@@ -24,8 +24,9 @@
   "enter-question": "Enter the question of your referendum",
   "possible-answers": "Possible answers",
   "enter-answers": "Yes\nNo",
-  "answer-explaination": "Please enter one possible answer per line. An abstention option will be added to this list.",
-  "web-site": "Website (optional)",
+  "answers-explaination": "Please enter one possible answer per line. An abstention option will be added to this list.",
+  "website": "Website (optional)",
+  "enter-website": "https://myreferendum.org",
   "deadline": "Deadline",
   "hour": "Hour:",
   "trust-delay": "Trust delay",
@@ -35,5 +36,6 @@
   "one-week": "one week",
   "trust-delay-explanation": "To participate (sign or vote), a citizen should be trusted by the judge for a least this amount of time.",
   "publish": "Publish",
-  "publish-warning": "Warning: nothing can be modifed after publication!"
+  "publish-warning": "Warning: nothing can be modifed after publication!",
+  "ok": "OK"
 }
