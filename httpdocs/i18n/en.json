@@ -24,7 +24,7 @@
   "enter-question": "Enter the question of your referendum",
   "possible-answers": "Possible answers",
   "enter-answers": "Yes\nNo",
-  "answers-explaination": "Please enter one answer per line. A blank option will be automatically added.",
+  "answers-explanation": "Please enter one answer per line. A blank option will be automatically added.",
   "website": "Website (optional)",
   "enter-website": "https://myreferendum.org",
   "deadline": "Deadline",
