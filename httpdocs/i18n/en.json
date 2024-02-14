@@ -37,5 +37,7 @@
   "trust-delay-explanation": "To participate (sign or vote), a citizen should be trusted by the judge for a least this amount of time.",
   "publish": "Publish",
   "publish-warning": "Warning: nothing can be modifed after publication!",
-  "ok": "OK"
+  "ok": "OK",
+  "european-union": "European Union",
+  "world": "World"
 }
