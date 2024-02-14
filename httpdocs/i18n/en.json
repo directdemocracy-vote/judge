@@ -1,5 +1,5 @@
 {
-  "moto": "a judge web service trusting participants",
+  "moto": "a judge trusting participants",
   "introduction": "This webservice is the home of the sample direct<b>democracy</b> judge. Judges are trusting participants by attributing a reputation to them. The reputation algorithm is documented <a target=\"_blank\" href=\"https://github.com/directdemocracy-vote/judge\">here</a>.",
   "more-info": "More information is available from <a href=\"//directdemocracy.vote\" target=\"_blank\">directdemocracy.vote</a>."
 }
