@@ -19,14 +19,14 @@ window.onload = function() {
       thead.appendChild(tr);
       let th = document.createElement('th');
       tr.appendChild(th);
-      th.innerHTML = 'Status';
+      translator.translateElement(th, 'status');
       tr.appendChild(th);
       th = document.createElement('th');
       tr.appendChild(th);
-      th.innerHTML = 'Name';
+      translator.translateElement(th, 'name');
       th = document.createElement('th');
       tr.appendChild(th);
-      th.innerHTML = 'Date';
+      translator.translateElement(th, 'date');
       const tbody = document.createElement('tbody');
       table.appendChild(tbody);
       for (let i = 0; i < answer.certificates.length; i++) {
