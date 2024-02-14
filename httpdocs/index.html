@@ -10,24 +10,46 @@
     <link rel="stylesheet" href="//directdemocracy.vote/css/directdemocracy.css">
     <link rel="stylesheet" href="//directdemocracy.vote/css/corner-ribbon.css">
   </head>
-  <body>
+  <body class="has-navbar-fixed-top">
     <div class="corner-ribbon" title="This web site is in beta quality: it may have bugs and change without notice. Please, report any problem to info@directdemocracy.vote.">Beta</div>
+    <nav class="navbar is-fixed-top is-light" role="navigation" aria-label="main navigation">
+      <div class="container">
+        <div class="navbar-brand">
+          <a id="main-menu" class="navbar-item">
+            <i class="f7-icons" style="rotate:-90deg;margin-right:4px">hand_point_right</i>
+            direct<b>democracy</b>
+          </a>
+          <a role="button" id="navbar-burger" class="navbar-burger" aria-label="menu" aria-expanded="false"
+            data-target="navbar-menu">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </a>
+        </div>
+        <div class="navbar-menu" id="navbar-menu">
+          <div class="navbar-end">
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link"><span class="is-size-4" id="language"></span></a>
+              <div class="navbar-dropdown" id="language-dropdown">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
     <section class="hero">
       <div class="hero-body">
         <div class="columns is-mobile">
           <div class="column is-narrow"><i class="f7-icons">building_columns</i></div>
           <div class="column">
             <p class="title">direct<b>democracy</b></p>
-            <p class="subtitle">a judge web service endorsing participants</p>
+            <p class="subtitle" data-i18n="moto"></p>
           </div>
         </div>
       </div>
     </section>
     <section class="section">
-      <p>
-        This web site is the home of the sample <i>directdemocracy</i> judge web service.
-        Currently, this web service is under development.
-      </p>
+      <p data-i18n="introduction"></p>
       <br>
       <div class="list">
         <div class="list-item">&raquo; Check the <a target="_blank" href="certificates.html">certificates</a> granted by this judge.</div>
@@ -35,9 +57,7 @@
       </div>
     </section>
     <footer class="footer">
-      <div class="content has-text-centered">
-        More information is available from <a href="//directdemocracy.vote" target="_blank">directdemocracy.vote</a>.
-      </div>
+      <div class="content has-text-centered" data-i18n="more-info"></div>
     </footer>
   </body>
 </html>
