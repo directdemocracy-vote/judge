@@ -37,5 +37,7 @@
   "trust-delay-explanation": "Pour participer (signer ou voter), un citoyen doit être approuvé par le juge depuis au moins le délai spécifié.",
   "publish": "Publier",
   "publish-warning": "Attention: aucune modification n'est possible après publication !",
-  "ok": "OK"
+  "ok": "OK",
+  "european-union": "Union Européenne",
+  "world": "Monde"
 }
