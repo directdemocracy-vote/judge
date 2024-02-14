@@ -227,7 +227,7 @@ window.onload = function() {
               if (answer.error)
                 showModal(translator.translate('publication-error'), JSON.stringify(answer.error));
               else {
-                showModal(translator.translate('publication-success'), translator.translate(type === 'petition' ? 'petition-confirmation' : 'referendum-confirmation');
+                showModal(translator.translate('publication-success'), translator.translate(type === 'petition' ? 'petition-confirmation' : 'referendum-confirmation'));
                 document.getElementById('modal-ok-button').addEventListener('click', function() {
                   window.location.href = `${notary}/proposal.html?signature=${encodeURIComponent(answer.signature)}`;
                 });
