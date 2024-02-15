@@ -81,7 +81,7 @@ window.onload = function() {
   document.getElementById('deadline-hour').addEventListener('input', validate);
 
   function updateArea() {
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=14`)
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=12`)
       .then(response => response.json())
       .then(answer => {
         const address = answer.address;
