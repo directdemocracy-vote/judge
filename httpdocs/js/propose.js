@@ -107,7 +107,7 @@ window.onload = function() {
           'country'];
         admin.forEach(function(item) { addAdminLevel(item); });
         const betaPlaces = [
-          70304398, // Le Poil (fr)
+          70072682, // Le Poil (fr)
         ];
         if (answer.place_id in betaPlaces) {
           const addressType = answer.addresstype;
