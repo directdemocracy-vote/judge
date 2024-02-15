@@ -92,10 +92,10 @@ window.onload = function() {
           if (level in address)
             select.options[count++] = new Option(address[level], level);
         }
-        const betaPlaces = [
+        const betaTestPlaces = [
           70072682, // Le Poil (fr)
         ];
-        if (betaPlaces.includes(answer.place_id)) {
+        if (betaTestPlaces.includes(answer.place_id)) {
           const addressType = answer.addresstype;
           select.options[count++] = new Option(address[addressType], addressType);
         }
