@@ -88,18 +88,19 @@ window.onload = function() {
         const select = document.getElementById('area');
         let count = 0;
 
-        function addAdminLevel(level) {
-          if (level in address)
-            select.options[count++] = new Option(address[level], level);
-        }
         const betaTestPlaces = [
           70072682, // Le Poil (fr)
         ];
         if (betaTestPlaces.includes(answer.place_id)) {
           const addressType = answer.addresstype;
+          console.log("Added " + addressType);
           select.options[count++] = new Option(address[addressType], addressType);
         }
         // we ignore irrelevant admin levels: 'block', 'neighbourhood', 'quarter', 'hamlet', 'municipality', 'region'
+        function addAdminLevel(level) {
+          if (level in address)
+            select.options[count++] = new Option(address[level], level);
+        }
         const admin = [
           'suburb',
           'borough',
