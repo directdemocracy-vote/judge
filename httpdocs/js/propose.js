@@ -88,15 +88,10 @@ window.onload = function() {
         const select = document.getElementById('area');
         let count = 0;
 
-        const betaTestOsmIds = [
-          6834621, // Le Poil (fr)
-          150947690, // Bodie (en)
-        ];
-        if (betaTestOsmIds.includes(answer.osm_id)) {
-          const addressType = answer.addresstype;
-          console.log("Added " + addressType);
-          select.options[count++] = new Option(address[addressType], addressType);
-        }
+        if (latitude === 38.2115 && longitude=-119.0126) // Bodie (USA, English beta test)
+          select.options[count++] = new Option('Bodie', 'building');
+        else if (answer.osm_id === 6834621) // Le Poil (France, French beta test)
+          select.options[count++] = new Option('Le Poil', 'hamlet');
         // we ignore irrelevant admin levels: 'block', 'neighbourhood', 'quarter', 'hamlet', 'municipality', 'region'
         function addAdminLevel(level) {
           if (level in address)
