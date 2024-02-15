@@ -88,10 +88,10 @@ window.onload = function() {
         const select = document.getElementById('area');
         let count = 0;
 
-        const betaTestPlaces = [
-          70072682, // Le Poil (fr)
+        const betaTestOsmIds = [
+          6834621, // Le Poil (fr)
         ];
-        if (betaTestPlaces.includes(answer.place_id)) {
+        if (betaTestOsmIds.includes(answer.osm_id)) {
           const addressType = answer.addresstype;
           console.log("Added " + addressType);
           select.options[count++] = new Option(address[addressType], addressType);
