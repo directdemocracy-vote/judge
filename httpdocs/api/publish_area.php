@@ -64,9 +64,9 @@ if (isset($json->id) && $json->id !== 0)
   die($response);
 
 if (str_starts_with($query, 'search?hamlet=Le+Poil&city=Senez&'))
-  $query = 'search?city=Le+Poil&county=Alpes-de-Haute-Provence&country=France';
+  $query = 'search?city=Le+Poil&county=Alpes-de-Haute-Provence&country=France&';
 elseif (str_starts_with($query, 'search?building=Bodie&county=Mono+County&'))
-  $query = 'search?street=Bodie+State+Historic+Park&county=Mono+County&state=California&country=USA';
+  $query = 'search?street=Bodie+State+Historic+Park&county=Mono+County&state=California&country=USA&';
 $url = "https://nominatim.openstreetmap.org/". $query . "zoom=12&polygon_geojson=1&format=json";
 $options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemocracy\r\n" ] ];
 $context = stream_context_create($options);
