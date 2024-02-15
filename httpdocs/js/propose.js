@@ -81,7 +81,7 @@ window.onload = function() {
   document.getElementById('deadline-hour').addEventListener('input', validate);
 
   function updateArea() {
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=12`)
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=14`)
       .then(response => response.json())
       .then(answer => {
         const address = answer.address;
@@ -90,7 +90,7 @@ window.onload = function() {
 
         const betaTestOsmIds = [
           6834621, // Le Poil (fr)
-          227078, // Bodie (en)
+          150947690, // Bodie (en)
         ];
         if (betaTestOsmIds.includes(answer.osm_id)) {
           const addressType = answer.addresstype;
