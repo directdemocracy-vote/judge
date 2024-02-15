@@ -63,6 +63,9 @@ if (isset($json->error))
 if (isset($json->id) && $json->id !== 0)
   die($response);
 
+if (str_starts_with($query, 'hamlet=Le Poil&city=Senez&')
+  $query = 'search?osmid=6834621&';
+
 $url = "https://nominatim.openstreetmap.org/". $query . "zoom=12&polygon_geojson=1&format=json";
 $options = [ 'http' => [ 'method' => 'GET', 'header' => "User-agent: directdemocracy\r\n" ] ];
 $context = stream_context_create($options);
