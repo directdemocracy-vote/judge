@@ -88,7 +88,7 @@ window.onload = function() {
         const select = document.getElementById('area');
         let count = 0;
 
-        if (latitude === 38.2115 && longitude=-119.0126) // Bodie (USA, English beta test)
+        if (latitude === 38.2115 && longitude === -119.0126) // Bodie (USA, English beta test)
           select.options[count++] = new Option('Bodie', 'building');
         else if (answer.osm_id === 6834621) // Le Poil (France, French beta test)
           select.options[count++] = new Option('Le Poil', 'hamlet');
