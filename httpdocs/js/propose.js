@@ -89,6 +89,8 @@ window.onload = function() {
         let count = 0;
 
         function addAdminLevel(level, betaPlaces) {
+          console.log(answer.place_id);
+          console.log(betaPlaces);
           if (level in address || answer.place_id in betaPlaces)
             select.options[count++] = new Option(address[level], level);
         }
