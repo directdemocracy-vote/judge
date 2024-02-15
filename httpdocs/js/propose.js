@@ -22,6 +22,7 @@ function closeModal() {
 
 window.onload = function() {
   let area = '';
+  let betaLink = null;
   if (localStorage.getItem('password')) {
     const a = document.createElement('a');
     a.setAttribute('id', 'logout');
@@ -88,10 +89,14 @@ window.onload = function() {
         const select = document.getElementById('area');
         let count = 0;
 
-        if (latitude === 38.2115 && longitude === -119.0126) // Bodie (USA, English beta test)
+        if (latitude === 38.2115 && longitude === -119.0126) { // Bodie (USA, English beta test)
           select.options[count++] = new Option('Bodie', 'building');
-        else if (answer.osm_id === 6834621) // Le Poil (France, French beta test)
+          betaLink = 'https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=227078&class=leisure';
+        } else if (answer.osm_id === 6834621) { // Le Poil (France, French beta test)
           select.options[count++] = new Option('Le Poil', 'hamlet');
+          betaLink = 'https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=6834621&class=boundary';
+        } else
+          betaLink = null;
         // we ignore irrelevant admin levels: 'block', 'neighbourhood', 'quarter', 'hamlet', 'municipality', 'region'
         function addAdminLevel(level) {
           if (level in address)
@@ -146,6 +151,8 @@ window.onload = function() {
       place.href = 'https://en.wikipedia.org/wiki/European_Union';
     else if (selectedType === 'world')
       place.href = 'https://en.wikipedia.org/wiki/Earth';
+    else if (betaLink && a.selectedIndex === 0)
+      place.href = betaLink;
     else
       place.href = 'https://nominatim.openstreetmap.org/ui/search.html?' + query + '&polygon_geojson=1';
     validate();
