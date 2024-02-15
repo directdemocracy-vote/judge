@@ -90,6 +90,7 @@ window.onload = function() {
 
         const betaTestOsmIds = [
           6834621, // Le Poil (fr)
+          227078, // Bodie (en)
         ];
         if (betaTestOsmIds.includes(answer.osm_id)) {
           const addressType = answer.addresstype;
