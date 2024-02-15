@@ -109,8 +109,11 @@ window.onload = function() {
         const betaPlaces = [
           70072682, // Le Poil (fr)
         ];
+        console.log(answer.place_id);
+        console.log(betaPlaces);
         if (answer.place_id in betaPlaces) {
           const addressType = answer.addresstype;
+          console.log('Found ' + addressType);
           select.options[count++] = new Option(address[addressType], addressType);
         }
         const countryCode = address.country_code.toUpperCase();
