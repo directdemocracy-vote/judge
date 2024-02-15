@@ -88,10 +88,8 @@ window.onload = function() {
         const select = document.getElementById('area');
         let count = 0;
 
-        function addAdminLevel(level, betaPlaces) {
-          console.log(answer.place_id);
-          console.log(betaPlaces);
-          if (level in address || answer.place_id in betaPlaces)
+        function addAdminLevel(level) {
+          if (level in address)
             select.options[count++] = new Option(address[level], level);
         }
         // we ignore irrelevant admin levels: 'block', 'neighbourhood', 'quarter', 'hamlet', 'municipality', 'region'
@@ -107,10 +105,14 @@ window.onload = function() {
           'state_district',
           'state',
           'country'];
+        admin.forEach(function(item) { addAdminLevel(item); });
         const betaPlaces = [
           70304398, // Le Poil (fr)
         ];
-        admin.forEach(function(item) { addAdminLevel(item, betaPlaces); });
+        if (answer.place_id in betaPlaces) {
+          const addressType = answer.addresstype;
+          select.options[count++] = new Option(address[addressType], addressType);
+        }
         const countryCode = address.country_code.toUpperCase();
         if (['DE', 'FR', 'IT', 'SE', 'PL', 'RO', 'HR', 'ES', 'NL', 'IE', 'BG', 'DK', 'GR',
           'AT', 'HU', 'FI', 'CZ', 'PT', 'BE', 'MT', 'CY', 'LU', 'SI', 'LU', 'SK', 'EE', 'LV'].indexOf(countryCode) >= 0) {
