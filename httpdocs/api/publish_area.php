@@ -63,6 +63,7 @@ if (isset($json->error))
 if (isset($json->id) && $json->id !== 0)
   die($response);
 
+die("query = $query");
 if (str_starts_with($query, 'hamlet=Le+Poil&city=Senez&'))
   $query = 'search?city=Le+Poil&county=Alpes-de-Haute-Provence&country=France';
 elseif (str_starts_with($query, 'building=Bodie&county=Mono+County&'))
