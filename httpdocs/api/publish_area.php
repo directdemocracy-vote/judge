@@ -1,4 +1,4 @@
-e<?php
+<?php
 $version = "2";
 $notary = 'https://notary.directdemocracy.vote';
 
