@@ -111,7 +111,7 @@ window.onload = function() {
         ];
         console.log(answer.place_id);
         console.log(betaPlaces);
-        if (answer.place_id in betaPlaces) {
+        if (betaPlaces.includes(answer.place_id)) {
           const addressType = answer.addresstype;
           console.log('Found ' + addressType);
           select.options[count++] = new Option(address[addressType], addressType);
