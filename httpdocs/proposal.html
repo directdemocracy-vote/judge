@@ -108,6 +108,22 @@
         </div>
         <div class="panel-block" style="display:block">
           <div class="field">
+            <label class="label" data-i18n="publication-date"></label>
+            <div class="level">
+              <div class="level-left">
+                <div class="level-item">
+                  <input class="input" type="date" id="publication-date">
+                </div>
+                <div class="level-item">
+                  <span data-i18n="hour"></span> <input class="input ml-2" type="number" value="12" maxlength="2" size="3" min="0" max="23" id="publication-hour">:00:00
+                </div>
+                <div class="level-item is-size-7" id="publication-time-zone"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-block" style="display:block">
+          <div class="field">
             <label class="label" data-i18n="deadline"></label>
             <div class="level">
               <div class="level-left">
@@ -117,7 +133,7 @@
                 <div class="level-item">
                   <span data-i18n="hour"></span> <input class="input ml-2" type="number" value="12" maxlength="2" size="3" min="0" max="23" id="deadline-hour">:00:00
                 </div>
-                <div class="level-item is-size-7" id="time-zone"></div>
+                <div class="level-item is-size-7" id="deadline-time-zone"></div>
               </div>
             </div>
           </div>
