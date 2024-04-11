@@ -37,7 +37,7 @@
   "trust-delay-explanation": "To participate (sign or vote), a citizen should be trusted by the judge for a least this amount of time.",
   "email": "E-mail",
   "enter-email":  "myname@mydomain.com",
-  "email-message": "Your e-mail address will be used only for the purpose of the review of this proposal. It won't be published or passed to any third party.",
+  "email-message": "Your e-mail address will be used only to communicate with you during the review process of this proposal. It won't be published or passed to any third party.",
   "publish": "Publish",
   "publish-warning": "Warning: nothing can be modifed after publication!",
   "submit": "Submit",
