@@ -211,6 +211,7 @@ window.onload = function() {
       document.getElementById('submit').removeAttribute('disabled');
   }
   document.getElementById('submit').addEventListener('click', function(event) {
+    const button = event.currentTarget;
     const type = document.querySelector('input[name="type"]:checked').value;
     const offset = Math.ceil(new Date().getTimezoneOffset() / 60);
     const deadlineHour = parseInt(document.getElementById('deadline-hour').value);
