@@ -36,7 +36,7 @@
   "one-week": "une semaine",
   "trust-delay-explanation": "Pour participer (signer ou voter), un citoyen doit être approuvé par le juge depuis au moins le délai spécifié.",
   "email": "E-mail",
-  "enter-email":  "mon.nom@domaine.com",
+  "enter-email":  "nom@domaine.com",
   "email-message": "Votre adresse mail sera utilisée uniquement pour communiquer avec vous lors de l'examen de cette proposition. Elle ne sera ni publiée, ni communiquée à un tiers.",
   "publish": "Publier",
   "publish-warning": "Attention: aucune modification n'est possible après publication !",
