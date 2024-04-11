@@ -27,6 +27,7 @@
   "answers-explanation": "Please enter one answer per line. A blank option will be automatically added.",
   "website": "Website (optional)",
   "enter-website": "https://myreferendum.org",
+  "publication-date": "Publication date",
   "deadline": "Deadline",
   "hour": "Hour:",
   "trust-delay": "Trust delay",
