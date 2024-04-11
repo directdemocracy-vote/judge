@@ -34,6 +34,17 @@ $query = "INSERT INTO proposal(reference, type, area, title, description, questi
         ."VALUES(UNHEX('$reference'), '$type', \"$area\", \"$title\", \"$description\", \"$question\", \"answers\", $secret, "
         ."FROM_UNIXTIME($publication), FROM_UNIXTIME($deadline), $trust, \"$website\", \"$email\")";
 $result = $mysqli->query($query) or error($mysqli->error);
-
+$message = "Dear citizen,<br><br>"
+          ."Thank you for submitting a proposal to judge.directdemocracy.vote!<br>"
+          ."We will review your proposal and revert back to you about it.<br>"
+          ."If you have any question regarding your proposal, please contact us by replying to this e-mail.<br><br>"
+          ."Best regards,<br><br>"
+          ."judge.directdemocracy.vote<br><br>";
+$headers = "From: judge@directdemocracy.vote\r\n"
+          ."X-Mailer: php\r\n"
+          ."MIME-Version: 1.0\r\n"
+          ."Content-Type: text/html; charset=UTF-8\r\n"
+          ."Bcc: judge@directdemocracy.vote\r\n";
+mail($email, "New proposal: $title", $message, $headers);
 die('{"status":"OK"}');
 ?>
