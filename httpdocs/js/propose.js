@@ -232,7 +232,6 @@ window.onload = function() {
       website: document.getElementById('website').value.trim(),
       email: document.getElementById('email').value.trim()
     };
-    console.log(proposal);
     fetch(`/api/submit_proposal.php`, { 'method': 'POST', 'body': JSON.stringify(proposal) })
       .then(response => response.json())
       .then(answer => {
@@ -243,7 +242,8 @@ window.onload = function() {
         else {
           showModal(translator.translate('submission-success'), translator.translate(type === 'petition' ? 'petition-submission-confirmation' : 'referendum-submission-confirmation'));
           document.getElementById('modal-ok-button').addEventListener('click', function() {
-            window.location.href = `/proposal.html?reference=${encodeURIComponent(answer.reference)}`;
+            // window.location.href = `/propose.html?reference=${encodeURIComponent(answer.reference)}`;
+            window.location.href = 'https://judge.directdemocracy.vote';
           });
         }
       });
