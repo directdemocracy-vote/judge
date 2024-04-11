@@ -27,6 +27,7 @@
   "answers-explanation": "Merci d'entrer une réponse par ligne. Un bulletin blanc sera automatiquement ajouté.",
   "website": "Site web (optionel)",
   "enter-website": "https://monreferendum.org",
+  "publication-date": "Date de publication",
   "deadline": "Échéance",
   "hour": "Heure&nbsp;:",
   "trust-delay": "Délai d'approbation",
