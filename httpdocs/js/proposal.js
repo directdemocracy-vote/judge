@@ -80,8 +80,11 @@ window.onload = function() {
   document.getElementById('description').addEventListener('input', validate);
   document.getElementById('question').addEventListener('input', validate);
   document.getElementById('answers').addEventListener('input', validate);
+  document.getElementById('publication-date').addEventListener('input', validate);
+  document.getElementById('publication-hour').addEventListener('input', validate);
   document.getElementById('deadline-date').addEventListener('input', validate);
   document.getElementById('deadline-hour').addEventListener('input', validate);
+  document.getElementById('email').addEventListener('input', validate);
 
   function updateArea() {
     fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=12`)
@@ -186,14 +189,57 @@ window.onload = function() {
       if (document.getElementById('answers').value === '')
         return;
     }
+    if (document.getElementById('publication-date').value === '')
+      return;
+    const publicationHour = document.getElementById('publication-hour').value;
+    if (publicationHour === '' || publicationHour > 23 || publicationHour < 0)
+      return;
     if (document.getElementById('deadline-date').value === '')
       return;
-    const hour = document.getElementById('deadline-hour').value;
-    if (hour === '' || hour > 23 || hour < 0)
+    const deadlineHour = document.getElementById('deadline-hour').value;
+    if (deadlineHour === '' || deadlineHour > 23 || deadlineHour < 0)
       return;
-    document.getElementById('publish').removeAttribute('disabled');
+    if (document.getElementById('email').value === '')
+      return;
+    document.getElementById('submit').removeAttribute('disabled');
   }
-
+  document.getElementById('submit').addEventListener('click', function(event) {
+    const type = document.querySelector('input[name="type"]:checked').value;
+    const offset = Math.ceil(new Date().getTimezoneOffset() / 60);
+    const deadlineHour = parseInt(document.getElementById('deadline-hour').value);
+    const deadline = Math.round(Date.parse(document.getElementById('deadline-date').value) / 1000) + (deadlineHour + offset) * 3600;
+    const publicationHour = parseInt(document.getElementById('publication-hour').value);
+    const publication = Math.round(Date.parse(document.getElementById('publication-date').value) / 1000) + (publicationHour + offset) * 3600;
+    let proposal = {
+      type: type,
+      area: area,
+      title: document.getElementById('title').value.trim(),
+      description: document.getElementById('description').value.trim(),
+      question: type === 'referendum' ? document.getElementById('question').value.trim() : '',
+      answers: type === 'referendum' ? document.getElementById('answers').value.trim() : '',
+      secret: type === 'referendum',
+      publication: publication,
+      deadline: deadline,
+      trust: parseInt(document.getElementById('trust').value),
+      website: document.getElementById('website').value.trim(),
+      email: document.getElementById('email').value.trim()
+    };
+    console.log(proposal);
+    fetch(`/api/submit_proposal.php`, { 'method': 'POST', 'body': JSON.stringify(proposal) })
+      .then(response => response.json())
+      .then(answer => {
+        button.classList.remove('is-loading');
+        button.removeAttribute('disabled');
+        if (answer.error)
+          showModal(translator.translate('publication-error'), JSON.stringify(answer.error));
+        else {
+          showModal(translator.translate('submission-success'), translator.translate(type === 'petition' ? 'petition-submission-confirmation' : 'referendum-submission-confirmation'));
+          document.getElementById('modal-ok-button').addEventListener('click', function() {
+            window.location.href = `/proposal.html?reference=${encodeURIComponent(answer.reference)}`;
+          });
+        }
+      });
+  });
   document.getElementById('publish').addEventListener('click', function(event) {
     const button = event.currentTarget;
     button.classList.add('is-loading');
@@ -232,7 +278,7 @@ window.onload = function() {
           const website = document.getElementById('website').value.trim();
           if (website)
             publication.website = website;
-          fetch(`/api/submit_proposal.php`, { 'method': 'POST', 'body': JSON.stringify(publication) })
+          fetch(`/api/publish_proposal.php`, { 'method': 'POST', 'body': JSON.stringify(publication) })
             .then(response => response.json())
             .then(answer => {
               button.classList.remove('is-loading');
