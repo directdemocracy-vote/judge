@@ -32,7 +32,7 @@ $email = $mysqli->escape_string($proposal->email);
 $reference = bin2hex(random_bytes(20));
 $query = "INSERT INTO proposal(reference, type, area, title, description, question, answers, secret, publication, deadline, trust, website, email) "
         ."VALUES(UNHEX('$reference'), '$type', \"$area\", \"$title\", \"$description\", \"$question\", \"answers\", $secret, "
-        ."FROM_UNIXTIME($publication), FROM_UNIXTIME($deadline), $trust, "\"$website\", \"$email\")";
+        ."FROM_UNIXTIME($publication), FROM_UNIXTIME($deadline), $trust, \"$website\", \"$email\")";
 $result = $mysqli->query($query) or error($mysqli->error);
 
 die('{"status":"OK"}');
