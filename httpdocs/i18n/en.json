@@ -37,6 +37,8 @@
   "trust-delay-explanation": "To participate (sign or vote), a citizen should be trusted by the judge for a least this amount of time.",
   "publish": "Publish",
   "publish-warning": "Warning: nothing can be modifed after publication!",
+  "submit": "Submit",
+  "submit-message": "Your proposal has to be approved by the judge before publication."
   "ok": "OK",
   "european-union": "European Union",
   "world": "World",
