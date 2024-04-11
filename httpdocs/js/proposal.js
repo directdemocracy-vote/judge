@@ -231,7 +231,7 @@ window.onload = function() {
         button.classList.remove('is-loading');
         button.removeAttribute('disabled');
         if (answer.error)
-          showModal(translator.translate('publication-error'), JSON.stringify(answer.error));
+          showModal(translator.translate('submission-error'), JSON.stringify(answer.error));
         else {
           showModal(translator.translate('submission-success'), translator.translate(type === 'petition' ? 'petition-submission-confirmation' : 'referendum-submission-confirmation'));
           document.getElementById('modal-ok-button').addEventListener('click', function() {
