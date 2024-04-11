@@ -46,5 +46,5 @@ $headers = "From: judge@directdemocracy.vote\r\n"
           ."Content-Type: text/html; charset=UTF-8\r\n"
           ."Bcc: judge@directdemocracy.vote\r\n";
 mail($email, "New proposal: $title", $message, $headers);
-die('{"status":"OK"}');
+die('{"reference":"$reference"}');
 ?>
