@@ -240,59 +240,61 @@ window.onload = function() {
         }
       });
   });
-  document.getElementById('publish').addEventListener('click', function(event) {
-    const button = event.currentTarget;
-    button.classList.add('is-loading');
-    button.setAttribute('disabled', '');
-    const query = area.trim().replace(/(\r\n|\n|\r)/g, '&');
-    fetch(`/api/publish_area.php?${query}`)
-      .then(response => response.json())
-      .then(function(answer) {
-        if (answer.error) {
-          showModal('Area publication error', JSON.stringify(answer.error));
-          button.classList.remove('is-loading');
-          button.removeAttribute('disabled');
-        } else {
-          let publication = {};
-          publication.schema = `https://directdemocracy.vote/json-schema/${directdemocracyVersion}/proposal.schema.json`;
-          publication.key = '';
-          publication.signature = '';
-          publication.published = Math.round(new Date().getTime() / 1000);
-          publication.area = answer.id;
-          publication.title = document.getElementById('title').value.trim();
-          publication.description = document.getElementById('description').value.trim();
-          const type = document.querySelector('input[name="type"]:checked').value;
-          if (type === 'referendum') {
-            publication.question = document.getElementById('question').value.trim();
-            publication.answers = document.getElementById('answers').value.trim().split('\n');
-            publication.type = type;
-            publication.secret = true;
+  const publish = document.getElementById('publish');
+  if (publish)
+    document.getElementById('publish').addEventListener('click', function(event) {
+      const button = event.currentTarget;
+      button.classList.add('is-loading');
+      button.setAttribute('disabled', '');
+      const query = area.trim().replace(/(\r\n|\n|\r)/g, '&');
+      fetch(`/api/publish_area.php?${query}`)
+        .then(response => response.json())
+        .then(function(answer) {
+          if (answer.error) {
+            showModal('Area publication error', JSON.stringify(answer.error));
+            button.classList.remove('is-loading');
+            button.removeAttribute('disabled');
           } else {
-            publication.type = type;
-            publication.secret = false;
+            let publication = {};
+            publication.schema = `https://directdemocracy.vote/json-schema/${directdemocracyVersion}/proposal.schema.json`;
+            publication.key = '';
+            publication.signature = '';
+            publication.published = Math.round(new Date().getTime() / 1000);
+            publication.area = answer.id;
+            publication.title = document.getElementById('title').value.trim();
+            publication.description = document.getElementById('description').value.trim();
+            const type = document.querySelector('input[name="type"]:checked').value;
+            if (type === 'referendum') {
+              publication.question = document.getElementById('question').value.trim();
+              publication.answers = document.getElementById('answers').value.trim().split('\n');
+              publication.type = type;
+              publication.secret = true;
+            } else {
+              publication.type = type;
+              publication.secret = false;
+            }
+            const hour = parseInt(document.getElementById('deadline-hour').value);
+            const offset = Math.ceil(new Date().getTimezoneOffset() / 60);
+            publication.deadline = Math.round(Date.parse(document.getElementById('deadline-date').value) / 1000) + (hour + offset) * 3600;
+            publication.trust = parseInt(document.getElementById('trust').value);
+            const website = document.getElementById('website').value.trim();
+            if (website)
+              publication.website = website;
+            fetch(`/api/publish_proposal.php`, { 'method': 'POST', 'body': JSON.stringify(publication) })
+              .then(response => response.json())
+              .then(answer => {
+                button.classList.remove('is-loading');
+                button.removeAttribute('disabled');
+                if (answer.error)
+                  showModal(translator.translate('publication-error'), JSON.stringify(answer.error));
+                else {
+                  showModal(translator.translate('publication-success'), translator.translate(type === 'petition' ? 'petition-confirmation' : 'referendum-confirmation'));
+                  document.getElementById('modal-ok-button').addEventListener('click', function() {
+                    window.location.href = `${notary}/proposal.html?signature=${encodeURIComponent(answer.signature)}`;
+                  });
+                }
+              });
           }
-          const hour = parseInt(document.getElementById('deadline-hour').value);
-          const offset = Math.ceil(new Date().getTimezoneOffset() / 60);
-          publication.deadline = Math.round(Date.parse(document.getElementById('deadline-date').value) / 1000) + (hour + offset) * 3600;
-          publication.trust = parseInt(document.getElementById('trust').value);
-          const website = document.getElementById('website').value.trim();
-          if (website)
-            publication.website = website;
-          fetch(`/api/publish_proposal.php`, { 'method': 'POST', 'body': JSON.stringify(publication) })
-            .then(response => response.json())
-            .then(answer => {
-              button.classList.remove('is-loading');
-              button.removeAttribute('disabled');
-              if (answer.error)
-                showModal(translator.translate('publication-error'), JSON.stringify(answer.error));
-              else {
-                showModal(translator.translate('publication-success'), translator.translate(type === 'petition' ? 'petition-confirmation' : 'referendum-confirmation'));
-                document.getElementById('modal-ok-button').addEventListener('click', function() {
-                  window.location.href = `${notary}/proposal.html?signature=${encodeURIComponent(answer.signature)}`;
-                });
-              }
-            });
-        }
-      });
-  });
+        });
+    });
 };
