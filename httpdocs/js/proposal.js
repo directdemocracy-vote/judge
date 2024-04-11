@@ -38,7 +38,9 @@ window.onload = function() {
   let deadlineDefaultDate = new Date();
   deadlineDefaultDate.setMonth(deadlineDefaultDate.getMonth() + 3);
   document.getElementById('deadline-date').valueAsDate = deadlineDefaultDate;
-  document.getElementById('time-zone').textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  document.getElementById('publication-time-zone').textContent = timeZone;
+  document.getElementById('deadline-time-zone').textContent = timeZone;
   const type = findGetParameter('type', 'none');
   if (type === 'referendum' || type === 'petition') {
     document.getElementById(type).checked = true;
