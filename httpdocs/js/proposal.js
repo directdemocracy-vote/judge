@@ -33,6 +33,7 @@ window.onload = function() {
       localStorage.removeItem('password');
     });
   }
+  const publish = document.getElementById('publish');
   document.getElementById('modal-close-button').addEventListener('click', closeModal);
   document.getElementById('modal-ok-button').addEventListener('click', closeModal);
   let deadlineDefaultDate = new Date();
@@ -175,7 +176,10 @@ window.onload = function() {
   }
 
   function validate() {
-    document.getElementById('publish').setAttribute('disabled', '');
+    if (publish)
+      publish.setAttribute('disabled', '');
+    else
+      document.getElementById('submit').setAttribute('disabled', '');      
     if (!document.querySelector('input[name="type"]:checked'))
       return;
     const type = document.querySelector('input[name="type"]:checked').value;
@@ -201,7 +205,10 @@ window.onload = function() {
       return;
     if (document.getElementById('email').value === '')
       return;
-    document.getElementById('submit').removeAttribute('disabled');
+    if (publish)
+      publish.remoteAttribute('disabled');
+    else
+      document.getElementById('submit').removeAttribute('disabled');
   }
   document.getElementById('submit').addEventListener('click', function(event) {
     const type = document.querySelector('input[name="type"]:checked').value;
@@ -240,7 +247,6 @@ window.onload = function() {
         }
       });
   });
-  const publish = document.getElementById('publish');
   if (publish)
     document.getElementById('publish').addEventListener('click', function(event) {
       const button = event.currentTarget;
