@@ -16,7 +16,7 @@ $proposal = json_decode(file_get_contents("php://input"));
 if (!$proposal)
   error("Unable to parse proposal");
 $type = $proposal->type;
-if ($type !== 'referendum && $type !== 'petition')
+if ($type !== 'referendum' && $type !== 'petition')
   error("Unsupported type: $type");
 $area = $mysqli->escape_string($proposal->area);
 $title = $mysqli->escape_string($proposal->title);
