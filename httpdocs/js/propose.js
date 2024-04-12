@@ -218,6 +218,7 @@ window.onload = function() {
     const deadline = Math.round(Date.parse(document.getElementById('deadline-date').value) / 1000) + (deadlineHour + offset) * 3600;
     const publicationHour = parseInt(document.getElementById('publication-hour').value);
     const publication = Math.round(Date.parse(document.getElementById('publication-date').value) / 1000) + (publicationHour + offset) * 3600;
+    const language = document.getElementById('language').firstChild.src.split('.')[1].split('/')[3];
     let proposal = {
       type: type,
       area: area,
@@ -230,7 +231,8 @@ window.onload = function() {
       deadline: deadline,
       trust: parseInt(document.getElementById('trust').value),
       website: document.getElementById('website').value.trim(),
-      email: document.getElementById('email').value.trim()
+      email: document.getElementById('email').value.trim(),
+      language: language
     };
     fetch(`/api/submit_proposal.php`, { 'method': 'POST', 'body': JSON.stringify(proposal) })
       .then(response => response.json())
