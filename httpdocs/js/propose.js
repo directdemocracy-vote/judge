@@ -1,7 +1,7 @@
 const directdemocracyVersion = '2';
 const notary = 'https://notary.directdemocracy.vote';
-let timeZone;
 let countryCode;
+let timeZone;
 
 function findGetParameter(parameterName, result = null) {
   location.search.substr(1).split('&').forEach(function(item) {
@@ -103,6 +103,7 @@ window.onload = function() {
         document.getElementById('trust').value = answer.trust;
         document.getElementById('email').value = answer.email;
         translator.translateElement(document.getElementById('submit'), 'modify');
+        countryCode = answer.countryCode;
       });
   } else {
     if (latitude === -1) {
