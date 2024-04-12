@@ -255,6 +255,8 @@ window.onload = function() {
       email: document.getElementById('email').value.trim(),
       language: language
     };
+    if (reference)
+      proposal.reference = reference;
     fetch(`/api/submit_proposal.php`, { 'method': 'POST', 'body': JSON.stringify(proposal) })
       .then(response => response.json())
       .then(answer => {
