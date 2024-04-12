@@ -49,6 +49,7 @@ window.onload = function() {
   }
   let latitude = parseFloat(findGetParameter('latitude', '-1'));
   let longitude = parseFloat(findGetParameter('longitude', '-1'));
+  let reference = findGetParameter('reference');
   let geolocation = false;
   function getGeolocationPosition(position) {
     geolocation = true;
@@ -56,24 +57,31 @@ window.onload = function() {
     longitude = position.coords.longitude;
     updateArea();
   }
-  if (latitude === -1) {
-    if (navigator.geolocation)
-      navigator.geolocation.getCurrentPosition(getGeolocationPosition);
-    fetch('https://ipinfo.io/loc')
-      .then(response => {
-        if (response.status === 429)
-          console.error('quota exceeded');
-        return response.text();
-      })
+  if (reference) {
+    fetch(`/api/proposal.php?reference=${reference}`)
+      .then(response => response.json())
       .then(answer => {
-        if (!geolocation) {
-          const coords = answer.split(',');
-          getGeolocationPosition({ coords: { latitude: coords[0], longitude: coords[1] } });
-        }
+        console.log(answer);
       });
-  } else
-    updateArea();
-
+  } else {
+    if (latitude === -1) {
+      if (navigator.geolocation)
+        navigator.geolocation.getCurrentPosition(getGeolocationPosition);
+      fetch('https://ipinfo.io/loc')
+        .then(response => {
+          if (response.status === 429)
+            console.error('quota exceeded');
+          return response.text();
+        })
+        .then(answer => {
+          if (!geolocation) {
+            const coords = answer.split(',');
+            getGeolocationPosition({ coords: { latitude: coords[0], longitude: coords[1] } });
+          }
+        });
+    } else
+      updateArea();
+  }
   document.getElementById('area').addEventListener('change', areaChange);
   document.getElementById('referendum').addEventListener('change', updateProposalType);
   document.getElementById('petition').addEventListener('change', updateProposalType);
