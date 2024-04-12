@@ -98,6 +98,7 @@ window.onload = function() {
         document.getElementById('deadline-hour').value = deadlineDate.getHours();
         document.getElementById('trust').value = answer.trust;
         document.getElementById('email').value = answer.email;
+        translator.translateElement('submit', 'modify');
       });
   } else {
     if (latitude === -1) {
