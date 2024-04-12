@@ -62,6 +62,7 @@ window.onload = function() {
       .then(response => response.json())
       .then(answer => {
         console.log(answer);
+        document.getElementById(answer.type).checked = true;
       });
   } else {
     if (latitude === -1) {
@@ -158,6 +159,7 @@ window.onload = function() {
       if (type !== 'union')
         query += type + '=' + encodeURIComponent(name) + '&';
     }
+    area = area.slice(0, -1);
     query = query.slice(0, -1);
     const place = document.getElementById('place');
     place.textContent = selectedName;
