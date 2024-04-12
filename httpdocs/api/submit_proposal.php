@@ -45,8 +45,13 @@ if (isset($proposal->reference)) {
 $result = $mysqli->query($query) or error($mysqli->error);
 $url = "https://judge.directdemocracy.vote/propose.html?reference=$reference";
 $link = "<a href=\"$url\">$url</a>";
-$area = str_replace("\\n", " &ndash; ", $area);
-$answers = str_replace("\\n", " &ndash; ", $answers);
+$areas = explode("\n", $area);
+foreach ($areas as &$a) {
+  $as = explode('=', $a);
+  $a = $as[1];
+}
+$area = joint(' &ndash; ', $areas);
+$answers = str_replace("\\n", ' &ndash; ', $answers);
 $title = str_replace("\\'", "'", $title);
 $description = str_replace("\\'", "'", $description);
 $question = str_replace("\\'", "'", $question);
@@ -71,19 +76,19 @@ $message = "Dear citizen,<br><br>"
           ."Best regards,";
 $message.= "<br><br>judge.directdemocracy.vote<br><br>"
           ."<hr>"
-          ."<b>Type</b>: $type<br>"
-          ."<b>Area</b>: $area<br>"
-          ."<b>Title</b>: $title<br>"
-          ."<b>Description</b>:<br>$description<br>";
+          ."<b>Type</b>: $type<br>\n"
+          ."<b>Area</b>: $area<br>\n"
+          ."<b>Title</b>: $title<br>\n"
+          ."<b>Description</b>:<br>$description<br>\n";
 if ($type === 'referendum')
-  $message.= "<b>Question</b>: $question<br>"
-            ."<b>Answers</b>: $answers<br>";
+  $message.= "<b>Question</b>: $question<br>\n"
+            ."<b>Answers</b>: $answers<br>\n";
 if ($website)
-  $message.= "<b>Web site</b>: $website<br>";
-$message.= "<b>Publication date</b>: $publication<br>"
-          ."<b>Deadline</b>: $deadline<br>"
-          ."<b>Trust delay</b>: $trust<br>"
-          ."<b>E-mail</b>: $email<br><br>";
+  $message.= "<b>Web site</b>: $website<br>\n";
+$message.= "<b>Publication date</b>: $publication<br>\n"
+          ."<b>Deadline</b>: $deadline<br>\n"
+          ."<b>Trust delay</b>: $trust<br>\n"
+          ."<b>E-mail</b>: $email<br><br>\n";
 $headers = "From: judge@directdemocracy.vote\r\n"
           ."X-Mailer: php\r\n"
           ."MIME-Version: 1.0\r\n"
