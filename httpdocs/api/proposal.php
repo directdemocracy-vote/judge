@@ -15,8 +15,8 @@ header("Access-Control-Allow-Headers: content-type");
 if (!isset($_GET['reference']))
   error('Missing reference parameter');
 $reference = $mysqli->escape_string($_GET['reference']);
-$query = "SELECT type, area, title, description, question, answers, secret, UNIX_TIMESTAMP(publication), "
-        ."UNIX_TIMESTAMP(deadline), trust, website, email, language FROM proposal WHERE reference=UNHEX('$reference')";
+$query = "SELECT type, area, title, description, question, answers, secret, UNIX_TIMESTAMP(publication) AS publication, "
+        ."UNIX_TIMESTAMP(deadline) AS deadline, trust, website, email, language FROM proposal WHERE reference=UNHEX('$reference')";
 $result = $mysqli->query($query) or error($mysqli->error);
 $proposal = $result->fetch_assoc();
 $result->free();
