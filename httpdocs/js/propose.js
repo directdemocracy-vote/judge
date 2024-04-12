@@ -68,7 +68,7 @@ window.onload = function() {
         console.log(answer);
         document.getElementById(answer.type).checked = true;
         const select = document.getElementById('area');
-        int count = 0;
+        let count = 0;
         for(area in answer.area.split('\n') {
           const a = area.split('=');
           console.log(a[0] + ' = ' + a[1]);
