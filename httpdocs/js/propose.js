@@ -67,6 +67,13 @@ window.onload = function() {
         }
         console.log(answer);
         document.getElementById(answer.type).checked = true;
+        const select = document.getElementById('area');
+        int count = 0;
+        for(area in answer.area.split('\n') {
+          const a = area.split('=');
+          console.log(a[0] + ' = ' + a[1]);
+          select.options[count++] = new Option(a[1], a[0]);
+        }
         document.getElementById('title').value = answer.title;
         document.getElementById('description').value = answer.description;
         document.getElementById('question').value = answer.question;
