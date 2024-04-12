@@ -20,5 +20,11 @@ $query = "SELECT type, area, title, description, question, answers, secret, UNIX
 $result = $mysqli->query($query) or error($mysqli->error);
 $proposal = $result->fetch_assoc();
 $result->free();
+if (!$proposal)
+  error('Proposal not found');
+$proposal['publication'] = intval($proposal['publication']);
+$proposal['deadline'] = intval($proposal['deadline']);
+$proposal['trust'] = intval($proposal['trust']);
+$proposal['secret'] = $proposal['secret'] === 1;
 die('{"proposal":'.json_encode($proposal, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).'}');
 ?>
