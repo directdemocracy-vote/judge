@@ -49,6 +49,7 @@ $area = str_replace("\\n", " &ndash; ", $area);
 $answers = str_replace("\\n", " &ndash; ", $answers);
 $title = str_replace("\\'", "'", $title);
 $description = str_replace("\\'", "'", $description);
+$question = str_replace("\\'", "'", $question);
 $publication = date(DATE_RFC2822, $publication);
 $deadline = date(DATE_RFC2822, $deadline);
 if ($trust === 0)
