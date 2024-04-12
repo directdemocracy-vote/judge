@@ -26,5 +26,6 @@ $proposal['publication'] = intval($proposal['publication']);
 $proposal['deadline'] = intval($proposal['deadline']);
 $proposal['trust'] = intval($proposal['trust']);
 $proposal['secret'] = $proposal['secret'] === 1;
-die('{"proposal":'.json_encode($proposal, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).'}');
+# die('{"proposal":'.json_encode($proposal, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).'}');
+die(json_encode($proposal, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 ?>
