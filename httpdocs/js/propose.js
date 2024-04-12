@@ -69,7 +69,7 @@ window.onload = function() {
         document.getElementById(answer.type).checked = true;
         const select = document.getElementById('area');
         let count = 0;
-        for(area in answer.area.split('\n') {
+        for(area of answer.area.split('\n')) {
           const a = area.split('=');
           console.log(a[0] + ' = ' + a[1]);
           select.options[count++] = new Option(a[1], a[0]);
