@@ -42,6 +42,7 @@
   "publish": "Publish",
   "publish-warning": "Warning: nothing can be modifed after publication!",
   "submit": "Submit",
+  "modify": "Modify",
   "submit-message": "Your proposal has to be approved by the judge before publication.",
   "ok": "OK",
   "european-union": "European Union",
