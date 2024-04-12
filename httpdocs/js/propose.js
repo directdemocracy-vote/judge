@@ -69,7 +69,8 @@ window.onload = function() {
         document.getElementById(answer.type).checked = true;
         const select = document.getElementById('area');
         let count = 0;
-        for(area of answer.area.split('\n')) {
+        const areas = answer.area.split('\n');
+        for(area of areas) {
           const a = area.split('=');
           if (count === 0) {
             const place = document.getElementById('place');
@@ -82,6 +83,8 @@ window.onload = function() {
           }
           select.options[count++] = new Option(a[1], a[0]);
         }
+        select.options[count] = new Option('', 'world');
+        translator.translateElement(select.options[count], 'world');
         document.getElementById('title').value = answer.title;
         document.getElementById('description').value = answer.description;
         document.getElementById('question').value = answer.question;
