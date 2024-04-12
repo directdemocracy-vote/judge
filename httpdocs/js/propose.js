@@ -71,7 +71,15 @@ window.onload = function() {
         let count = 0;
         for(area of answer.area.split('\n')) {
           const a = area.split('=');
-          console.log(a[0] + ' = ' + a[1]);
+          if (count === 0) {
+            const place = document.getElementById('place');
+            place.textContent = a[1];
+            if (a[0] === 'union')
+              place.href = 'https://en.wikipedia.org/wiki/European_Union';
+            else if (a[0] === 'world')
+              place.hred = 'https://en.wikipedia.org/wiki/Earth';
+            place.href = 'https://nominatim.openstreetmap.org/ui/search.html?' + encodeURIComponent(area.replace('\n', '&')) + '&polygon_json=1';
+          }
           select.options[count++] = new Option(a[1], a[0]);
         }
         document.getElementById('title').value = answer.title;
