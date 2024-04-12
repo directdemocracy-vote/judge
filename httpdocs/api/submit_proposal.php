@@ -29,10 +29,11 @@ $deadline = intval($proposal->deadline);
 $trust = intval($proposal->trust);
 $website = $mysqli->escape_string($proposal->website);
 $email = $mysqli->escape_string($proposal->email);
+$language = $mysqli->escape_string($proposal->language);
 $reference = bin2hex(random_bytes(20));
-$query = "INSERT INTO proposal(reference, type, area, title, description, question, answers, secret, publication, deadline, trust, website, email) "
+$query = "INSERT INTO proposal(reference, type, area, title, description, question, answers, secret, publication, deadline, trust, website, email, language) "
         ."VALUES(UNHEX('$reference'), '$type', \"$area\", \"$title\", \"$description\", \"$question\", \"answers\", $secret, "
-        ."FROM_UNIXTIME($publication), FROM_UNIXTIME($deadline), $trust, \"$website\", \"$email\")";
+        ."FROM_UNIXTIME($publication), FROM_UNIXTIME($deadline), $trust, \"$website\", \"$email\", \"$language\")";
 $result = $mysqli->query($query) or error($mysqli->error);
 $message = "Dear citizen,<br><br>"
           ."Thank you for submitting a proposal to judge.directdemocracy.vote!<br>"
