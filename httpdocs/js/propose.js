@@ -1,5 +1,7 @@
 const directdemocracyVersion = '2';
 const notary = 'https://notary.directdemocracy.vote';
+let timeZone;
+let countryCode;
 
 function findGetParameter(parameterName, result = null) {
   location.search.substr(1).split('&').forEach(function(item) {
@@ -23,6 +25,7 @@ function closeModal() {
 window.onload = function() {
   let area = '';
   let betaLink = null;
+  let reference = findGetParameter('reference');
   if (localStorage.getItem('password')) {
     const a = document.createElement('a');
     a.setAttribute('id', 'logout');
@@ -36,12 +39,14 @@ window.onload = function() {
   const publish = document.getElementById('publish');
   document.getElementById('modal-close-button').addEventListener('click', closeModal);
   document.getElementById('modal-ok-button').addEventListener('click', closeModal);
-  let deadlineDefaultDate = new Date();
-  deadlineDefaultDate.setMonth(deadlineDefaultDate.getMonth() + 3);
-  document.getElementById('deadline-date').valueAsDate = deadlineDefaultDate;
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  document.getElementById('publication-time-zone').textContent = timeZone;
-  document.getElementById('deadline-time-zone').textContent = timeZone;
+  if (!reference) {
+    let deadlineDefaultDate = new Date();
+    deadlineDefaultDate.setMonth(deadlineDefaultDate.getMonth() + 3);
+    document.getElementById('deadline-date').valueAsDate = deadlineDefaultDate;
+    timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    document.getElementById('publication-time-zone').textContent = timeZone;
+    document.getElementById('deadline-time-zone').textContent = timeZone;
+  }
   const type = findGetParameter('type', 'none');
   if (type === 'referendum' || type === 'petition') {
     document.getElementById(type).checked = true;
@@ -49,7 +54,6 @@ window.onload = function() {
   }
   let latitude = parseFloat(findGetParameter('latitude', '-1'));
   let longitude = parseFloat(findGetParameter('longitude', '-1'));
-  let reference = findGetParameter('reference');
   let geolocation = false;
   function getGeolocationPosition(position) {
     geolocation = true;
@@ -166,7 +170,7 @@ window.onload = function() {
           'state',
           'country'];
         admin.forEach(function(item) { addAdminLevel(item); });
-        const countryCode = address.country_code.toUpperCase();
+        countryCode = address.country_code.toUpperCase();
         if (['DE', 'FR', 'IT', 'SE', 'PL', 'RO', 'HR', 'ES', 'NL', 'IE', 'BG', 'DK', 'GR',
           'AT', 'HU', 'FI', 'CZ', 'PT', 'BE', 'MT', 'CY', 'LU', 'SI', 'LU', 'SK', 'EE', 'LV'].indexOf(countryCode) >= 0) {
           select.options[count] = new Option('', 'union');
@@ -259,7 +263,8 @@ window.onload = function() {
   document.getElementById('submit').addEventListener('click', function(event) {
     const button = event.currentTarget;
     const type = document.querySelector('input[name="type"]:checked').value;
-    const offset = Math.ceil(new Date().getTimezoneOffset() / 60);
+    const timeZoneOffset = new Date().getTimezoneOffset();
+    const offset = Math.ceil(timeZoneOffset / 60);
     const deadlineHour = parseInt(document.getElementById('deadline-hour').value);
     const deadline = Math.round(Date.parse(document.getElementById('deadline-date').value) / 1000) + (deadlineHour + offset) * 3600;
     const publicationHour = parseInt(document.getElementById('publication-hour').value);
@@ -278,7 +283,10 @@ window.onload = function() {
       trust: parseInt(document.getElementById('trust').value),
       website: document.getElementById('website').value.trim(),
       email: document.getElementById('email').value.trim(),
-      language: language
+      language: language,
+      timeZone: timeZone,
+      timeZoneOffset: timeZoneOffset,
+      countryCode: countryCode
     };
     if (reference)
       proposal.reference = reference;
