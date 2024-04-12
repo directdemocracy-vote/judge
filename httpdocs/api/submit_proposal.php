@@ -72,7 +72,7 @@ $message.= "<br><br>judge.directdemocracy.vote<br><br>"
           ."<b>Area</b>: $area<br>"
           ."<b>Title</b>: $title<br>"
           ."<b>Description</b>:<br>$description<br>";
-if (type === 'referendum')
+if ($type === 'referendum')
   $message.= "<b>Question</b>: $question<br>"
             ."<b>Answers</b>: $answers<br>";
 if ($website)
