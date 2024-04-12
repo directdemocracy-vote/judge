@@ -16,9 +16,10 @@ if (!isset($_GET['reference']))
   error('Missing reference parameter');
 $reference = $mysqli->escape_string($_GET['reference']);
 $query = "SELECT type, area, title, description, question, answers, secret, UNIX_TIMESTAMP(publication), "
-        ."UNIX_TIMESTAMP(deadline), trust, website, email, language FROM proposal WHERE reference='$reference'";
+        ."UNIX_TIMESTAMP(deadline), trust, website, email, language FROM proposal WHERE reference=UNHEX('$reference')";
 $result = $mysqli->query($query) or error($mysqli->error);
 $proposal = $result->fetch_assoc();
 $result->free();
-die('{"proposal":{'.json_encode($proposal, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).'}}');
+# die('{"proposal":{'.json_encode($proposal, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).'}}');
+die(json_encode($proposal));
 ?>
