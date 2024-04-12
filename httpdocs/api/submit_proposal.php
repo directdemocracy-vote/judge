@@ -43,12 +43,44 @@ if (isset($proposal->reference)) {
           ."FROM_UNIXTIME($publication), FROM_UNIXTIME($deadline), $trust, \"$website\", \"$email\", \"$language\")";
 }
 $result = $mysqli->query($query) or error($mysqli->error);
+$url = "https://judge.directdemocracy.vote/propose.html?reference=$reference";
+$link = "<a href=\"$url\">$url</a>";
+$area = str_replace("\n", " &ndash; ", $area);
+$answers = str_replace("\n", " &ndash; ", $answers);
+$publication = date(DATE_RFC2822, $publication);
+$deadline = date(DATE_RFC2822, $deadline);
+if ($trust === 0)
+  $trust = 'immediate';
+elseif ($trust === 86400)
+  $trust = 'one day';
+elseif ($trust === 259200)
+  $trust = 'three days';
+elseif ($trust === 604800)
+  $trust = 'one week';
+else
+  $trust = 'unsupported';
 $message = "Dear citizen,<br><br>"
           ."Thank you for submitting a proposal to judge.directdemocracy.vote!<br>"
-          ."We will review your proposal and revert back to you about it.<br>"
+          ."We will review your proposal and revert back to you about it very soon.<br>"
+          ."Meanwhile, you can still make modifications to your proposal from here:<br>"
+          ."$link<br>"
           ."If you have any question regarding your proposal, please contact us by replying to this e-mail.<br><br>"
-          ."Best regards,<br><br>"
-          ."judge.directdemocracy.vote<br><br>";
+          ."Best regards,";
+$message.= "<br><br>judge.directdemocracy.vote<br><br>"
+          ."<hr>"
+          ."<b>Type</b>: $type<br>"
+          ."<b>Area</b>: $area<br>"
+          ."<b>Title</b>: $title<br>"
+          ."<b>Description</b>:<br>$description<br>";
+if (type === 'referendum')
+  $message.= "<b>Question</b>: $question<br>"
+            ."<b>Answers</b>: $answers<br>";
+if ($website)
+  $message.= "<b>Web site</b>: $website<br>";
+$message.= "<b>Publication date<b>: $publication<br>"
+          ."<b>Deadline</b>: $deadline<br>"
+          ."<b>Trust delay</b>: $trust<br>"
+          ."<b>E-mail</b>: $email<br><br>";
 $headers = "From: judge@directdemocracy.vote\r\n"
           ."X-Mailer: php\r\n"
           ."MIME-Version: 1.0\r\n"
