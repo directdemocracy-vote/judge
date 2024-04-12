@@ -33,7 +33,7 @@ $language = $mysqli->escape_string($proposal->language);
 if (isset($proposal->reference)) {
   $reference = $mysqli->escape_string($proposal->reference);
   $query = "UPDATE proposal SET type='$type', area=\"$area\", title=\"$title\", description=\"$description\", question=\"$question\", "
-          ."answers=\"$answers\", secret=$secret, publication=FROM_UNIXTIME($publication), deadline=FROM_UNIXTIME($deadline) "
+          ."answers=\"$answers\", secret=$secret, publication=FROM_UNIXTIME($publication), deadline=FROM_UNIXTIME($deadline), "
           ."trust=$trust, website=\"$website\", email=\"$email\", language=\"$language\" "
           ."WHERE reference=UNHEX('$reference')";
 } else {
