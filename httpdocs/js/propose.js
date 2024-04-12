@@ -72,8 +72,14 @@ window.onload = function() {
         document.getElementById('question').value = answer.question;
         document.getElementById('answers').value = answer.answers;
         document.getElementById('website').value = answer.website;
-        publicationDate = new Date(answer.publication * 1000);
+        const publicationDate = new Date(answer.publication * 1000);
         document.getElementById('publication-date').valueAsDate = publicationDate;
+        document.getElementById('publication-hour').value = publicationDate.getHours();
+        const deadlineDate = new Date(answer.deadline * 1000);
+        document.getElementById('deadline-date').valueAsDate = deadlineDate;
+        document.getElementById('deadline-hour').value = deadlineDate.getHours();
+        document.getElementById('trust').value = answer.trust;
+        document.getElementById('email').value = answer.email;
       });
   } else {
     if (latitude === -1) {
