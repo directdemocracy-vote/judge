@@ -30,17 +30,20 @@ $trust = intval($proposal->trust);
 $website = $mysqli->escape_string($proposal->website);
 $email = $mysqli->escape_string($proposal->email);
 $language = $mysqli->escape_string($proposal->language);
+$countryCode = $mysqli->escape_string($proposal->countryCode);
+$timeZone = $mysqli->escape_string($proposal->timeZone);
+$timeZoneOffset = intval($proposal->timeZoneOffset);
 if (isset($proposal->reference)) {
   $reference = $mysqli->escape_string($proposal->reference);
   $query = "UPDATE proposal SET type='$type', area=\"$area\", title=\"$title\", description=\"$description\", question=\"$question\", "
           ."answers=\"$answers\", secret=$secret, publication=FROM_UNIXTIME($publication), deadline=FROM_UNIXTIME($deadline), "
-          ."trust=$trust, website=\"$website\", email=\"$email\", language=\"$language\" "
+          ."trust=$trust, website=\"$website\", email=\"$email\", language=\"$language\", countryCode=\"$countryCode\", timeZone=\"$timeZone\", timeZoneOffset=$timeZoneOffset "
           ."WHERE reference=UNHEX('$reference')";
 } else {
   $reference = bin2hex(random_bytes(20));
-  $query = "INSERT INTO proposal(reference, type, area, title, description, question, answers, secret, publication, deadline, trust, website, email, language) "
+  $query = "INSERT INTO proposal(reference, type, area, title, description, question, answers, secret, publication, deadline, trust, website, email, language, countryCode, timeZone, timeZoneOffset) "
           ."VALUES(UNHEX('$reference'), '$type', \"$area\", \"$title\", \"$description\", \"$question\", \"$answers\", $secret, "
-          ."FROM_UNIXTIME($publication), FROM_UNIXTIME($deadline), $trust, \"$website\", \"$email\", \"$language\")";
+          ."FROM_UNIXTIME($publication), FROM_UNIXTIME($deadline), $trust, \"$website\", \"$email\", \"$language\", \"$countryCode\", \"$timeZone\", $timeZoneOffset)";
 }
 $result = $mysqli->query($query) or error($mysqli->error);
 $url = "https://judge.directdemocracy.vote/propose.html?reference=$reference";
@@ -55,8 +58,8 @@ $answers = str_replace("\\n", ' &ndash; ', $answers);
 $title = str_replace("\\'", "'", $title);
 $description = str_replace("\\'", "'", $description);
 $question = str_replace("\\'", "'", $question);
-$publication = date(DATE_RFC2822, $publication);
-$deadline = date(DATE_RFC2822, $deadline);
+$publication = date('Y-m-d H:i:s', $publication + $timeZoneOffset * 60);
+$deadline = date('Y-m-d H:i:s', $deadline + $timeZoneOffset * 60);
 if ($trust === 0)
   $trust = 'immediate';
 elseif ($trust === 86400)
@@ -85,8 +88,8 @@ if ($type === 'referendum')
             ."<b>Answers</b>: $answers<br>\n";
 if ($website)
   $message.= "<b>Web site</b>: $website<br>\n";
-$message.= "<b>Publication date</b>: $publication<br>\n"
-          ."<b>Deadline</b>: $deadline<br>\n"
+$message.= "<b>Publication date</b>: $publication <small>($timeZone)</small><br>\n"
+          ."<b>Deadline</b>: $deadline <small>($timeZone)</small><br>\n"
           ."<b>Trust delay</b>: $trust<br>\n"
           ."<b>E-mail</b>: $email<br><br>\n";
 $headers = "From: judge@directdemocracy.vote\r\n"
