@@ -61,8 +61,19 @@ window.onload = function() {
     fetch(`/api/proposal.php?reference=${reference}`)
       .then(response => response.json())
       .then(answer => {
+        if (answer.error) {
+          console.error(answer);
+          return;
+        }
         console.log(answer);
         document.getElementById(answer.type).checked = true;
+        document.getElementById('title').value = answer.title;
+        document.getElementById('description').value = answer.description;
+        document.getElementById('question').value = answer.question;
+        document.getElementById('answers').value = answer.answers;
+        document.getElementById('website').value = answer.website;
+        publicationDate = new Date(answer.publication * 1000);
+        document.getElementById('publication-date') = publicationDate;
       });
   } else {
     if (latitude === -1) {
