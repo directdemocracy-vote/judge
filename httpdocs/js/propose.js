@@ -78,7 +78,7 @@ window.onload = function() {
               place.href = 'https://en.wikipedia.org/wiki/European_Union';
             else if (a[0] === 'world')
               place.hred = 'https://en.wikipedia.org/wiki/Earth';
-            place.href = 'https://nominatim.openstreetmap.org/ui/search.html?' + encodeURIComponent(answer.area.replace('\n', '&')) + '&polygon_json=1';
+            place.href = 'https://nominatim.openstreetmap.org/ui/search.html?' + encodeURI(answer.area.replace('\n', '&')) + '&polygon_json=1';
           }
           select.options[count++] = new Option(a[1], a[0]);
         }
