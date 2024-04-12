@@ -73,7 +73,7 @@ window.onload = function() {
         document.getElementById('answers').value = answer.answers;
         document.getElementById('website').value = answer.website;
         publicationDate = new Date(answer.publication * 1000);
-        document.getElementById('publication-date') = publicationDate;
+        document.getElementById('publication-date').value = publicationDate;
       });
   } else {
     if (latitude === -1) {
