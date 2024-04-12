@@ -50,7 +50,7 @@ foreach ($areas as &$a) {
   $as = explode('=', $a);
   $a = $as[1];
 }
-$area = joint(' &ndash; ', $areas);
+$area = join(' &ndash; ', $areas);
 $answers = str_replace("\\n", ' &ndash; ', $answers);
 $title = str_replace("\\'", "'", $title);
 $description = str_replace("\\'", "'", $description);
