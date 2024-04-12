@@ -45,8 +45,10 @@ if (isset($proposal->reference)) {
 $result = $mysqli->query($query) or error($mysqli->error);
 $url = "https://judge.directdemocracy.vote/propose.html?reference=$reference";
 $link = "<a href=\"$url\">$url</a>";
-$area = str_replace("\n", " &ndash; ", $area);
-$answers = str_replace("\n", " &ndash; ", $answers);
+$area = str_replace("\\n", " &ndash; ", $area);
+$answers = str_replace("\\n", " &ndash; ", $answers);
+$title = str_replace("\\'", "'", $title);
+$description = str_replace("\\'", "'", $description);
 $publication = date(DATE_RFC2822, $publication);
 $deadline = date(DATE_RFC2822, $deadline);
 if ($trust === 0)
@@ -77,7 +79,7 @@ if ($type === 'referendum')
             ."<b>Answers</b>: $answers<br>";
 if ($website)
   $message.= "<b>Web site</b>: $website<br>";
-$message.= "<b>Publication date<b>: $publication<br>"
+$message.= "<b>Publication date</b>: $publication<br>"
           ."<b>Deadline</b>: $deadline<br>"
           ."<b>Trust delay</b>: $trust<br>"
           ."<b>E-mail</b>: $email<br><br>";
