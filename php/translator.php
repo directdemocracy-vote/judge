@@ -1,7 +1,7 @@
 <?php
 $translator_dictionary = null;
 
-function translator_set_language($language) {
+function translator_init($language) {
   global $translator_dictionary;
   $json = file_get_contents("../httpdocs/i18n/$language.json"); 
   $translator_dictionary = json_decode($json, true); 
