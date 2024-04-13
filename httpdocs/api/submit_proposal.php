@@ -73,13 +73,13 @@ elseif ($trust === 604800)
   $trust = 'one week';
 else
   $trust = 'unsupported';
-$message = translator.translate('dear')."<br><br>"
-          .translator.translate('thank-you')."<br>"
-          .translator.translate('review')."<br>"
-          .translator.translate('modifications')."<br>"
+$message = translator_translate('dear')."<br><br>"
+          .translator_translate('thank-you')."<br>"
+          .translator_translate('review')."<br>"
+          .translator_translate('modifications')."<br>"
           ."$link<br>"
-          .translator.translate('questions')."<br><br>"
-          .translator.translate('best-regards');
+          .translator_translate('questions')."<br><br>"
+          .translator_translate('best-regards');
 $message.= "<br><br>judge.directdemocracy.vote<br><br>"
           ."<hr>"
           ."<b>".translator_translate('type')."</b>: ".translator_translate($type)."<br>\n"
