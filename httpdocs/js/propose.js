@@ -24,6 +24,7 @@ window.onload = function() {
   let area = '';
   let countryCode = '';
   let timeZone = '';
+  let timeZoneOffset = 0;
   let betaLink = null;
   let reference = findGetParameter('reference');
   if (localStorage.getItem('password')) {
@@ -105,8 +106,11 @@ window.onload = function() {
         document.getElementById('email').value = answer.email;
         translator.translateElement(document.getElementById('submit'), 'modify');
         countryCode = answer.countryCode;
+        timeZone = answer.timeZone;
+        timeZoneOffset = answer.timeZoneOffset;
       });
   } else {
+    timeZoneOffset = new Date().getTimezoneOffset();
     if (latitude === -1) {
       if (navigator.geolocation)
         navigator.geolocation.getCurrentPosition(getGeolocationPosition);
@@ -266,7 +270,6 @@ window.onload = function() {
   document.getElementById('submit').addEventListener('click', function(event) {
     const button = event.currentTarget;
     const type = document.querySelector('input[name="type"]:checked').value;
-    const timeZoneOffset = new Date().getTimezoneOffset();
     const offset = Math.ceil(timeZoneOffset / 60);
     const deadlineHour = parseInt(document.getElementById('deadline-hour').value);
     const deadline = Math.round(Date.parse(document.getElementById('deadline-date').value) / 1000) + (deadlineHour + offset) * 3600;
