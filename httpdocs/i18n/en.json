@@ -55,5 +55,11 @@
   "publication-success": "Publication success",
   "petition-confirmation": "Your petition was just published!<br>You will be redirected to it.",
   "referendum-confirmation": "Your referendum was just published!<br>You will be redirected to it.",
-  "new-proposal": "New proposal:"
+  "new-proposal": "New proposal:",
+  "dear": "Dear Citizen,",
+  "thank-you": "Thank you for submitting a proposal to judge.directdemocracy.vote!",
+  "review": "We will review your proposal and revert back to you about it very soon.",
+  "modifications": "Meanwhile, you can still make modifications to your proposal from here:",
+  "questions": "If you have any question regarding your proposal, please contact us by replying to this e-mail.",
+  "best-regards": "Best regards,"
 }
