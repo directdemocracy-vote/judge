@@ -100,6 +100,6 @@ $headers = "From: judge@directdemocracy.vote\r\n"
           ."MIME-Version: 1.0\r\n"
           ."Content-Type: text/html; charset=UTF-8\r\n"
           ."Bcc: judge@directdemocracy.vote\r\n";
-mail($email, translate.translate('new-proposal')." $title", $message, $headers);
+mail($email, translate_translate('new-proposal')." $title", $message, $headers);
 die("{\"reference\":\"$reference\"}");
 ?>
