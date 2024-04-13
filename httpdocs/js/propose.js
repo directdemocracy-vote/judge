@@ -1,7 +1,5 @@
 const directdemocracyVersion = '2';
 const notary = 'https://notary.directdemocracy.vote';
-let countryCode;
-let timeZone;
 
 function findGetParameter(parameterName, result = null) {
   location.search.substr(1).split('&').forEach(function(item) {
@@ -24,6 +22,8 @@ function closeModal() {
 
 window.onload = function() {
   let area = '';
+  let countryCode = '';
+  let timeZone = '';
   let betaLink = null;
   let reference = findGetParameter('reference');
   if (localStorage.getItem('password')) {
@@ -73,9 +73,10 @@ window.onload = function() {
         document.getElementById(answer.type).checked = true;
         const select = document.getElementById('area');
         let count = 0;
-        const areas = answer.area.split('\n');
-        for(area of areas) {
-          const a = area.split('=');
+        area = answer.area;
+        const areas = area.split('\n');
+        for(let ar of areas) {
+          const a = ar.split('=');
           if (count === 0) {
             const place = document.getElementById('place');
             place.textContent = a[1];
@@ -83,7 +84,7 @@ window.onload = function() {
               place.href = 'https://en.wikipedia.org/wiki/European_Union';
             else if (a[0] === 'world')
               place.hred = 'https://en.wikipedia.org/wiki/Earth';
-            place.href = 'https://nominatim.openstreetmap.org/ui/search.html?' + encodeURI(answer.area.replaceAll('\n', '&')) + '&polygon_json=1';
+            place.href = 'https://nominatim.openstreetmap.org/ui/search.html?' + encodeURI(area.replaceAll('\n', '&')) + '&polygon_json=1';
           }
           select.options[count++] = new Option(a[1], a[0]);
         }
@@ -172,6 +173,7 @@ window.onload = function() {
           'country'];
         admin.forEach(function(item) { addAdminLevel(item); });
         countryCode = address.country_code.toUpperCase();
+        console.log("country code = " + countryCode);
         if (['DE', 'FR', 'IT', 'SE', 'PL', 'RO', 'HR', 'ES', 'NL', 'IE', 'BG', 'DK', 'GR',
           'AT', 'HU', 'FI', 'CZ', 'PT', 'BE', 'MT', 'CY', 'LU', 'SI', 'LU', 'SK', 'EE', 'LV'].indexOf(countryCode) >= 0) {
           select.options[count] = new Option('', 'union');
@@ -291,6 +293,7 @@ window.onload = function() {
     };
     if (reference)
       proposal.reference = reference;
+    console.log(proposal);
     fetch(`/api/submit_proposal.php`, { 'method': 'POST', 'body': JSON.stringify(proposal) })
       .then(response => response.json())
       .then(answer => {
