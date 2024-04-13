@@ -73,33 +73,33 @@ elseif ($trust === 604800)
   $trust = 'one week';
 else
   $trust = 'unsupported';
-$message = "Dear citizen,<br><br>"
-          ."Thank you for submitting a proposal to judge.directdemocracy.vote!<br>"
-          ."We will review your proposal and revert back to you about it very soon.<br>"
-          ."Meanwhile, you can still make modifications to your proposal from here:<br>"
+$message = translator.translate('dear')."<br><br>"
+          .translator.translate('thank-you')."<br>"
+          .translator.translate('review')."<br>"
+          .translator.translate('modifications')."<br>"
           ."$link<br>"
-          ."If you have any question regarding your proposal, please contact us by replying to this e-mail.<br><br>"
-          ."Best regards,";
+          .translator.translate('questions')."<br><br>"
+          .translator.translate('best-regards');
 $message.= "<br><br>judge.directdemocracy.vote<br><br>"
           ."<hr>"
-          ."<b>Type</b>: $type<br>\n"
-          ."<b>Area</b>: $area<br>\n"
+          ."<b>".translator_translate('type')."</b>: ".translator_translate($type)."<br>\n"
+          ."<b>".translator_translate('are')."</b>: $area<br>\n"
           ."<b>".translator_translate('title')."</b>: $title<br>\n"
-          ."<b>Description</b>:<br>$description<br>\n";
+          ."<b>".translator_translate('description')."</b>:<br>$description<br>\n";
 if ($type === 'referendum')
-  $message.= "<b>Question</b>: $question<br>\n"
-            ."<b>Answers</b>: $answers<br>\n";
+  $message.= "<b>".translator_translate('question')."</b>: $question<br>\n"
+            ."<b>".translator_translate('possible-answers')."</b>: $answers<br>\n";
 if ($website)
-  $message.= "<b>Web site</b>: $website<br>\n";
-$message.= "<b>Publication date</b>: $publication <small>($timeZone)</small><br>\n"
-          ."<b>Deadline</b>: $deadline <small>($timeZone)</small><br>\n"
-          ."<b>Trust delay</b>: $trust<br>\n"
-          ."<b>E-mail</b>: $email<br><br>\n";
+  $message.= "<b>".translator_translate('website')."</b>: $website<br>\n";
+$message.= "<b>".translator_translate('publication-date')."</b>: $publication <small>($timeZone)</small><br>\n"
+          ."<b>".translator_translate('deadline')."</b>: $deadline <small>($timeZone)</small><br>\n"
+          ."<b>".translator_translate('trust-delay')."</b>: ".translator_translate($trust)."<br>\n"
+          ."<b>".translator_translate('email')."</b>: $email<br><br>\n";
 $headers = "From: judge@directdemocracy.vote\r\n"
           ."X-Mailer: php\r\n"
           ."MIME-Version: 1.0\r\n"
           ."Content-Type: text/html; charset=UTF-8\r\n"
           ."Bcc: judge@directdemocracy.vote\r\n";
-mail($email, "New proposal: $title", $message, $headers);
+mail($email, translate.translate('new-proposal')." $title", $message, $headers);
 die("{\"reference\":\"$reference\"}");
 ?>
