@@ -41,11 +41,13 @@ window.onload = function() {
   document.getElementById('modal-close-button').addEventListener('click', closeModal);
   document.getElementById('modal-ok-button').addEventListener('click', closeModal);
   if (!reference) {
-    let deadlineDefaultDate = new Date();
-    deadlineDefaultDate.setMonth(deadlineDefaultDate.getMonth() + 3);
-    document.getElementById('deadline-date').valueAsDate = deadlineDefaultDate;
+    let defaultDate = new Date();
     timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    publicationDefaultDate.setDay(defaultDate.getDay() + 1);
+    document.getElementById('publication-date').valueAsDate = defaultDate;
     document.getElementById('publication-time-zone').textContent = timeZone;
+    defaultDate.setMonth(defaultDate.getMonth() + 3);
+    document.getElementById('deadline-date').valueAsDate = defaultDate;
     document.getElementById('deadline-time-zone').textContent = timeZone;
   }
   const type = findGetParameter('type', 'none');
