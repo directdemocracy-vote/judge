@@ -54,5 +54,6 @@
   "publication-error": "Publication error",
   "publication-success": "Publication success",
   "petition-confirmation": "Your petition was just published!<br>You will be redirected to it.",
-  "referendum-confirmation": "Your referendum was just published!<br>You will be redirected to it."  
+  "referendum-confirmation": "Your referendum was just published!<br>You will be redirected to it.",
+  "new-proposal": "New proposal:"
 }
