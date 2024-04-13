@@ -58,8 +58,9 @@ $answers = str_replace("\\n", ' &ndash; ', $answers);
 $title = str_replace("\\'", "'", $title);
 $description = str_replace("\\'", "'", $description);
 $question = str_replace("\\'", "'", $question);
-$publication = date('Y-m-d H:i:s', $publication + $timeZoneOffset * 60);
-$deadline = date('Y-m-d H:i:s', $deadline + $timeZoneOffset * 60);
+date_default_timezone_set($timeZone);
+$publication = date('Y-m-d H:i:s', $publication);
+$deadline = date('Y-m-d H:i:s', $deadline);
 if ($trust === 0)
   $trust = 'immediate';
 elseif ($trust === 86400)
