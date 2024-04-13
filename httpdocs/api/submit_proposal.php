@@ -83,7 +83,7 @@ $message = translator_translate('dear')."<br><br>"
 $message.= "<br><br>judge.directdemocracy.vote<br><br>"
           ."<hr>"
           ."<b>".translator_translate('type')."</b>: ".translator_translate($type)."<br>\n"
-          ."<b>".translator_translate('are')."</b>: $area<br>\n"
+          ."<b>".translator_translate('area')."</b>: $area<br>\n"
           ."<b>".translator_translate('title')."</b>: $title<br>\n"
           ."<b>".translator_translate('description')."</b>:<br>$description<br>\n";
 if ($type === 'referendum')
@@ -100,6 +100,6 @@ $headers = "From: judge@directdemocracy.vote\r\n"
           ."MIME-Version: 1.0\r\n"
           ."Content-Type: text/html; charset=UTF-8\r\n"
           ."Bcc: judge@directdemocracy.vote\r\n";
-mail($email, translate_translate('new-proposal')." $title", $message, $headers);
+mail($email, translator_translate('new-proposal')." $title", $message, $headers);
 die("{\"reference\":\"$reference\"}");
 ?>
