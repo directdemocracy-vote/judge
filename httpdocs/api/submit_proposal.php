@@ -1,6 +1,7 @@
 <?php
 
 require_once '../../php/database.php';
+require_once '../../php/translator.php';
 
 function error($message) {
   if ($message[0] != '{')
@@ -30,6 +31,7 @@ $trust = intval($proposal->trust);
 $website = $mysqli->escape_string($proposal->website);
 $email = $mysqli->escape_string($proposal->email);
 $language = $mysqli->escape_string($proposal->language);
+translator_init($language);
 $countryCode = $mysqli->escape_string($proposal->countryCode);
 $timeZone = $mysqli->escape_string($proposal->timeZone);
 $timeZoneOffset = intval($proposal->timeZoneOffset);
@@ -82,7 +84,7 @@ $message.= "<br><br>judge.directdemocracy.vote<br><br>"
           ."<hr>"
           ."<b>Type</b>: $type<br>\n"
           ."<b>Area</b>: $area<br>\n"
-          ."<b>Title</b>: $title<br>\n"
+          ."<b>".translator_translate('title')."</b>: $title<br>\n"
           ."<b>Description</b>:<br>$description<br>\n";
 if ($type === 'referendum')
   $message.= "<b>Question</b>: $question<br>\n"
