@@ -43,7 +43,7 @@ window.onload = function() {
   if (!reference) {
     let defaultDate = new Date();
     timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    publicationDefaultDate.setDay(defaultDate.getDay() + 1);
+    defaultDate.setDay(defaultDate.getDay() + 1);
     document.getElementById('publication-date').valueAsDate = defaultDate;
     document.getElementById('publication-time-zone').textContent = timeZone;
     defaultDate.setMonth(defaultDate.getMonth() + 3);
