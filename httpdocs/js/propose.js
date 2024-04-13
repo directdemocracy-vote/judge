@@ -108,6 +108,8 @@ window.onload = function() {
         countryCode = answer.countryCode;
         timeZone = answer.timeZone;
         timeZoneOffset = answer.timeZoneOffset;
+        document.getElementById('publication-time-zone').textContent = timeZone;
+        document.getElementById('deadline-time-zone').textContent = timeZone;
       });
   } else {
     timeZoneOffset = new Date().getTimezoneOffset();
