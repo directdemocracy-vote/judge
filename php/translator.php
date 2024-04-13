@@ -9,7 +9,7 @@ function translator_init($language) {
 
 function translator_translate($key) {
   global $translator_dictionary;
-  if (!array_key_exists($key, $translator_dictionary)
+  if (!array_key_exists($key, $translator_dictionary))
     return $key;
   return $translator_dictionary[$key];
 }
