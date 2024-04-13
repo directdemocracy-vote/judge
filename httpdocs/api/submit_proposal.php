@@ -48,7 +48,7 @@ if (isset($proposal->reference)) {
 $result = $mysqli->query($query) or error($mysqli->error);
 $url = "https://judge.directdemocracy.vote/propose.html?reference=$reference";
 $link = "<a href=\"$url\">$url</a>";
-$areas = explode("\n", $area);
+$areas = explode("\\n", $area);
 foreach ($areas as &$a) {
   $as = explode('=', $a);
   $a = $as[1];
