@@ -55,5 +55,11 @@
   "publication-success": "Proposition publiée",
   "petition-confirmation": "Votre pétition vient d'être publiée !<br>Vous allez être redirigé sur sa page.",
   "referendum-confirmation": "Votre référendum vient d'être publié !<br>Vous allez être redirigé sur sa page.",
-  "new-proposal": "Nouvelle proposition :"
+  "new-proposal": "Nouvelle proposition :",
+  "dear": "Cher citoyen,",
+  "thank-you": "Merci pour votre soumission de proposition à notre juge, judge.directdemocracy.vote!",
+  "review": "Nous allons l'examiner et reviendrons vers vous dans les plus brefs délais.",
+  "modifications": "En attendant, vous pouvez modifier votre proposition ici :",
+  "questions": "Si vous avez des questions concernant votre proposition, contactez-nous en répondant à ce message.",
+  "best-regards": "Meilleures salutations,"
 }
