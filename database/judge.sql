@@ -14,7 +14,7 @@ CREATE TABLE `participant` (
   `id` int(11) NOT NULL,
   `key` blob NOT NULL,
   `signature` blob NOT NULL,
-  `home` point NOT NULL,
+  `location` bigint(20) NOT NULL,
   `reputation` float NOT NULL,
   `trusted` tinyint(1) NOT NULL,
   `changed` tinyint(1) NOT NULL,
