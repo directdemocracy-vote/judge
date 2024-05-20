@@ -33,19 +33,6 @@ public static function reputation_function($x) {
   else
     return 1 - (0.75 / ($x - 1.5));
 }
-
-public static function vincentyDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo) {
-  $earthRadius = 6371000;
-  $latFrom = deg2rad($latitudeFrom);
-  $lonFrom = deg2rad($longitudeFrom);
-  $latTo = deg2rad($latitudeTo);
-  $lonTo = deg2rad($longitudeTo);
-  $lonDelta = $lonTo - $lonFrom;
-  $a = pow(cos($latTo) * sin($lonDelta), 2) + pow(cos($latFrom) * sin($latTo) - sin($latFrom) * cos($latTo) * cos($lonDelta), 2);
-  $b = sin($latFrom) * sin($latTo) + cos($latFrom) * cos($latTo) * cos($lonDelta);
-  $angle = atan2(sqrt($a), $b);
-  return $angle * $earthRadius;
-}
   
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: content-type");
@@ -145,7 +132,7 @@ if ($certificates)
         $url = "https://nominatim.openstreetmap.org/lookup?osm_ids=R" . $endorsed->locality . ",R". $endorser->locality ."&format=json";
         $json = file_get_contents($url);
         $localities = json_decode($json);
-        $distance = vincentyDistance(localities[0]->lat, localities[0]->lon, localities[1]->lat, localities[1]->lon);
+        $distance = "ST_Distance_Sphere(POINT(localities[0]->lon, localities[0]->lat), POINT(localities[1]->lon, localities[1]->lat))";
       }
       $revoke = ($certificate->type === 'report' && str_starts_with($certificate->comment, 'revoked+')) ? 1 : 0;
       $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
