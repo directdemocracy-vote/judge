@@ -4,14 +4,14 @@ require_once '../../php/database.php';
 $version = '2';
 $notary = 'https://notary.directdemocracy.vote';
 
-function stripped_key($public_key) {
+public static function stripped_key($public_key) {
   $stripped = str_replace("-----BEGIN PUBLIC KEY-----", "", $public_key);
   $stripped = str_replace("-----END PUBLIC KEY-----", "", $stripped);
   $stripped = str_replace(array("\r", "\n", '='), '', $stripped);
   return substr($stripped, 44, -6);
 }
 
-function distance_function($distance) {
+public static function distance_function($distance) {
   if ($distance < 1)
     $distance = 1;
 
@@ -23,17 +23,30 @@ function distance_function($distance) {
     return 0;
 }
 
-function time_function($time) {
+public static function time_function($time) {
   return 1 - (1 / (1 + exp((63072000 - $time) / 8000000)));
 }
 
-function reputation_function($x) {
+public static function reputation_function($x) {
   if ($x < 3)
     return pow($x, 2) / 18;
   else
     return 1 - (0.75 / ($x - 1.5));
 }
 
+public static function vincentyDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo) {
+  $earthRadius = 6371000;
+  $latFrom = deg2rad($latitudeFrom);
+  $lonFrom = deg2rad($longitudeFrom);
+  $latTo = deg2rad($latitudeTo);
+  $lonTo = deg2rad($longitudeTo);
+  $lonDelta = $lonTo - $lonFrom;
+  $a = pow(cos($latTo) * sin($lonDelta), 2) + pow(cos($latFrom) * sin($latTo) - sin($latFrom) * cos($latTo) * cos($lonDelta), 2);
+  $b = sin($latFrom) * sin($latTo) + cos($latFrom) * cos($latTo) * cos($lonDelta);
+  $angle = atan2(sqrt($a), $b);
+  return $angle * $earthRadius;
+}
+  
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: content-type");
 
@@ -128,8 +141,12 @@ if ($certificates)
         $distance = -1;
       elseif ($endorsed->locality === $endorser->locality) # they live in the same locality
         $distance = 0;
-      else
-        $distance = 100000; # FIXME: we should compute the distance between the localities.
+      else {
+        $url = "https://nominatim.openstreetmap.org/lookup?osm_ids=R" . $endorsed->locality . ",R". $endorser->locality ."&format=json";
+        $json = file_get_contents($url);
+        $localities = json_decode($json);
+        $distance = vincentyDistance(localities[0]->lat, localities[0]->lon, localities[1]->lat, localities[1]->lon);
+      }
       $revoke = ($certificate->type === 'report' && str_starts_with($certificate->comment, 'revoked+')) ? 1 : 0;
       $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
               ."VALUES($endorser->id, $endorsed->id, $distance, $revoke, FROM_UNIXTIME($certificate->published)) "
