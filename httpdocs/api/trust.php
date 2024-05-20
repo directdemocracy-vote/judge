@@ -78,7 +78,7 @@ $public_key = stripped_key($k);
 # insert endorser and endorsed in participant, link
 if ($certificates)
   foreach($certificates as $certificate) {
-    $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE `key` = FROM_BASE64('$certificate->key==')";  # endorser
+    $query = "SELECT id, locality FROM participant WHERE `key` = FROM_BASE64('$certificate->key==')";  # endorser
     $result = $mysqli->query($query) or die($mysqli->error);
     if (!$result->num_rows) {
       $key = urlencode($certificate->key);
@@ -89,14 +89,12 @@ if ($certificates)
         die($response);
       if (isset($endorser->error))
         die("$endorser->error from $notary/api/publication.php?key=$key");
-      if (!isset($endorser->latitude))
-        $endorser->latitude = 0;
-      if (!isset($endorser->longitude))
-        $endorser->longitude = 0;
+      if (!isset($endorser->locality))
+        $endorser->locality = 0;
       if ($endorser->key !== $certificate->key)
         die("Key mismatch for endorser in notary database.");
-      $query = "INSERT IGNORE INTO participant(`key`, `signature`, home, reputation, trusted, changed) "
-              ."VALUES(FROM_BASE64('$endorser->key=='), FROM_BASE64('$endorser->signature=='), POINT($endorser->longitude, $endorser->latitude), 0, 0, 0) ";
+      $query = "INSERT IGNORE INTO participant(`key`, `signature`, locality, reputation, trusted, changed) "
+              ."VALUES(FROM_BASE64('$endorser->key=='), FROM_BASE64('$endorser->signature=='), $endorser->locality, 0, 0, 0) ";
       $mysqli->query($query) or die("$query $mysqli->error");
       $endorser->id = $mysqli->insert_id;
     } else
@@ -105,7 +103,7 @@ if ($certificates)
     if ($deleted)
       $mysqli->query("UPDATE participant SET changed=trusted, trusted=-1 WHERE signature=FROM_BASE64('$certificate->publication==')") or die($mysqli->error);
     else {
-      $query = "SELECT id, ST_Y(home) AS latitude, ST_X(home) AS longitude FROM participant WHERE signature=FROM_BASE64('$certificate->publication==')";
+      $query = "SELECT id, locality FROM participant WHERE signature=FROM_BASE64('$certificate->publication==')";
       $result = $mysqli->query($query) or die($mysqli->error);
       if (!$result->num_rows) {
         $signature = urlencode($certificate->publication);
@@ -115,24 +113,23 @@ if ($certificates)
           die($response);
         if (isset($endorsed->error))
           die("$endorsed->error from $notary/api/publication.php?signature=$signature");
-        if (!isset($endorsed->latitude))
-          $endorsed->latitude = 0;
-        if (!isset($endorsed->longitude))
-          $endorsed->longitude = 0;
+        if (!isset($endorsed->locality))
+          $endorsed->locality = 0;
         if ($endorsed->signature !== $certificate->publication)
           die("Key mismatch for endorsed in notary database.");
         $trusted = $deleted ? -1 : 0;
-        $query = "INSERT IGNORE INTO participant(`key`, signature, home, reputation, trusted, changed) "
-                ."VALUES(FROM_BASE64('$endorsed->key=='), FROM_BASE64('$endorsed->signature=='), POINT($endorsed->longitude, $endorsed->latitude), 0, $trusted, 0) ";
+        $query = "INSERT IGNORE INTO participant(`key`, signature, locality, reputation, trusted, changed) "
+                ."VALUES(FROM_BASE64('$endorsed->key=='), FROM_BASE64('$endorsed->signature=='), $endorsed->locality, 0, $trusted, 0) ";
         $mysqli->query($query) or die($mysqli->error);
         $endorsed->id = $mysqli->insert_id;
       } else
         $endorsed = $result->fetch_object();
-      if (($endorsed->latitude == 0 && $endorsed->longitude == 0) ||
-          ($endorser->latitude == 0 && $endorser->longitude == 0))
-        $distance = "-1";  # one of them is not a citizen (maybe a judge, a notary or a station)
+      if (($endorsed->locality == 0) || ($endorser->locality == 0)) # one of them is not a citizen (maybe a judge, a notary or a station)
+        $distance = -1;
+      elseif ($endorsed->locality === $endorser->locality) # they live in the same locality
+        $distance = 0;
       else
-        $distance = "ST_Distance_Sphere(POINT($endorsed->longitude, $endorsed->latitude), POINT($endorser->longitude, $endorser->latitude))";
+        $distance = 100000; # FIXME: we should compute the distance between the localities.
       $revoke = ($certificate->type === 'report' && str_starts_with($certificate->comment, 'revoked+')) ? 1 : 0;
       $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
               ."VALUES($endorser->id, $endorsed->id, $distance, $revoke, FROM_UNIXTIME($certificate->published)) "
