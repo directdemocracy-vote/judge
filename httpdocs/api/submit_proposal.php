@@ -82,19 +82,19 @@ $message = translator_translate('dear')."<br><br>"
           .translator_translate('best-regards');
 $message.= "<br><br>judge.directdemocracy.vote<br><br>"
           ."<hr>"
-          ."<b>".translator_translate('type')."</b>: ".translator_translate($type)."<br>\n"
-          ."<b>".translator_translate('area')."</b>: $area<br>\n"
-          ."<b>".translator_translate('title')."</b>: $title<br>\n"
-          ."<b>".translator_translate('description')."</b>:<br>$description<br>\n";
+          ."<b>".translator_translate('type')."</b>".translator_translate(': ').translator_translate($type)."<br>\n"
+          ."<b>".translator_translate('area')."</b>".translator_translate(': ')."$area<br>\n"
+          ."<b>".translator_translate('title')."</b>".translator_translate(': ')."$title<br>\n"
+          ."<b>".translator_translate('description')."</b>".translator_translate(': ')."<br>$description<br>\n";
 if ($type === 'referendum')
-  $message.= "<b>".translator_translate('question')."</b>: $question<br>\n"
-            ."<b>".translator_translate('possible-answers')."</b>: $answers<br>\n";
+  $message.= "<b>".translator_translate('question')."</b>".translator_translate(': ')."$question<br>\n"
+            ."<b>".translator_translate('possible-answers')."</b>".translator_translate(': ')."$answers<br>\n";
 if ($website)
-  $message.= "<b>".translator_translate('website')."</b>: $website<br>\n";
-$message.= "<b>".translator_translate('publication-date')."</b>: $publication <small>($timeZone)</small><br>\n"
-          ."<b>".translator_translate('deadline')."</b>: $deadline <small>($timeZone)</small><br>\n"
-          ."<b>".translator_translate('trust-delay')."</b>: ".translator_translate($trust)."<br>\n"
-          ."<b>".translator_translate('email')."</b>: $email<br><br>\n";
+  $message.= "<b>".translator_translate('website')."</b>".translator_translate(': ')."$website<br>\n";
+$message.= "<b>".translator_translate('publication-date')."</b>".translator_translate(': ')."$publication <small>($timeZone)</small><br>\n"
+          ."<b>".translator_translate('deadline')."</b>".translator_translate(': ')."$deadline <small>($timeZone)</small><br>\n"
+          ."<b>".translator_translate('trust-delay')."</b>".translator_translate(': ')."".translator_translate($trust)."<br>\n"
+          ."<b>".translator_translate('email')."</b>".translator_translate(': ')."$email<br><br>\n";
 $headers = "From: judge@directdemocracy.vote\r\n"
           ."X-Mailer: php\r\n"
           ."MIME-Version: 1.0\r\n"
