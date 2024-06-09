@@ -1,4 +1,5 @@
 {
+  ": ":" : ",
   "moto": "un juge pour approuver les participants",
   "introduction": "Ce service web héberge le juge d'exemple de direct<b>democracy</b> judge. Les juges approuvent les participants en leur attribuant une réputation. L'algorithme utilisé par ce juge est documenté <a target=\"_blank\" href=\"https://github.com/directdemocracy-vote/judge\">ici</a>.",
   "check-link": "&raquo; Consultez les <a target=\"_blank\" href=\"certificates.html\">certificats</a> octroyés par ce juge.",
