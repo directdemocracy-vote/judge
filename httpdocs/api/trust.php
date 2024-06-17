@@ -155,6 +155,8 @@ if ($certificates)
           $distance = haversine_great_circle_distance(localities[0]->lat, localities[0]->lon, localities[1]->lat, localities[1]->lon);
         } else {
           $d = $result->fetch_assoc();
+          if (!$d)
+            die($query);
           $distance = floatval($d['distance']);
         }
       }
