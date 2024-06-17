@@ -148,13 +148,16 @@ if ($certificates)
         if (!$d) {
           $context  = stream_context_create(array('http' => array('header' => 'User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36')));
           $url = "https://nominatim.openstreetmap.org/lookup?osm_ids=R" . $endorsed->locality . ",R". $endorser->locality ."&format=json";
-          $json = file_get_contents($url, false, $context);
-          $localities = json_decode($json);
-          $query = "INSERT INTO locality(osm_id, location) VALUES(".$localities[0].osm_id.", ST_PointFromText('POINT(".$localities[0].lon." ".$localities[0].lat.")')) ON DUPLICATE KEY UPDATE updated=NOW()";
-          $mysqli->query($query) or die($mysqli->error);
-          $query = "INSERT INTO locality(osm_id, location) VALUES(".$localities[1].osm_id.", ST_PointFromText('POINT(".$localities[1].lon." ".$localities[1].lat.")')) ON DUPLICATE KEY UPDATE updated=NOW()";
-          $mysqli->query($query) or die($mysqli->error);
-          $distance = haversine_great_circle_distance(localities[0]->lat, localities[0]->lon, localities[1]->lat, localities[1]->lon);
+          $json = @file_get_contents($url, false, $context);
+          if ($json) {
+            $localities = json_decode($json);
+            $query = "INSERT INTO locality(osm_id, location) VALUES(".$localities[0].osm_id.", ST_PointFromText('POINT(".$localities[0].lon." ".$localities[0].lat.")')) ON DUPLICATE KEY UPDATE updated=NOW()";
+            $mysqli->query($query) or die($mysqli->error);
+            $query = "INSERT INTO locality(osm_id, location) VALUES(".$localities[1].osm_id.", ST_PointFromText('POINT(".$localities[1].lon." ".$localities[1].lat.")')) ON DUPLICATE KEY UPDATE updated=NOW()";
+            $mysqli->query($query) or die($mysqli->error);
+            $distance = haversine_great_circle_distance(localities[0]->lat, localities[0]->lon, localities[1]->lat, localities[1]->lon);
+          } else
+            $distance = 1000; // 1000 km is a large distance which won't reinforce the trust level in case of 403 failure
         } else
           $distance = floatval($d['distance']);
         $result->free();
