@@ -156,7 +156,6 @@ if ($certificates)
         } else {
           $d = $result->fetch_assoc();
           $distance = floatval($d['distance']);
-          die($query);
         }
       }
       $revoke = ($certificate->type === 'report' && str_starts_with($certificate->comment, 'revoked+')) ? 1 : 0;
