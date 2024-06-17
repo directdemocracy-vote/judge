@@ -4,14 +4,14 @@ require_once '../../php/database.php';
 $version = '2';
 $notary = 'https://notary.directdemocracy.vote';
 
-public static function stripped_key($public_key) {
+function stripped_key($public_key) {
   $stripped = str_replace("-----BEGIN PUBLIC KEY-----", "", $public_key);
   $stripped = str_replace("-----END PUBLIC KEY-----", "", $stripped);
   $stripped = str_replace(array("\r", "\n", '='), '', $stripped);
   return substr($stripped, 44, -6);
 }
 
-public static function distance_function($distance) {
+function distance_function($distance) {
   if ($distance < 1)
     $distance = 1;
 
@@ -23,11 +23,11 @@ public static function distance_function($distance) {
     return 0;
 }
 
-public static function time_function($time) {
+function time_function($time) {
   return 1 - (1 / (1 + exp((63072000 - $time) / 8000000)));
 }
 
-public static function reputation_function($x) {
+function reputation_function($x) {
   if ($x < 3)
     return pow($x, 2) / 18;
   else
