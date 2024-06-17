@@ -144,7 +144,8 @@ if ($certificates)
         $query = "SELECT ST_Distance_Sphere(locality1.location, locality2.location)/1000 AS distance FROM locality AS locality1 INNER JOIN locality AS locality2 ON locality2.osm_id="
                 .$endorser->locality . " WHERE locality1.osm_id=" . $endorsed->locality;
         $result = $mysqli->query($query) or die($mysqli->error);
-        if (!$result) {
+        $d = $result->fetch_assoc();
+        if (!$d) {
           $url = "https://nominatim.openstreetmap.org/lookup?osm_ids=R" . $endorsed->locality . ",R". $endorser->locality ."&format=json";
           $json = file_get_contents($url);
           $localities = json_decode($json);
@@ -153,12 +154,9 @@ if ($certificates)
           $query = "INSERT INTO locality(osm_id, location) VALUES(".$locality[1].osm_id.", ST_PointFromText('POINT(".$locality[1].lon." ".$locality[1].lat.")')) ON DUPLICATE KEY UPDATE updated=NOW()";
           $mysqli->query($query) or die($mysqli->error);
           $distance = haversine_great_circle_distance(localities[0]->lat, localities[0]->lon, localities[1]->lat, localities[1]->lon);
-        } else {
-          $d = $result->fetch_assoc();
-          if (!$d)
-            die($query);
+        } else
           $distance = floatval($d['distance']);
-        }
+        $result->free();
       }
       $revoke = ($certificate->type === 'report' && str_starts_with($certificate->comment, 'revoked+')) ? 1 : 0;
       $query = "INSERT INTO link(endorser, endorsed, distance, `revoke`, date) "
