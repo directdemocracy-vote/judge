@@ -150,7 +150,7 @@ if ($certificates)
           $url = "$notary/api/locate.php?osm_ids=" . $endorsed->locality . "," . $endorser->locality;
           $json = @file_get_contents($url, false, $context);
           echo "json = $json<br><br>";
-          $localities = json_decode($json, true);
+          $localities = json_decode($json, true)['localities'];
           echo json_encode($localities[0]);
           echo "<br>" . $localities[0]->name . "<br>";
           if (!empty($localities)) {
