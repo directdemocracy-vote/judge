@@ -150,8 +150,8 @@ if ($certificates)
           $url = "$notary/api/locate.php?osm_ids=" . $endorsed->locality . "," . $endorser->locality;
           $json = @file_get_contents($url, false, $context);
           echo "$url => $json<br>";
-          if ($json) {
-            $localities = json_decode($json);
+          $localities = json_decode($json);
+          if (!empty($localities)) {
             $query = "INSERT IGNORE INTO locality(osm_id, location, name) "
               ."VALUES(".$localities[0].osm_id.", ST_PointFromText('POINT(".$localities[0].longitude." ".$localities[0].latitude.")'), \"$localities[0].name\")";
             $mysqli->query($query) or die($mysqli->error);
@@ -159,9 +159,9 @@ if ($certificates)
               ."VALUES(".$localities[1].osm_id.", ST_PointFromText('POINT(".$localities[1].longitude." ".$localities[1].latitude.")'), \"$localities[1].name\")";
             $mysqli->query($query) or die($mysqli->error);
             $distance = haversine_great_circle_distance(localities[0]->lat, localities[0]->lon, localities[1]->lat, localities[1]->lon);
-            echo "distance = $distance<br>";
           } else
             $distance = 1000; // 1000 km is a large distance which won't reinforce the trust level in case of 403 failure
+          echo "distance = $distance<br>";
         } else
           $distance = floatval($d['distance']);
         $result->free();
