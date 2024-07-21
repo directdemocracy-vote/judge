@@ -159,6 +159,7 @@ if ($certificates)
               ."VALUES(".$localities[1].osm_id.", ST_PointFromText('POINT(".$localities[1].longitude." ".$localities[1].latitude.")'), \"$localities[1].name\")";
             $mysqli->query($query) or die($mysqli->error);
             $distance = haversine_great_circle_distance(localities[0]->lat, localities[0]->lon, localities[1]->lat, localities[1]->lon);
+            echo "distance = $distance<br>";
           } else
             $distance = 1000; // 1000 km is a large distance which won't reinforce the trust level in case of 403 failure
         } else
