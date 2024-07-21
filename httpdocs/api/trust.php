@@ -150,7 +150,7 @@ if ($certificates)
           $url = "$notary/api/locate.php?osm_ids=" . $endorsed->locality . "," . $endorser->locality;
           $json = @file_get_contents($url, false, $context);
           $localities = json_decode($json);
-          echo json_encode($localities);
+          echo json_encode($localities[0]);
           echo $localities[0].name . "<br>";
           if (!empty($localities)) {
             $query = "INSERT IGNORE INTO locality(osm_id, location, name) "
