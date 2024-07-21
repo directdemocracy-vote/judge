@@ -149,8 +149,10 @@ if ($certificates)
           $context  = stream_context_create(array('http' => array('header' => 'User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36')));
           $url = "$notary/api/locate.php?osm_ids=" . $endorsed->locality . "," . $endorser->locality;
           $json = @file_get_contents($url, false, $context);
-          # echo "$url => $json<br>";
           $localities = json_decode($json, true);
+          echo $localities[0] . "<br>";
+          echo $localities[0].name . "<br>";
+          echo $localities[0]['name'] . "<br>";
           if (!empty($localities)) {
             $query = "INSERT IGNORE INTO locality(osm_id, location, name) "
               ."VALUES(".$localities[0]['osm_id'].", ST_PointFromText('POINT(".$localities[0]['longitude']." ".$localities[0]['latitude'].")'), \"".$localities[0]['name']."\")";
