@@ -152,7 +152,7 @@ if ($certificates)
           echo "json = $json<br><br>";
           $localities = json_decode($json, true)['localities'];
           echo json_encode($localities[0]);
-          echo "<br>" . $localities[0]->name . "<br>";
+          echo "<br>" . $localities[0]['name'] . "<br>";
           if (!empty($localities)) {
             $query = "INSERT IGNORE INTO locality(osm_id, location, name) "
               ."VALUES(".$localities[0]['osm_id'].", ST_PointFromText('POINT(".$localities[0]['longitude']." ".$localities[0]['latitude'].")'), \"".$localities[0]['name']."\")";
