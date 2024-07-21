@@ -153,10 +153,10 @@ if ($certificates)
           $localities = json_decode($json, true);
           if (!empty($localities)) {
             $query = "INSERT IGNORE INTO locality(osm_id, location, name) "
-              ."VALUES(".$localities[0].osm_id.", ST_PointFromText('POINT(".$localities[0].longitude." ".$localities[0].latitude.")'), \"$localities[0].name\")";
+              ."VALUES(".$localities[0]['osm_id'].", ST_PointFromText('POINT(".$localities[0]['longitude']." ".$localities[0]['latitude'].")'), \"".$localities[0]['name']."\")";
             $mysqli->query($query) or die($mysqli->error);
             $query = "INSERT IGNORE INTO locality(osm_id, location, name) "
-              ."VALUES(".$localities[1].osm_id.", ST_PointFromText('POINT(".$localities[1].longitude." ".$localities[1].latitude.")'), \"$localities[1].name\")";
+              ."VALUES(".$localities[1]['osm_id'].", ST_PointFromText('POINT(".$localities[1].['longitude']." ".$localities[1]['latitude'].")'), \"".$localities[1]['name']."\")";
             $mysqli->query($query) or die($mysqli->error);
             $distance = haversine_great_circle_distance(localities[0]->lat, localities[0]->lon, localities[1]->lat, localities[1]->lon);
           } else
