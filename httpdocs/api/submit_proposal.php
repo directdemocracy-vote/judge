@@ -1,5 +1,5 @@
 <?php
-
+require_once '../../php/header.php';
 require_once '../../php/database.php';
 require_once '../../php/translator.php';
 
@@ -8,10 +8,6 @@ function error($message) {
     $message = '"'.$message.'"';
   die("{\"error\":$message}");
 }
-
-header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: content-type");
 
 $proposal = json_decode(file_get_contents("php://input"));
 if (!$proposal)
