@@ -1,4 +1,5 @@
 <?php
+require_once '../../php/header.php';
 require_once '../../php/database.php';
 
 $version = '2';
@@ -45,9 +46,6 @@ function haversine_great_circle_distance($latitudeFrom, $longitudeFrom, $latitud
   $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) + cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
   return $angle * $earthRadius;
 }
-
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: content-type");
 
 $now = time();
 
