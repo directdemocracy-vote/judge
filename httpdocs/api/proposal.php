@@ -1,5 +1,5 @@
 <?php
-
+require_once '../../php/header.php';
 require_once '../../php/database.php';
 
 function error($message) {
@@ -7,10 +7,6 @@ function error($message) {
     $message = '"'.$message.'"';
   die("{\"error\":$message}");
 }
-
-header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: content-type");
 
 if (!isset($_GET['reference']))
   error('Missing reference parameter');
