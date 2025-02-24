@@ -1,4 +1,5 @@
 <?php
+require_once '../../php/header.php';
 require_once '../../php/database.php';
 $myself = 'https://judge.directdemocracy.vote';
 
@@ -8,10 +9,6 @@ function stripped_key($public_key) {
   $stripped = str_replace(array("\r", "\n", '='), '', $stripped);
   return substr($stripped, 44, -6);
 }
-
-header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: content-type");
 
 if (!isset($_GET['key']))
   die('{"error":"missing key argument"}');
