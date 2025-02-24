@@ -1,6 +1,7 @@
 <?php
 $version = "2";
 $notary = 'https://notary.directdemocracy.vote';
+require_once '../../php/header.php';
 
 function error($message) {
   if ($message[0] != '{')
@@ -14,10 +15,6 @@ function stripped_key($public_key) {
   $stripped = str_replace(array("\r", "\n", '='), '', $stripped);
   return substr($stripped, 44, -6);
 }
-
-header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: content-type");
 
 $proposal = json_decode(file_get_contents("php://input"));
 if (!$proposal)
